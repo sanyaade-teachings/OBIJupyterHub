@@ -1,0 +1,16 @@
+FROM jupyterhub/jupyterhub:latest
+
+# Installation de DockerSpawner
+RUN pip install dockerspawner
+
+# Copie de la configuration
+COPY jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py
+
+# Port exposé
+EXPOSE 8000
+
+# Répertoire de travail
+WORKDIR /srv/jupyterhub
+
+# Commande de démarrage
+CMD ["jupyterhub", "-f", "/srv/jupyterhub/jupyterhub_config.py"]

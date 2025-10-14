@@ -1,0 +1,34 @@
+services:
+  jupyterhub:
+    build:
+      context: .
+      dockerfile: Dockerfile.hub
+    container_name: jupyterhub
+    image: jupyterhub-hub:latest
+    ports:
+      - "8888:8000"
+    volumes:
+      # Accès au socket Docker pour spawner les containers étudiants
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Persistance de la base de données JupyterHub
+      - jupyterhub-data:/srv/jupyterhub
+      # Montage du fichier de config en direct (pour modifications faciles)
+      - ./jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro
+    networks:
+      - jupyterhub-network
+    restart: unless-stopped
+    environment:
+      # Mot de passe partagé pour tous les étudiants
+      JUPYTERHUB_PASSWORD: metabar2025
+      # Variables d'environnement optionnelles
+      DOCKER_NOTEBOOK_DIR: /home/jovyan/work
+
+networks:
+  jupyterhub-network:
+    name: jupyterhub-network
+    driver: bridge
+
+volumes:
+  jupyterhub-data:
+  jupyterhub-shared:
+  jupyterhub-course:
