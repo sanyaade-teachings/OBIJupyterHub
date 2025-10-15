@@ -39,16 +39,10 @@ echo ""
 echo -e "${BLUE}🔨 Building JupyterHub image...${NC}"
 docker build -t jupyterhub-hub:latest -f Dockerfile.hub .
 
-# Create volumes if they don't exist
-echo ""
-echo -e "${BLUE}💾 Creating shared volumes...${NC}"
-docker volume create jupyterhub-shared 2>/dev/null || echo "  Volume jupyterhub-shared already exists"
-docker volume create jupyterhub-course 2>/dev/null || echo "  Volume jupyterhub-course already exists"
-
 # Start the stack
 echo ""
 echo -e "${BLUE}🚀 Starting JupyterHub...${NC}"
-docker-compose up -d
+docker-compose up -d --remove-orphans
 
 # Wait for service to be ready
 echo ""

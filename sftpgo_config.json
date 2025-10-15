@@ -1,0 +1,45 @@
+{
+  "folders": [
+    {
+      "name": "shared_data",
+      "mapped_path": "/volumes/shared",
+      "description": "Dossier partagé entre utilisateurs",
+      "filesystem": {
+        "provider": 0
+      }
+    },
+    {
+      "name": "web_site",
+      "mapped_path": "/volumes/web",
+      "description": "Site web static",
+      "filesystem": {
+        "provider": 0
+      }
+    }  
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "password": "admin2025",
+      "status": 1,
+      "home_dir": "/volumes/course",
+      "permissions": {
+        "/": ["*"]
+      },
+      "virtual_folders": [
+        {
+          "name": "shared_data",
+          "virtual_path": "/shared",
+          "quota_size": -1,
+          "quota_files": -1
+        },
+        {
+          "name": "web_site",
+          "virtual_path": "/web",
+          "quota_size": -1,
+          "quota_files": -1
+        }
+      ]
+    }
+  ]
+}

@@ -4,9 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile.hub
     container_name: jupyterhub
+    hostname: jupyterhub
     image: jupyterhub-hub:latest
-    ports:
-      - "8888:8000"
+    expose:
+      - "8000"
     volumes:
       # Access to Docker socket to spawn student containers
       - /var/run/docker.sock:/var/run/docker.sock
@@ -25,6 +26,47 @@ services:
       # Optional environment variables
       DOCKER_NOTEBOOK_DIR: /home/jovyan/work
 
+  # ---------- Nginx ----------
+
+  caddy:
+    container_name: jupyterhub-caddy
+    hostname: jupytercaddy
+    image: caddy:latest
+    ports:
+      - "8888:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - jupyterhub-caddy-data:/data
+      - jupyterhub-caddy-config:/config
+      - jupyterhub-web:/srv                # Votre app
+    networks:
+      - jupyterhub-network
+    restart: unless-stopped
+
+  # ---------- SFTPGo ----------
+  sftpgo:
+    image: drakkan/sftpgo:latest
+    container_name: jupyterhub-sftpgo
+    hostname: jupytersftp
+    command: sftpgo serve --loaddata-from /config/local_config.json --loaddata-clean
+    expose:
+      - "2022"
+      - "8080"
+    environment:
+      SFTPGO_DATA_PROVIDER__CREATE_DEFAULT_ADMIN: true
+      SFTPGO_DEFAULT_ADMIN_USERNAME: admin
+      SFTPGO_DEFAULT_ADMIN_PASSWORD: admin2025
+      SFTPGO_HTTPD__BINDINGS__0__CLIENT_IP_PROXY_HEADER: X-Real-IP
+    volumes:
+      - jupyterhub-shared:/volumes/shared
+      - jupyterhub-course:/volumes/course
+      - jupyterhub-web:/volumes/web
+      - ./sftpgo_config.json:/config/local_config.json:ro
+
+    networks:
+      - jupyterhub-network
+    restart: unless-stopped
+
 networks:
   jupyterhub-network:
     name: jupyterhub-network
@@ -32,6 +74,44 @@ networks:
 
 volumes:
   jupyterhub-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./jupyterhub_volumes/jupyterhub
   jupyterhub-shared:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./jupyterhub_volumes/shared
   jupyterhub-course:
-  
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./jupyterhub_volumes/course
+  jupyterhub-web:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./jupyterhub_volumes/web
+  jupyterhub-caddy-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./jupyterhub_volumes/caddy/data
+  jupyterhub-caddy-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./jupyterhub_volumes/caddy/config
+  jupyterhub-users:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./jupyterhub_volumes/users
