@@ -33,19 +33,19 @@ c.DockerSpawner.remove = True
 c.DockerSpawner.name_template = "jupyter-{username}"
 
 # Volume mounting to persist student data
-# Set root to /home/jovyan to see all directories
-notebook_dir = '/home/jovyan'
+# Set root to work/ - everything is persistent
+notebook_dir = '/home/jovyan/work'
 c.DockerSpawner.notebook_dir = notebook_dir
 
-# Personal volume for each student + shared volume
+# Personal volume for each student + shared volumes under work/
 c.DockerSpawner.volumes = {
-    # Personal volume (persistent) - mounted in work/
+    # Personal volume (persistent) - root directory
     'jupyterhub-user-{username}': '/home/jovyan/work',
-    # Shared volume between all students
-    'jupyterhub-shared': '/home/jovyan/shared',
-    # Shared read-only volume for course files (optional)
+    # Shared volume between all students - under work/
+    'jupyterhub-shared': '/home/jovyan/work/shared',
+    # Shared read-only volume for course files - under work/
     'jupyterhub-course': {
-        'bind': '/home/jovyan/course',
+        'bind': '/home/jovyan/work/course',
         'mode': 'ro'  # read-only
     }
 }
@@ -53,6 +53,23 @@ c.DockerSpawner.volumes = {
 # Memory and CPU configuration (adjust according to your needs)
 c.DockerSpawner.mem_limit = '2G'
 c.DockerSpawner.cpu_limit = 1.0
+
+# Environment variables for student containers
+c.DockerSpawner.environment = {
+    # R package library in read-only course directory under work/
+    'R_LIBS_USER': '/home/jovyan/work/R_packages',
+    'R_LIBS_SITE': '/home/jovyan/work/course/R_packages',
+     # Path to R packages in read-only
+    'PATH': '/home/jovyan/work/course/bin:${PATH}'
+}
+
+# Create user R lib directory 
+#async def create_user_hierarchy(spawner):
+#    cmd = "mkdir -p /home/jovyan/work/R_packages && chown jovyan:jovyan /home/jovyan/work/R_packages"
+#    spawner.extra_create_kwargs.update({'command': f"/bin/bash -c '{cmd} && start-notebook.sh'"})
+
+#c.Spawner.pre_spawn_hook = create_user_r_libs
+
 
 # User configuration - Simple password authentication for lab
 from jupyterhub.auth import DummyAuthenticator
@@ -65,12 +82,16 @@ class SimplePasswordAuthenticator(DummyAuthenticator):
         if authentication is None:
             return False
         
-        # Get password from environment variable
-        expected_password = os.environ.get('JUPYTERHUB_PASSWORD', 'metabar2025')
         provided_password = authentication.get('password', '')
         
-        # Check password
-        return provided_password == expected_password
+        # Admin user with special password
+        if username == 'admin':
+            admin_password = os.environ.get('JUPYTERHUB_ADMIN_PASSWORD', 'admin2025')
+            return provided_password == admin_password
+        
+        # Regular students with shared password
+        student_password = os.environ.get('JUPYTERHUB_PASSWORD', 'metabar2025')
+        return provided_password == student_password
 
 c.JupyterHub.authenticator_class = SimplePasswordAuthenticator
 
@@ -125,7 +146,7 @@ c.DockerSpawner.name_template = "jupyter-{username}"
 
 # Montage de volumes pour persister les données des étudiants
 # Définir la racine à /home/jovyan pour voir tous les dossiers
-notebook_dir = '/home/jovyan'
+notebook_dir = '/home/jovyan/work'
 c.DockerSpawner.notebook_dir = notebook_dir
 
 # Volume personnel pour chaque étudiant + volume partagé
@@ -133,10 +154,10 @@ c.DockerSpawner.volumes = {
     # Volume personnel (persistant) - monté dans work/
     'jupyterhub-user-{username}': '/home/jovyan/work',
     # Volume partagé entre tous les étudiants
-    'jupyterhub-shared': '/home/jovyan/shared',
+    'jupyterhub-shared': '/home/jovyan/work/shared',
     # Volume partagé en lecture seule pour les fichiers du cours (optionnel)
     'jupyterhub-course': {
-        'bind': '/home/jovyan/course',
+        'bind': '/home/jovyan/work/course',
         'mode': 'ro'  # read-only
     }
 }

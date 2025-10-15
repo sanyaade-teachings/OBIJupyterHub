@@ -113,6 +113,71 @@ Each student will see these directories in their JupyterLab:
 - **`work/`** : Personal workspace (persistent, private)
 - **`shared/`** : Shared workspace between all students (read/write)
 - **`course/`** : Course files (read-only, you deposit files)
+  - **`course/R_packages/`** : Shared R packages (read-only for students, only admin can install)
+
+### User Accounts
+
+**Admin Account:**
+- Username: `admin`
+- Password: `admin2025` (change in docker-compose.yml: `JUPYTERHUB_ADMIN_PASSWORD`)
+- Can write to `course/` directory
+
+**Student Accounts:**
+- Username: any name
+- Password: `metabar2025` (change in docker-compose.yml: `JUPYTERHUB_PASSWORD`)
+- Read-only access to `course/` directory
+
+### Installing R Packages (Admin Only)
+
+**From your Mac (recommended):**
+
+```bash
+chmod +x install-r-packages-admin.sh
+
+# Install packages
+./install-r-packages-admin.sh reshape2 plotly knitr
+```
+
+This script:
+- Installs packages in the `course/R_packages/` directory
+- All students can use them (read-only)
+- No need to rebuild the image
+
+**From admin notebook:**
+
+Login as `admin` and create an R notebook:
+
+```r
+# Install packages in course directory (admin only)
+course_lib <- "/home/jovyan/course/R_packages"
+dir.create(course_lib, recursive = TRUE, showWarnings = FALSE)
+
+install.packages(c('reshape2', 'plotly', 'knitr'), 
+                 lib = course_lib,
+                 repos = 'http://cran.rstudio.com/')
+```
+
+Note: Admin account has write access to the course directory.
+
+### Using R Packages (Students)
+
+Students simply load packages normally:
+```r
+library(reshape2)  # Loads from course/R_packages/ automatically
+library(plotly)
+```
+
+R automatically finds packages in `/home/jovyan/course/R_packages/` thanks to the `R_LIBS_USER` environment variable.
+
+### List Available Packages
+
+```r
+# List all available packages
+installed.packages()[,"Package"]
+
+# Or check course packages specifically
+list.files("/home/jovyan/course/R_packages")
+```
 
 ### Deposit Files for Course
 

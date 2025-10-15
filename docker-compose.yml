@@ -6,7 +6,7 @@ services:
     container_name: jupyterhub
     image: jupyterhub-hub:latest
     ports:
-      - "8000:8000"
+      - "8888:8000"
     volumes:
       # Access to Docker socket to spawn student containers
       - /var/run/docker.sock:/var/run/docker.sock
@@ -20,6 +20,8 @@ services:
     environment:
       # Shared password for all students
       JUPYTERHUB_PASSWORD: metabar2025
+      # Admin password (for installing R packages)
+      JUPYTERHUB_ADMIN_PASSWORD: admin2025
       # Optional environment variables
       DOCKER_NOTEBOOK_DIR: /home/jovyan/work
 
