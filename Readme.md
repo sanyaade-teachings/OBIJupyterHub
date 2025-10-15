@@ -1,258 +1,257 @@
-# Configuration JupyterHub avec OrbStack sur Mac (tout en Docker)
+# JupyterHub Configuration with OrbStack on Mac (all in Docker)
 
-## Prérequis
-- OrbStack installé et démarré
+## Prerequisites
+- OrbStack installed and running
 
-## Structure des fichiers
+## File Structure
 
-Votre dossier `~/jupyterhub-tp` doit contenir :
+Your `~/jupyterhub-tp` directory should contain:
 ```
 ~/jupyterhub-tp/
-├── Dockerfile                  # Image pour les étudiants (déjà créée)
-├── Dockerfile.hub              # Image pour JupyterHub (nouvelle)
+├── Dockerfile                  # Image for students (already created)
+├── Dockerfile.hub              # Image for JupyterHub (new)
 ├── jupyterhub_config.py        # Configuration
-└── docker-compose.yml          # Orchestration
+├── docker-compose.yml          # Orchestration
+└── start-jupyterhub.sh         # Startup script
 ```
 
-## Étapes d'installation
+## Installation Steps
 
-### 1. Créer la structure de dossiers
+### 1. Create Directory Structure
 
 ```bash
 mkdir -p ~/jupyterhub-tp
 cd ~/jupyterhub-tp
 ```
 
-### 2. Créer tous les fichiers nécessaires
+### 2. Create All Necessary Files
 
-Créez les fichiers suivants avec le contenu des artifacts :
-- `Dockerfile` (artifact "Dockerfile pour JupyterHub avec R et Bash")
-- `Dockerfile.hub` (artifact "Dockerfile pour le container JupyterHub")
-- `jupyterhub_config.py` (artifact "Configuration JupyterHub")
+Create the following files with the content from artifacts:
+- `Dockerfile` (artifact "Dockerfile for JupyterHub with R and Bash")
+- `Dockerfile.hub` (artifact "Dockerfile for JupyterHub container")
+- `jupyterhub_config.py` (artifact "JupyterHub Configuration")
 - `docker-compose.yml` (artifact "docker-compose.yml")
+- `start-jupyterhub.sh` (artifact "start-jupyterhub.sh")
 
-### 3. Construire les images Docker
-
-```bash
-# Image pour les étudiants
-docker build -t jupyterhub-student:latest -f Dockerfile .
-
-# Image pour le hub JupyterHub
-docker build -t jupyterhub-hub:latest -f Dockerfile.hub .
-```
-
-### 4. Démarrer JupyterHub avec Docker Compose
+### 3. Make Startup Script Executable
 
 ```bash
-docker-compose up -d
+chmod +x start-jupyterhub.sh
 ```
 
-### 5. Accéder à JupyterHub
+### 4. Start JupyterHub
 
-Ouvrez votre navigateur et allez à : **http://localhost:8000**
+```bash
+./start-jupyterhub.sh
+```
 
-Vous pouvez vous connecter avec n'importe quel nom d'utilisateur.
+### 5. Access JupyterHub
 
-## Commandes utiles
+Open your browser and go to: **http://localhost:8000**
 
-### Voir les logs de JupyterHub
+You can log in with any username and password: `metabar2025`
+
+## Useful Commands
+
+### View JupyterHub logs
 ```bash
 docker-compose logs -f jupyterhub
 ```
 
-### Voir tous les containers (hub + étudiants)
+### View all containers (hub + students)
 ```bash
 docker ps
 ```
 
-### Arrêter JupyterHub
+### Stop JupyterHub
 ```bash
 docker-compose down
 ```
 
-### Redémarrer JupyterHub (après modification du config)
+### Restart JupyterHub (after config modification)
 ```bash
 docker-compose restart jupyterhub
 ```
 
-### Reconstruire après modification du Dockerfile
+### Rebuild after Dockerfile modification
 ```bash
-# Pour l'image étudiants
+# For student image
 docker build -t jupyterhub-student:latest -f Dockerfile .
 docker-compose restart jupyterhub
 
-# Pour l'image hub
+# For hub image
 docker-compose up -d --build
 ```
 
-### Voir les logs d'un étudiant spécifique
+### View logs for a specific student
 ```bash
-docker logs jupyter-nom_utilisateur
+docker logs jupyter-username
 ```
 
-### Nettoyer après le TP
+### Clean up after lab
 ```bash
-# Arrêter et supprimer tous les containers
+# Stop and remove all containers
 docker-compose down
 
-# Supprimer les containers étudiants
+# Remove student containers
 docker ps -a | grep jupyter- | awk '{print $1}' | xargs docker rm -f
 
-# Supprimer les volumes (ATTENTION : supprime les données étudiants)
+# Remove volumes (WARNING: deletes student data)
 docker volume ls | grep jupyterhub-user | awk '{print $2}' | xargs docker volume rm
 
-# Tout nettoyer (containers + volumes + réseau)
+# Clean everything (containers + volumes + network)
 docker-compose down -v
 docker ps -a | grep jupyter- | awk '{print $1}' | xargs docker rm -f
 docker volume prune -f
 ```
 
-## Gestion des données partagées
+## Managing Shared Data
 
-### Structure des dossiers pour chaque étudiant
+### Directory Structure for Each Student
 
-Chaque étudiant verra ces dossiers dans son JupyterLab :
-- **`work/`** : Son espace personnel (persistant, privé)
-- **`shared/`** : Espace partagé entre tous les étudiants (lecture/écriture)
-- **`course/`** : Fichiers du cours (lecture seule, vous déposez les fichiers)
+Each student will see these directories in their JupyterLab:
+- **`work/`** : Personal workspace (persistent, private)
+- **`shared/`** : Shared workspace between all students (read/write)
+- **`course/`** : Course files (read-only, you deposit files)
 
-### Déposer des fichiers pour le cours
+### Deposit Files for Course
 
-Pour mettre des fichiers dans le dossier `course/` (accessible en lecture seule) :
+To put files in the `course/` directory (accessible read-only):
 
 ```bash
-# Créer un dossier temporaire
+# Create a temporary directory
 mkdir -p ~/jupyterhub-tp/course-files
 
-# Copier vos fichiers dedans
-cp mes_notebooks.ipynb ~/jupyterhub-tp/course-files/
-cp mes_donnees.csv ~/jupyterhub-tp/course-files/
+# Copy your files into it
+cp my_notebooks.ipynb ~/jupyterhub-tp/course-files/
+cp my_data.csv ~/jupyterhub-tp/course-files/
 
-# Copier dans le volume Docker
+# Copy into Docker volume
 docker run --rm \
   -v jupyterhub-course:/target \
   -v ~/jupyterhub-tp/course-files:/source \
   alpine sh -c "cp -r /source/* /target/"
 ```
 
-### Accéder aux fichiers partagés entre étudiants
+### Access Shared Files Between Students
 
-Les étudiants peuvent collaborer via le dossier `shared/` :
+Students can collaborate via the `shared/` directory:
 
 ```python
-# Dans un notebook, pour lire un fichier partagé
+# In a notebook, to read a shared file
 import pandas as pd
-df = pd.read_csv('/home/jovyan/shared/donnees_groupe.csv')
+df = pd.read_csv('/home/jovyan/shared/group_data.csv')
 
-# Pour écrire un fichier partagé
-df.to_csv('/home/jovyan/shared/resultats_alice.csv')
+# To write a shared file
+df.to_csv('/home/jovyan/shared/alice_results.csv')
 ```
 
-### Récupérer les travaux des étudiants
+### Retrieve Student Work
 
 ```bash
-# Lister les volumes utilisateurs
+# List user volumes
 docker volume ls | grep jupyterhub-user
 
-# Copier les fichiers d'un étudiant spécifique
+# Copy files from a specific student
 docker run --rm \
   -v jupyterhub-user-alice:/source \
-  -v ~/rendus:/target \
+  -v ~/submissions:/target \
   alpine sh -c "cp -r /source/* /target/alice/"
 
-# Copier tous les travaux partagés
+# Copy all shared work
 docker run --rm \
   -v jupyterhub-shared:/source \
-  -v ~/rendus/shared:/target \
+  -v ~/submissions/shared:/target \
   alpine sh -c "cp -r /source/* /target/"
 ```
 
-## Gestion des utilisateurs
+## User Management
 
-### Option 1 : Liste d'utilisateurs prédéfinis
-Dans `jupyterhub_config.py`, décommentez et modifiez :
+### Option 1: Predefined User List
+In `jupyterhub_config.py`, uncomment and modify:
 ```python
-c.Authenticator.allowed_users = {'etudiant1', 'etudiant2', 'etudiant3'}
+c.Authenticator.allowed_users = {'student1', 'student2', 'student3'}
 ```
 
-### Option 2 : Autoriser tout le monde (pour tests)
-Par défaut, la configuration autorise n'importe quel utilisateur :
+### Option 2: Allow Everyone (for testing)
+By default, the configuration allows any user:
 ```python
 c.Authenticator.allow_all = True
 ```
 
-⚠️ **Attention** : DummyAuthenticator est UNIQUEMENT pour les tests locaux !
+⚠️ **Warning**: DummyAuthenticator is ONLY for local testing!
 
-## Vérification des kernels
+## Kernel Verification
 
-Une fois connecté, créez un nouveau notebook et vérifiez que vous avez accès à :
-- **Python 3** (kernel par défaut)
-- **R** (kernel R)
-- **Bash** (kernel bash)
+Once logged in, create a new notebook and verify you have access to:
+- **Python 3** (default kernel)
+- **R** (R kernel)
+- **Bash** (bash kernel)
 
-## Personnalisation pour vos TP
+## Customization for Your Labs
 
-### Ajouter des packages R supplémentaires
-Modifiez le `Dockerfile` (avant `USER ${NB_UID}`) :
+### Add Additional R Packages
+Modify the `Dockerfile` (before `USER ${NB_UID}`):
 ```dockerfile
-RUN R -e "install.packages(c('votre_package'), repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages(c('your_package'), repos='http://cran.rstudio.com/')"
 ```
 
-Puis reconstruisez :
+Then rebuild:
 ```bash
 docker build -t jupyterhub-student:latest -f Dockerfile .
 docker-compose restart jupyterhub
 ```
 
-### Ajouter des packages Python
-Ajoutez dans le `Dockerfile` (avant `USER ${NB_UID}`) :
+### Add Python Packages
+Add to the `Dockerfile` (before `USER ${NB_UID}`):
 ```dockerfile
 RUN pip install numpy pandas matplotlib seaborn
 ```
 
-### Distribuer des fichiers aux étudiants
-Créez un dossier `files_tp/` et ajoutez dans le `Dockerfile` :
+### Distribute Files to Students
+Create a `files_lab/` directory and add to the `Dockerfile`:
 ```dockerfile
-COPY files_tp/ /home/${NB_USER}/tp/
-RUN chown -R ${NB_UID}:${NB_GID} /home/${NB_USER}/tp
+COPY files_lab/ /home/${NB_USER}/lab/
+RUN chown -R ${NB_UID}:${NB_GID} /home/${NB_USER}/lab
 ```
 
-### Changer le port (si 8000 est occupé)
-Modifiez dans `docker-compose.yml` :
+### Change Port (if 8000 is occupied)
+Modify in `docker-compose.yml`:
 ```yaml
 ports:
-  - "8001:8000"  # Accessible sur localhost:8001
+  - "8001:8000"  # Accessible on localhost:8001
 ```
 
-## Avantages de cette approche
+## Advantages of This Approach
 
-✅ **Tout en Docker** : Plus besoin d'installer Python/JupyterHub sur votre Mac  
-✅ **Portable** : Facile à déployer sur un autre Mac ou serveur  
-✅ **Isolé** : Pas de pollution de votre environnement système  
-✅ **Facile à nettoyer** : Un simple `docker-compose down` suffit  
-✅ **Reproductible** : Les étudiants auront exactement le même environnement
+✅ **Everything in Docker**: No need to install Python/JupyterHub on your Mac  
+✅ **Portable**: Easy to deploy on another Mac or server  
+✅ **Isolated**: No pollution of your system environment  
+✅ **Easy to Clean**: A simple `docker-compose down` is enough  
+✅ **Reproducible**: Students will have exactly the same environment
 
-## Dépannage
+## Troubleshooting
 
-**Erreur "Cannot connect to Docker daemon"** :
-- Vérifiez qu'OrbStack est démarré
-- Vérifiez que le socket existe : `ls -la /var/run/docker.sock`
+**Error "Cannot connect to Docker daemon"**:
+- Check that OrbStack is running
+- Verify the socket exists: `ls -la /var/run/docker.sock`
 
-**Les containers étudiants ne démarrent pas** :
-- Vérifiez les logs : `docker-compose logs jupyterhub`
-- Vérifiez que l'image étudiants existe : `docker images | grep jupyterhub-student`
+**Student containers don't start**:
+- Check logs: `docker-compose logs jupyterhub`
+- Verify student image exists: `docker images | grep jupyterhub-student`
 
-**Port 8000 déjà utilisé** :
-- Changez le port dans `docker-compose.yml`
+**Port 8000 already in use**:
+- Change port in `docker-compose.yml`
 
-**Après modification du config, les changements ne sont pas pris en compte** :
+**After config modification, changes are not applied**:
 ```bash
 docker-compose restart jupyterhub
 ```
 
-**Je veux repartir de zéro** :
+**I want to start from scratch**:
 ```bash
 docker-compose down -v
 docker rmi jupyterhub-hub jupyterhub-student
-# Puis reconstruire tout
+# Then rebuild everything
+./start-jupyterhub.sh
 ```
