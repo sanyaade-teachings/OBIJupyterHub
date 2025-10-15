@@ -47,7 +47,7 @@ chmod +x start-jupyterhub.sh
 
 ### 5. Access JupyterHub
 
-Open your browser and go to: **http://localhost:8000**
+Open your browser and go to: **http://localhost:8888**
 
 You can log in with any username and password: `metabar2025`
 
@@ -109,11 +109,24 @@ docker volume prune -f
 
 ### Directory Structure for Each Student
 
-Each student will see these directories in their JupyterLab:
-- **`work/`** : Personal workspace (persistent, private)
-- **`shared/`** : Shared workspace between all students (read/write)
-- **`course/`** : Course files (read-only, you deposit files)
-  - **`course/R_packages/`** : Shared R packages (read-only for students, only admin can install)
+Each student will see this directory structure in their JupyterLab (everything under `work/` is persistent):
+```
+work/                              # Personal workspace root (persistent)
+├── [student files]               # Their own files and notebooks
+├── R_packages/                   # Personal R packages (writable by student)
+├── shared/                       # Shared workspace (read/write, shared with all)
+└── course/                       # Course files (read-only, managed by admin)
+    ├── R_packages/               # Shared R packages (read-only, installed by prof)
+    ├── bin/                      # Shared executables (in PATH)
+    └── [course materials]        # Your course files
+```
+
+**R Package Priority:**
+1. R checks `work/R_packages/` first (personal, writable)
+2. Then `work/course/R_packages/` (shared, read-only, installed by prof)
+3. Then system libraries
+
+**Important:** Everything is under `work/`, so all student files are automatically saved in their persistent volume.
 
 ### User Accounts
 
@@ -148,8 +161,8 @@ This script:
 Login as `admin` and create an R notebook:
 
 ```r
-# Install packages in course directory (admin only)
-course_lib <- "/home/jovyan/course/R_packages"
+# Install packages in course/R_packages (admin only, available to all students)
+course_lib <- "/home/jovyan/work/course/R_packages"
 dir.create(course_lib, recursive = TRUE, showWarnings = FALSE)
 
 install.packages(c('reshape2', 'plotly', 'knitr'), 
@@ -159,24 +172,39 @@ install.packages(c('reshape2', 'plotly', 'knitr'),
 
 Note: Admin account has write access to the course directory.
 
+**Students can also install their own packages:**
+
+Students can install packages in their personal `work/R_packages/`:
+
+```r
+# Install in personal library (each student has their own)
+install.packages(c('mypackage'))  # Will install in work/R_packages/
+```
+
 ### Using R Packages (Students)
 
 Students simply load packages normally:
 ```r
-library(reshape2)  # Loads from course/R_packages/ automatically
+library(reshape2)  # R checks: 1) work/R_packages/ 2) work/course/R_packages/ 3) system
 library(plotly)
 ```
 
-R automatically finds packages in `/home/jovyan/course/R_packages/` thanks to the `R_LIBS_USER` environment variable.
+R automatically searches in this order:
+1. Personal packages: `/home/jovyan/work/R_packages/` (R_LIBS_USER)
+2. Prof packages: `/home/jovyan/work/course/R_packages/` (R_LIBS_SITE)
+3. System packages
 
 ### List Available Packages
 
 ```r
-# List all available packages
+# List all available packages (personal + course + system)
 installed.packages()[,"Package"]
 
-# Or check course packages specifically
-list.files("/home/jovyan/course/R_packages")
+# Check personal packages
+list.files("/home/jovyan/work/R_packages")
+
+# Check course packages (installed by prof)
+list.files("/home/jovyan/work/course/R_packages")
 ```
 
 ### Deposit Files for Course
@@ -205,10 +233,10 @@ Students can collaborate via the `shared/` directory:
 ```python
 # In a notebook, to read a shared file
 import pandas as pd
-df = pd.read_csv('/home/jovyan/shared/group_data.csv')
+df = pd.read_csv('/home/jovyan/work/shared/group_data.csv')
 
 # To write a shared file
-df.to_csv('/home/jovyan/shared/alice_results.csv')
+df.to_csv('/home/jovyan/work/shared/alice_results.csv')
 ```
 
 ### Retrieve Student Work

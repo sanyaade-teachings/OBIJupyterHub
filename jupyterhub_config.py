@@ -54,23 +54,6 @@ c.DockerSpawner.volumes = {
 c.DockerSpawner.mem_limit = '2G'
 c.DockerSpawner.cpu_limit = 1.0
 
-# Environment variables for student containers
-c.DockerSpawner.environment = {
-    # R package library in read-only course directory under work/
-    'R_LIBS_USER': '/home/jovyan/work/R_packages',
-    'R_LIBS_SITE': '/home/jovyan/work/course/R_packages',
-     # Path to R packages in read-only
-    'PATH': '/home/jovyan/work/course/bin:${PATH}'
-}
-
-# Create user R lib directory 
-#async def create_user_hierarchy(spawner):
-#    cmd = "mkdir -p /home/jovyan/work/R_packages && chown jovyan:jovyan /home/jovyan/work/R_packages"
-#    spawner.extra_create_kwargs.update({'command': f"/bin/bash -c '{cmd} && start-notebook.sh'"})
-
-#c.Spawner.pre_spawn_hook = create_user_r_libs
-
-
 # User configuration - Simple password authentication for lab
 from jupyterhub.auth import DummyAuthenticator
 
@@ -165,26 +148,6 @@ c.DockerSpawner.volumes = {
 # Configuration de la mémoire et CPU (ajustez selon vos besoins)
 c.DockerSpawner.mem_limit = '2G'
 c.DockerSpawner.cpu_limit = 1.0
-
-# Configuration des utilisateurs - Mot de passe simple pour TP
-from jupyterhub.auth import DummyAuthenticator
-
-class SimplePasswordAuthenticator(DummyAuthenticator):
-    """Authentificateur simple avec un mot de passe partagé pour tous"""
-    
-    def check_allowed(self, username, authentication=None):
-        """Vérifie si l'utilisateur est autorisé"""
-        if authentication is None:
-            return False
-        
-        # Récupérer le mot de passe depuis la variable d'environnement
-        expected_password = os.environ.get('JUPYTERHUB_PASSWORD', 'metabar2025')
-        provided_password = authentication.get('password', '')
-        
-        # Vérifier le mot de passe
-        return provided_password == expected_password
-
-c.JupyterHub.authenticator_class = SimplePasswordAuthenticator
 
 # Pour créer une liste d'utilisateurs autorisés, décommentez et modifiez:
 # c.Authenticator.allowed_users = {'etudiant1', 'etudiant2', 'etudiant3'}

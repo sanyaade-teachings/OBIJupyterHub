@@ -50,9 +50,9 @@ docker run --rm \
     exit 1
 }
 
-# Copy to course volume
+# Copy to course R packages directory
 echo ""
-echo -e "${BLUE}💾 Copying to course volume...${NC}"
+echo -e "${BLUE}💾 Copying to course/R_packages...${NC}"
 docker run --rm \
     -v jupyterhub-course:/target \
     -v "${TEMP_DIR}:/source" \
@@ -65,7 +65,7 @@ rm -rf "${TEMP_DIR}"
 echo ""
 echo -e "${GREEN}✅ Installation complete!${NC}"
 echo ""
-echo -e "${BLUE}📦 Installed packages in course/R_packages:${NC}"
+echo -e "${BLUE}📦 Installed packages in work/course/R_packages:${NC}"
 docker run --rm \
     -v jupyterhub-course:/course \
     alpine ls -1 /course/R_packages/
