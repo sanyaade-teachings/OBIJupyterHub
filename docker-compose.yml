@@ -8,19 +8,21 @@ services:
     ports:
       - "8888:8000"
     volumes:
-      # Accès au socket Docker pour spawner les containers étudiants
+      # Access to Docker socket to spawn student containers
       - /var/run/docker.sock:/var/run/docker.sock
-      # Persistance de la base de données JupyterHub
+      # JupyterHub database persistence
       - jupyterhub-data:/srv/jupyterhub
-      # Montage du fichier de config en direct (pour modifications faciles)
+      # Mount config file directly (for easy modifications)
       - ./jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro
     networks:
       - jupyterhub-network
     restart: unless-stopped
     environment:
-      # Mot de passe partagé pour tous les étudiants
+      # Shared password for all students
       JUPYTERHUB_PASSWORD: metabar2025
-      # Variables d'environnement optionnelles
+      # Admin password (for installing R packages)
+      JUPYTERHUB_ADMIN_PASSWORD: admin2025
+      # Optional environment variables
       DOCKER_NOTEBOOK_DIR: /home/jovyan/work
 
 networks:
@@ -32,3 +34,4 @@ volumes:
   jupyterhub-data:
   jupyterhub-shared:
   jupyterhub-course:
+  

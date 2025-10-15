@@ -1,30 +1,90 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
-# === Variables ===
-WORKDIR="$PWD"
-NETWORK="jupyterhub-net"
-HUB_IMAGE="jupyterhub-hub"
-USER_IMAGE="jupyter-tp-singleuser"
+# JupyterHub startup script for labs
+# Usage: ./start-jupyterhub.sh
 
-# === Préparation ===
-mkdir -p "$WORKDIR"
-cd "$WORKDIR"
+set -e  # Stop on error
 
-echo "[1/5] Création du réseau Docker..."
-docker network inspect $NETWORK >/dev/null 2>&1 || docker network create $NETWORK
+echo "🚀 Starting JupyterHub for Lab"
+echo "=============================="
+echo ""
 
-echo "[2/5] Construction des images..."
-docker build -t $USER_IMAGE -f Dockerfile .
-docker build -t $HUB_IMAGE -f Dockerfile.hub .
+# Colors for display
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
 
-echo "[3/5] Lancement de JupyterHub..."
-docker compose up -d
+# Check we're in the right directory
+if [ ! -f "Dockerfile" ] || [ ! -f "docker-compose.yml" ]; then
+    echo "❌ Error: Run this script from the jupyterhub-tp/ directory"
+    exit 1
+fi
 
-echo "[4/5] Hub accessible sur http://localhost:8888"
-echo "      Login avec n'importe quel nom et mot de passe : metabar2025"
+# Stop existing containers
+echo -e "${BLUE}📦 Stopping existing containers...${NC}"
+docker-compose down 2>/dev/null || true
 
-echo "[5/5] Pour voir les utilisateurs actifs :"
-echo "      docker ps | grep jupyterhub-user"
+# Remove old student containers
+echo -e "${BLUE}🧹 Cleaning up student containers...${NC}"
+docker ps -aq --filter name=jupyter- | xargs -r docker rm -f 2>/dev/null || true
 
-echo "Terminé."
+# Build student image
+echo ""
+echo -e "${BLUE}🔨 Building student image...${NC}"
+docker build -t jupyterhub-student:latest -f Dockerfile .
+
+# Build hub image
+echo ""
+echo -e "${BLUE}🔨 Building JupyterHub image...${NC}"
+docker build -t jupyterhub-hub:latest -f Dockerfile.hub .
+
+# Create volumes if they don't exist
+echo ""
+echo -e "${BLUE}💾 Creating shared volumes...${NC}"
+docker volume create jupyterhub-shared 2>/dev/null || echo "  Volume jupyterhub-shared already exists"
+docker volume create jupyterhub-course 2>/dev/null || echo "  Volume jupyterhub-course already exists"
+
+# Start the stack
+echo ""
+echo -e "${BLUE}🚀 Starting JupyterHub...${NC}"
+docker-compose up -d
+
+# Wait for service to be ready
+echo ""
+echo -e "${YELLOW}⏳ Waiting for JupyterHub to start...${NC}"
+sleep 3
+
+# Check that container is running
+if docker ps | grep -q jupyterhub; then
+    echo ""
+    echo -e "${GREEN}✅ JupyterHub is running!${NC}"
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo -e "${GREEN}🌐 JupyterHub available at: http://localhost:8888${NC}"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    echo "📝 Password: metabar2025"
+    echo "👥 Students can connect with any username"
+    echo ""
+    echo "🔑 Admin account:"
+    echo "   Username: admin"
+    echo "   Password: admin2025"
+    echo ""
+    echo "📂 Each student will have access to:"
+    echo "   - work/                     : personal workspace (everything saved)"
+    echo "   - work/R_packages/          : personal R packages (writable)"
+    echo "   - work/shared/              : shared workspace"
+    echo "   - work/course/              : course files (read-only)"
+    echo "   - work/course/R_packages/   : shared R packages by prof (read-only)"
+    echo "   - work/course/bin/          : shared executables (in PATH)"
+    echo ""
+    echo "🔍 To view logs:    docker-compose logs -f jupyterhub"
+    echo "🛑 To stop:         docker-compose down"
+    echo ""
+else
+    echo ""
+    echo -e "${YELLOW}⚠️  JupyterHub container doesn't seem to be starting${NC}"
+    echo "Check logs with: docker-compose logs jupyterhub"
+    exit 1
+fi
