@@ -12,7 +12,9 @@ services:
       # Access to Docker socket to spawn student containers
       - /var/run/docker.sock:/var/run/docker.sock
       # JupyterHub database persistence
-      - jupyterhub-data:/srv/jupyterhub
+      - data:/srv/jupyterhub
+      # The Jupyter user volumes
+      - users:/volumes
       # Mount config file directly (for easy modifications)
       - ./jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro
     networks:
@@ -36,9 +38,9 @@ services:
       - "8888:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - jupyterhub-caddy-data:/data
-      - jupyterhub-caddy-config:/config
-      - jupyterhub-web:/srv                # Votre app
+      - caddy-data:/data
+      - caddy-config:/config
+      - web:/srv                # Votre app
     networks:
       - jupyterhub-network
     restart: unless-stopped
@@ -58,9 +60,9 @@ services:
       SFTPGO_DEFAULT_ADMIN_PASSWORD: admin2025
       SFTPGO_HTTPD__BINDINGS__0__CLIENT_IP_PROXY_HEADER: X-Real-IP
     volumes:
-      - jupyterhub-shared:/volumes/shared
-      - jupyterhub-course:/volumes/course
-      - jupyterhub-web:/volumes/web
+      - shared:/volumes/shared
+      - course:/volumes/course
+      - web:/volumes/web
       - ./sftpgo_config.json:/config/local_config.json:ro
 
     networks:
@@ -73,45 +75,45 @@ networks:
     driver: bridge
 
 volumes:
-  jupyterhub-data:
+  data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./jupyterhub_volumes/jupyterhub
-  jupyterhub-shared:
+      device: ../jupyterhub_volumes/jupyterhub
+  shared:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./jupyterhub_volumes/shared
-  jupyterhub-course:
+      device: ../jupyterhub_volumes/shared
+  course:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./jupyterhub_volumes/course
-  jupyterhub-web:
+      device: ../jupyterhub_volumes/course
+  web:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./jupyterhub_volumes/web
-  jupyterhub-caddy-data:
+      device: ../jupyterhub_volumes/web
+  caddy-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./jupyterhub_volumes/caddy/data
-  jupyterhub-caddy-config:
+      device: ../jupyterhub_volumes/caddy/data
+  caddy-config:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./jupyterhub_volumes/caddy/config
-  jupyterhub-users:
+      device: ../jupyterhub_volumes/caddy/config
+  users:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./jupyterhub_volumes/users
+      device: ../jupyterhub_volumes/users

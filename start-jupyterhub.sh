@@ -3,17 +3,34 @@
 # JupyterHub startup script for labs
 # Usage: ./start-jupyterhub.sh
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DOCKER_DIR="${SCRIPT_DIR}/obijupyterhub/"
+
 set -e  # Stop on error
 
 echo "🚀 Starting JupyterHub for Lab"
 echo "=============================="
 echo ""
 
+# Compile the web site
+echo ""
+echo  -e "${BLUE}🔨 Building the volume directories...${NC}"
+pushd "${SCRIPT_DIR}/jupyterhub_volumes"
+mkdir -p caddy
+mkdir -p course/bin
+mkdir -p course/R_packages
+mkdir -p jupyterhub
+mkdir -p shared
+mkdir -p users
+popd
+
 # Colors for display
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
+
+pushd "${DOCKER_DIR}"
 
 # Check we're in the right directory
 if [ ! -f "Dockerfile" ] || [ ! -f "docker-compose.yml" ]; then
@@ -39,6 +56,14 @@ echo ""
 echo -e "${BLUE}🔨 Building JupyterHub image...${NC}"
 docker build -t jupyterhub-hub:latest -f Dockerfile.hub .
 
+# Compile the web site
+echo ""
+echo  -e "${BLUE}🔨 Building web site...${NC}"
+pushd ../web_src
+quarto render
+python3 ../tools/generate_pages_json.py
+popd
+
 # Start the stack
 echo ""
 echo -e "${BLUE}🚀 Starting JupyterHub...${NC}"
@@ -48,6 +73,8 @@ docker-compose up -d --remove-orphans
 echo ""
 echo -e "${YELLOW}⏳ Waiting for JupyterHub to start...${NC}"
 sleep 3
+
+popd
 
 # Check that container is running
 if docker ps | grep -q jupyterhub; then

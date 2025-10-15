@@ -1,4 +1,7 @@
 import os
+import logging
+from pathlib import Path
+
 
 # Base configuration coucou
 c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
@@ -6,6 +9,8 @@ c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
 # Enable debug logs
 c.JupyterHub.log_level = 'DEBUG'
 c.Spawner.debug = True
+
+VOLUMES_BASE_PATH = '/volumes'
 
 # Docker image to use for student containers
 c.DockerSpawner.image = 'jupyterhub-student:latest'
@@ -21,6 +26,11 @@ c.DockerSpawner.client_kwargs = {'base_url': 'unix:///var/run/docker.sock'}
 c.JupyterHub.hub_ip = '0.0.0.0'
 c.JupyterHub.hub_connect_ip = 'jupyterhub'
 
+c.DockerSpawner.environment = {
+    # R package library in read-only course directory under work/
+    'R_LIBS_USER': '/home/jovyan/work/R_packages',
+    'R_LIBS_SITE': '/home/jovyan/work/course/R_packages:/usr/local/lib/R/site-library:/usr/lib/R/site-library'
+}
 # Network configuration for student containers
 c.DockerSpawner.use_internal_ip = True
 c.DockerSpawner.network_name = 'jupyterhub-network'
@@ -38,18 +48,34 @@ notebook_dir = '/home/jovyan/work'
 c.DockerSpawner.notebook_dir = notebook_dir
 
 # Personal volume for each student + shared volumes under work/
+# Pre-spawn hook to create user directory
+async def create_user_dir(spawner):
+    """Create user directory if it doesn't exist"""
+    user_dir = os.path.join(VOLUMES_BASE_PATH, spawner.user.name)
+    spawner.log.info(f"Ensured user directory exists: {user_dir}")
+    Path(user_dir).mkdir(parents=True, exist_ok=True)
+    os.chmod(user_dir, 0o755)
+
+c.Spawner.pre_spawn_hook = create_user_dir
+
 c.DockerSpawner.volumes = {
     # Personal volume (persistent) - root directory
-    'jupyterhub-user-{username}': '/home/jovyan/work',
+    'obijupyterhub_shared-{username}' : '/home/jovyan/work',
     # Shared volume between all students - under work/
-    'jupyterhub-shared': '/home/jovyan/work/shared',
+    'obijupyterhub_shared': '/home/jovyan/work/shared',
     # Shared read-only volume for course files - under work/
-    'jupyterhub-course': {
+    'obijupyterhub_course': {
         'bind': '/home/jovyan/work/course',
         'mode': 'ro'  # read-only
     }
 }
 
+c.DockerSpawner.volume_driver = 'local'
+c.DockerSpawner.volume_driver_opts = {
+    'type': 'none',
+    'device': '/volumes',
+    'o': 'bind'
+}
 # Memory and CPU configuration (adjust according to your needs)
 c.DockerSpawner.mem_limit = '2G'
 c.DockerSpawner.cpu_limit = 1.0
@@ -93,3 +119,6 @@ c.JupyterHub.bind_url = 'http://0.0.0.0:8000/jupyter/'
 # Timeout
 c.Spawner.start_timeout = 300
 c.Spawner.http_timeout = 120
+
+# Post-start hook to create R_packages directory after volumes are mounted
+c.DockerSpawner.cmd = ['start-notebook.sh']

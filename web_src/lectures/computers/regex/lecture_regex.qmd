@@ -1,0 +1,335 @@
+---
+title: "Regular Expressions"
+format: 
+  html:
+    embed-resources: true   # pour que les SVG soient inclus
+    self-contained: true    # optionnel : tout est intégré dans le HTML
+---
+
+Regular expressions allow describing a fragment of text by authorizing variations in that text. As an example, $tot*o$ describes a piece of text starting with a "t" then an "o" followed by an undetermined number of "t"s and a final "o". We can therefore consider a regular expression as a pattern of the actual text being searched. To clarify the rest of this text, we'll admit the following definitions:
+
+## Definitions
+
+- **Alphabet**: The set of symbols we are allowed to use. For example, DNA is described using a four-letter alphabet ${A, C, G, T}$. Standard UNIX programs using regular expressions (`egrep`, `awk`, etc...) work on a much larger alphabet including all uppercase and lowercase letters, numbers, punctuation marks, and other characters representing formatting actions like line breaks.
+
+- **Text**: The sequence of symbols corresponding to the analyzed document. A text corresponds to an alphabet. A text can therefore represent very diverse things: a chromosome or protein sequence, the output of another program, a series of descriptions of biological objects such as those obtainable by downloading "flat" files from biological databases.
+
+- **Word**: A word is a subset of consecutive symbols from a text. This is a more general definition than that of a word in the French language, which gives word status to a group of letters in a text preceded and followed by a space or punctuation mark.
+
+We'll say that a regular expression is a pattern representing one or more words in a text. Search engines use this pattern to find occurrences of words matching this pattern in a text.
+
+## The Simplest Regular Expression
+
+Any piece of text can be considered as a regular expression that recognizes text identical to itself. For example, $ATG$ recognizes the sequence of three letters A, T, G.
+
+```{mermaid}
+graph LR
+    D((D)) -->|A| 1((1))
+    1 -->|T| 2((2))
+    2 -->|G| F((F))
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+## Introducing Ambiguities
+
+The main interest of regular expressions is their ability to describe words (text fragments) by authorizing certain ambiguities. There are two main classes of ambiguities. The first allows describing alterations on symbols. The second category allows describing the repetition of symbols. Alterations are introduced in the regular expression by using special characters.
+
+### Symbol Ambiguities
+
+#### Any Character
+
+The first special character is the dot ".". It can recognize any character. If we stick to the example of codons, the regular expression `regex{.TG}` recognizes any character followed by a "T" then a "G".
+
+```{mermaid}
+graph LR
+    D((D)) -->|any| 1((1))
+    1 -->|T| 2((2))
+    2 -->|G| F((F))
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+#### A Specific Subset of Characters
+
+The dot sometimes offers too much flexibility. There's another mechanism to list an authorized group of characters. Just list the authorized characters between brackets "[" and "]". The expression `regex{[ACGT]}` recognizes one of the four letters "A", "C", "G", or "T".
+
+In bacteria, initiation codons are multiple. Most of the time, codons *ATG*, *TTG*, and *GTG* are recognized as translation initiation codons. These three codons only vary by their first letter, which can be an "A", "T", or "G". The regular expression `regex{[ATG]TG}` recognizes words of three letters starting with a symbol "A", "T", or "G" followed by a "T" and a "G".
+
+```{mermaid}
+graph LR
+    D((D)) -->|A/T/G| 1((1))
+    1 -->|T| 2((2))
+    2 -->|G| F((F))
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+#### Any Character Except a Subgroup
+
+Sometimes it's necessary to describe a set of characters as: "any character of the alphabet except for a particular group of symbols." To describe these negated groups, the same notation is used as for character groups described previously. The only difference is that the group must start with the "^" character. The expression `regex{[^A-Z]}` therefore recognizes any character except an uppercase letter, and `regex{[^b]}` recognizes all characters except "b".
+
+### Variations on Symbol Repetition
+
+#### A Symbol Present Zero or One Time
+
+The simplest alteration on the number of occurrences of a symbol is represented by "?". This character added after the description of a symbol indicates that it can be present or absent in the recognized word. That is, present 0 or 1 times.
+
+```{mermaid}
+graph LR
+    D((D)) -->|b| 1((1))
+    1 -->|a| 2((2))
+    2 -->|l| 3((3))
+    3 -->|l| 4((4))
+    4 -->|o| 5((5))
+    5 -->|n| 6((6))
+    5 -->|s| 7((7))
+    7 -->|n| F((F))
+    6 --> F
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+#### A Symbol Present an Undetermined Number of Times
+
+A more flexible form regarding the presence or absence of a symbol in words recognized by a regular expression is provided by the "*" character, which indicates the preceding symbol can be absent or present an undetermined number of times.
+
+```{mermaid}
+graph LR
+    D((D)) -->|T| 1((1))
+    1 -->|T| 2((2))
+    2 -->|A| 2
+    2 -->|T| 3((3))
+    3 -->|T| F((F))
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+#### A Symbol Present at Least Once
+
+There's syntax that simplifies writing such a constraint. It uses the "+" character as a marker. Thus, the regular expressions `regex{TTA+TT}` and `regex{TTAA*TT}` are strictly equivalent.
+
+```{mermaid}
+graph LR
+    D((D)) -->|T| 1((1))
+    1 -->|T| 2((2))
+    2 -->|A| 3((3))
+    3 -->|A| 3
+    3 -->|T| 4((4))
+    4 -->|T| F((F))
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+#### Describing a Repetition Interval
+
+A final notation, recently introduced in regular expression syntax, allows giving a lower and upper bound to the number of occurrences of a symbol. The format uses braces "{" and "}" to frame the two bounds.
+
+### Special Characters
+
+#### Beginning and End of Line
+
+By adding a "^" at the beginning of an expression or "$" at the end of an expression, you can force the recognized word to be at the beginning or end of a line.
+
+#### The Double Meaning of a Character
+
+Each character has two meanings:
+- A primary meaning: the symbol represented by the character
+- A meta-meaning: Which gives another meaning to the character
+
+You switch from one meaning to the other by preceding the character with the backslash "\".
+
+### Combining Multiple Expressions
+
+The question arises when combining multiple regular expressions with the logical OR operator. I want to build an expression that recognizes the words "papa" or "mama". For this, combine the two simple expressions `regex{papa}` and `regex{mama}` using the "|" character to get the global expression `regex{papa|mama}`.
+
+```{mermaid}
+graph LR
+    D((D)) -->|p| 1((1))
+    1 -->|a| 2((2))
+    2 -->|p| 3((3))
+    3 -->|a| F1((F))
+    
+    D -->|m| 4((4))
+    4 -->|a| 5((5))
+    5 -->|m| 6((6))
+    6 -->|a| F2((F))
+    
+    style D fill:#90EE90
+    style F1 fill:#FFC0CB
+    style F2 fill:#FFC0CB
+```
+
+### Subexpressions
+
+#### Subexpressions and Combination of Multiple Expressions
+
+It's possible to isolate a subpart of a regular expression using parentheses "(" and ")".
+
+#### Reusing a Subexpression
+
+Normally, each step of a regular expression is independent of what happened before in the automaton. It's possible thanks to subexpressions to go against this principle by memorizing a sequence of previous states using a subexpression.
+
+## Summary of Authorized Alteration Forms
+
+### Symbol Ambiguity
+
+| Symbol | Recognizes |
+|--------|------------|
+| . | Any character |
+| [ ] | One of the characters listed between brackets |
+| [^ ] | Any character except those listed between brackets |
+
+### Repetition Ambiguity
+
+| Symbol | Number of accepted occurrences |
+|--------|--------------------------------|
+| * | 0 to ∞ |
+| ? | 0 or 1 |
+| + | 1 or more |
+| {x,y} | between x and y occurrences |
+| {x,} | at least x occurrences |
+
+### Special Characters
+
+| Symbol | Meaning |
+|--------|---------|
+| ^ at expression start | beginning of line |
+| $ at expression end | end of line |
+| \n | line break |
+| \t | a tabulation |
+
+## Exercise: Identifying Genes with a Regular Expression
+
+To identify a CDS, we need to combine three regular expressions: one for the initiation codon, the second for non-stop codons, and the last for stop codons.
+
+### Start Codons
+
+In bacteria, there are three start codons: ATG, TTG, and GTG. The corresponding regular expression is: `regex{[ATG]TG}`
+
+```{mermaid}
+graph LR
+    D((D)) -->|A/T/G| 1((1))
+    1 -->|T| 2((2))
+    2 -->|G| F((F))
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+### Stop Codons
+
+In most bacteria, there are three different termination codons: TAA (ochre), TAG (amber), and TGA (opale). The regular expression recognizing all stop codons is `regex{T(A[AG]\|GA)}`
+
+```{mermaid}
+graph LR
+    D((D)) -->|T| 1((1))
+    1 -->|A| 2((2))
+    2 -->|A/G| F1((F))
+    1 -->|G| 3((3))
+    3 -->|A| F2((F))
+    style D fill:#90EE90
+    style F1 fill:#FFC0CB
+    style F2 fill:#FFC0CB
+```
+
+### Non-stop Codons
+
+The regular expression recognizing the 61 non-stop codons is:
+
+`regex{[ACG][ACGT][ACGT]\|T([CT][ACGT]\|G[CGT]\|A[CT])}`
+
+```{mermaid}
+graph LR
+    %% État initial
+    D((D))
+    style D fill:#90EE90
+    
+    %% Branche 1: [ACG][ACGT][ACGT]
+    D -->|A/C/G| A1((1))
+    A1 -->|A/C/G/T| A2((2))
+    A2 -->|A/C/G/T| F1((F))
+    
+    %% Branche 2: T([CT][ACGT]|G[CGT]|A[CT])
+    D -->|T| B1((3))
+    
+    %% Sous-branche 2.1: [CT][ACGT]
+    B1 -->|C/T| B2a((4))
+    B2a -->|A/C/G/T| F2((F))
+    
+    %% Sous-branche 2.2: G[CGT]
+    B1 -->|G| B2b((5))
+    B2b -->|C/G/T| F3((F))
+    
+    %% Sous-branche 2.3: A[CT]
+    B1 -->|A| B2c((6))
+    B2c -->|C/T| F4((F))
+    
+    %% États finaux
+    style F1 fill:#FFC0CB
+    style F2 fill:#FFC0CB
+    style F3 fill:#FFC0CB
+    style F4 fill:#FFC0CB
+```
+
+### Recognizing a Complete CDS
+
+Recognizing a complete CDS now comes down to assembling the regular expression for starts, that for non-stops (authorizing its repetition), then that recognizing stop codons.
+
+`regex{[ATG]TG([ACG][ACGT][ACGT]\|T([CT][ACGT]\|G[CGT]\|A[CT]))+T(A[GA]\|GA)}`
+
+```{mermaid}
+graph LR
+    %% État initial
+    D((D))
+    style D fill:#90EE90
+    
+    %% Début: [ATG]TG
+    D -->|A/T/G| 1((1))
+    1 -->|T| 2((2))
+    2 -->|G| 3((3))
+    
+    %% Boucle principale pour la partie médiane (répétition +)
+    3 --> 4((4))
+    
+    %% Alternative 1: [ACG][ACGT][ACGT]
+    4 -->|A/C/G| 5((5))
+    5 -->|A/C/G/T| 6((6))
+    6 -->|A/C/G/T| 7((7))
+    
+    %% Alternative 2: T([CT][ACGT]|G[CGT]|A[CT])
+    4 -->|T| 8((8))
+    
+    %% Sous-alternative 2.1: [CT][ACGT]
+    8 -->|C/T| 9((9))
+    9 -->|A/C/G/T| 7((7))
+    
+    %% Sous-alternative 2.2: G[CGT]
+    8 -->|G| 10((10))
+    10 -->|C/G/T| 7((7))
+    
+    %% Sous-alternative 2.3: A[CT]
+    8 -->|A| 11((11))
+    11 -->|C/T| 7((7))
+    
+    %% Boucle de répétition
+    7 --> 4
+    
+    %% Fin: T(A[GA]|GA)
+    7 -->|T| 12((12))
+    
+    %% Alternative finale 1: A[GA]
+    12 -->|A| 13((13))
+    13 -->|A/G| F((F))
+    
+    %% Alternative finale 2: GA
+    12 -->|G| 14((14))
+    14 -->|A| F((F))
+    
+    %% État final
+    style F fill:#FFC0CB
+```
+
+To impose that the CDS codes for a protein of at least 100 amino acids, just replace the "+" sign with a constraint on the minimum number of repetitions of non-stop codons to 99.
+
+`[ATG]TG([ACG][ACGT][ACGT]\|T([CT][ACGT]\|G[CGT]\|A[CT])){99,}T(A[GA]\|GA)`
+

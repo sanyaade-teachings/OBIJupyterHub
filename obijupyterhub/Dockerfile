@@ -39,6 +39,9 @@ RUN cp $HOME/.cargo/bin/csvlens /usr/local/bin/
 RUN mkdir -p /home/${NB_USER}/.local/share/jupyter && \
     chown -R ${NB_UID}:${NB_GID} /home/${NB_USER} 
 
+COPY start-notebook.sh /usr/local/bin/start-notebook.sh
+RUN chmod +x /usr/local/bin/start-notebook.sh
+
 # Switch back to Jupyter user
 USER ${NB_UID}:${NB_GID}
 WORKDIR /home/${NB_USER}/work
@@ -47,3 +50,4 @@ WORKDIR /home/${NB_USER}/work
 ENV PATH="/home/${NB_USER}/work/course/bin:${PATH}"
 ENV R_LIBS_USER="/home/${NB_USER}/work/R_packages"
 ENV R_LIBS_SITE="/home/${NB_USER}/work/course/R_packages:/usr/local/lib/R/site-library:/usr/lib/R/site-library"
+

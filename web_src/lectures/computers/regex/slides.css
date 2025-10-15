@@ -1,0 +1,6 @@
+/* Centre toutes les images dans les slides */
+.quarto-figure-default {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}

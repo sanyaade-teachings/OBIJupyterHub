@@ -5,6 +5,9 @@
 
 set -e
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+VOLUME="obijupyterhub_course"
+
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
@@ -54,7 +57,7 @@ docker run --rm \
 echo ""
 echo -e "${BLUE}💾 Copying to course/R_packages...${NC}"
 docker run --rm \
-    -v jupyterhub-course:/target \
+    -v ${VOLUME}:/target \
     -v "${TEMP_DIR}:/source" \
     alpine sh -c "mkdir -p /target/R_packages && cp -r /source/* /target/R_packages/"
 
@@ -67,7 +70,7 @@ echo -e "${GREEN}✅ Installation complete!${NC}"
 echo ""
 echo -e "${BLUE}📦 Installed packages in work/course/R_packages:${NC}"
 docker run --rm \
-    -v jupyterhub-course:/course \
+    -v ${VOLUME}:/course \
     alpine ls -1 /course/R_packages/
 
 echo ""

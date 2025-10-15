@@ -1,4 +1,8 @@
+/Affinity
 /jupyterhub_volumes/users
 /jupyterhub_volumes/shared
 /jupyterhub_volumes/jupyterhub
 /jupyterhub_volumes/caddy
+/**/.DS_Store
+
+/.luarc.json

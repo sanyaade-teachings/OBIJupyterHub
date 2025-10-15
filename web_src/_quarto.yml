@@ -1,0 +1,10 @@
+project:
+  type: default
+  output-dir: _output
+  post-render:
+    - scripts/copy-to-web.sh
+
+format:
+  html:
+    toc: false
+    self-contained: true

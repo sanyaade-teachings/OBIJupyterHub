@@ -1,0 +1,8 @@
+---
+title: "Home"
+format: html
+---
+
+# Welcome to the DNA Metabarcoding Learning Server
+
+This is the **home page** of your training platform. Here you can access Jupyter notebooks, learn DNA metabarcoding analysis with OBITools and R, and explore example datasets.

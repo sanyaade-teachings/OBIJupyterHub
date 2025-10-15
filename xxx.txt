@@ -1,0 +1,41 @@
+.
+├── start-jupyterhub.sh
+├── docker
+│   ├── Caddyfile
+│   ├── docker-compose.yml
+│   ├── Dockerfile
+│   ├── Dockerfile.hub
+│   ├── jupyterhub_config.py
+│   ├── sftpgo_config.json
+│   └── start-notebook.sh
+├── jupyterhub_volumes
+│   ├── caddy
+│   ├── course
+│   │   ├── bin
+│   │   └── R_packages
+│   ├── jupyterhub
+│   ├── shared
+│   ├── users
+│   └── web
+│       ├── img
+│       │   └── welcome_metabar.webp
+│       ├── index.html
+│       └── pages
+│           └── pages.json
+├── Readme.md
+├── tools
+│   ├── generate_pages_json.py
+│   └── install_packages.sh
+├── users.json
+└─── web_src
+    ├── _output
+    ├── _quarto.yml
+    ├── 00_home.qmd
+    ├── lectures
+    │   └── computers
+    │       └── regex
+    │           ├── lecture_regex.qmd
+    │           ├── slides_regex.qmd
+    │           └── slides.css
+    └── scripts
+         └── copy-to-web.sh
