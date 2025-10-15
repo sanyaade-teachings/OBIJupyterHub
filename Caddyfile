@@ -1,0 +1,43 @@
+http:// {
+
+    root * /srv
+    file_server
+
+    # Proxy pour SFTPGo avec réécriture du chemin
+    # Proxy pour l'interface Web de SFTPGo
+    # SFTPGo n'a pas de support natif pour les sous-chemins
+    # Il faut proxy /web/ et /static/ séparément
+    handle /web/* {
+        reverse_proxy http://jupytersftp:8080 {
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+        }
+    }
+    
+    handle /static/* {
+        reverse_proxy http://jupytersftp:8080 {
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+        }
+    }
+    
+    handle /api/* {
+        reverse_proxy http://jupytersftp:8080 {
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+        }
+    }
+
+    handle /sftp/* {
+        uri strip_prefix /sftp
+        reverse_proxy http://jupytersftp:8080 {
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+        }
+    }
+
+    # Proxy vers JupyterHub
+    handle /jupyter/* {
+        reverse_proxy http://jupyterhub:8000
+    }
+}
