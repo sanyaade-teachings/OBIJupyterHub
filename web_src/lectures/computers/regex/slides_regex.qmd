@@ -1,0 +1,369 @@
+---
+title: "Regular Expressions"
+format:
+  revealjs:
+    theme: beige   # thème des slides
+    transition: fade   # effet de transition entre les slides
+---
+
+
+## Regular Expressions
+
+Pattern matching for text with variations
+
+Example: `tot*o` matches:
+
+- "to" + any number of "t" + "o"
+- "toto", "totto", "totttto", etc.
+
+---
+
+## Basic Concepts
+
+**Alphabet**: Set of allowed symbols 
+
+- DNA: {A, C, G, T}
+- Text: {letters, digits, punctuation, ...}
+
+**Text**: Sequence of symbols from alphabet
+
+**Word**: Subsequence of consecutive symbols
+
+---
+
+## Simple Regular Expression
+
+`ATG` matches exactly "ATG"
+
+```{mermaid}
+graph LR
+    D((D)) -->|A| 1((1))
+    1 -->|T| 2((2))
+    2 -->|G| F((F))
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+---
+
+## Symbol Ambiguities
+
+### Any Character: `.`
+
+`.TG` matches:
+
+- "ATG", "TTG", "GTG", "CTG", ...
+
+```{mermaid}
+graph LR
+    D((D)) -->|any| 1((1))
+    1 -->|T| 2((2))
+    2 -->|G| F((F))
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+---
+
+## Character Classes
+
+`[ATG]TG` matches only:
+
+- "ATG", "TTG", "GTG"
+
+```{mermaid}
+graph LR
+    D((D)) -->|A/T/G| 1((1))
+    1 -->|T| 2((2))
+    2 -->|G| F((F))
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+---
+
+## Ranges and Negation
+
+**Ranges**: `[A-Z]`, `[0-9]`, `[A-Za-z0-9]`
+
+**Negation**: `[^A-Z]` (anything except uppercase)
+
+---
+
+## Repetition: Zero or One
+
+`ballons?` matches:
+
+- "ballon" (singular)
+- "ballons" (plural)
+
+```{mermaid}
+graph LR
+    D((D)) -->|b| 1((1))
+    1 -->|a| 2((2))
+    2 -->|l| 3((3))
+    3 -->|l| 4((4))
+    4 -->|o| 5((5))
+    5 -->|n| 6((6))
+    5 -->|s| 7((7))
+    7 -->|n| F((F))
+    6 --> F
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+---
+
+## Repetition: Zero or More
+
+`TTA*TT` matches:
+
+- "TTTT", "TTATT", "TTAAATT", ...
+
+```{mermaid}
+graph LR
+    D((D)) -->|T| 1((1))
+    1 -->|T| 2((2))
+    2 -->|A| 2
+    2 -->|T| 3((3))
+    3 -->|T| F((F))
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+---
+
+## Repetition: One or More
+
+`TTA+TT` matches:
+
+- "TTATT", "TTAATT", "TTAAATT", ...
+- But NOT "TTTT"
+
+```{mermaid}
+graph LR
+    D((D)) -->|T| 1((1))
+    1 -->|T| 2((2))
+    2 -->|A| 3((3))
+    3 -->|A| 3
+    3 -->|T| 4((4))
+    4 -->|T| F((F))
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+---
+
+## Exact Repetition
+
+`A{3,5}` matches:
+
+- "AAA", "AAAA", "AAAAA"
+
+`A{3}` matches exactly "AAA"
+
+---
+
+## Special Characters
+
+- `^` - Start of line
+- `$` - End of line  
+- `\n` - Newline
+- `\t` - Tab
+
+Examples:
+
+- `^start` - "start" at beginning of line
+- `end$` - "end" at end of line
+- `^exact$` - "exact" as entire line
+
+---
+
+## Alternation
+
+`papa|mama` matches either:
+
+- "papa" OR "mama"
+
+```{mermaid}
+graph LR
+    D((D)) -->|p| 1((1))
+    1 -->|a| 2((2))
+    2 -->|p| 3((3))
+    3 -->|a| F1((F))
+    
+    D -->|m| 4((4))
+    4 -->|a| 5((5))
+    5 -->|m| 6((6))
+    6 -->|a| F2((F))
+    
+    style D fill:#90EE90
+    style F1 fill:#FFC0CB
+    style F2 fill:#FFC0CB
+```
+
+---
+
+## Grouping
+
+`T(AA|AG|GA)` matches:
+
+- "TAA", "TAG", "TGA"
+
+Instead of incorrect: `TAA|AG|GA`
+
+---
+
+## Backreferences
+
+`([ACGT]{3})\1{9,}` matches:
+
+- Any triplet repeated 10+ times
+- Example: "CAGCAGCAGCAG..."
+
+---
+
+## Quick Reference
+
+### Symbol Ambiguity
+| Pattern | Matches |
+|---------|---------|
+| `.` | Any character |
+| `[abc]` | a, b, or c |
+| `[^abc]` | Not a, b, or c |
+
+### Repetition
+| Pattern | Matches |
+|---------|---------|
+| `?` | 0 or 1 |
+| `*` | 0 or more |
+| `+` | 1 or more |
+| `{n,m}` | n to m times |
+
+---
+
+## Biological Application: Gene Finding
+
+Find Coding Sequences (CDS) in bacterial DNA:
+
+1. Start codon
+2. Multiple non-stop codons  
+3. Stop codon
+
+---
+
+## Start Codons
+
+Bacterial start: ATG, TTG, GTG
+
+Pattern: `[ATG]TG`
+
+```{mermaid}
+graph LR
+    D((D)) -->|A/T/G| 1((1))
+    1 -->|T| 2((2))
+    2 -->|G| F((F))
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+---
+
+## Stop Codons
+
+Bacterial stop: TAA, TAG, TGA
+
+Pattern: `T(A[AG]|GA)`
+
+```{mermaid}
+graph LR
+    D((D)) -->|T| 1((1))
+    1 -->|A| 2((2))
+    2 -->|A/G| F1((F))
+    1 -->|G| 3((3))
+    3 -->|A| F2((F))
+    style D fill:#90EE90
+    style F1 fill:#FFC0CB
+    style F2 fill:#FFC0CB
+```
+
+---
+
+## Non-Stop Codons
+
+61 codons that aren't stop codons
+
+Pattern: `[ACG][ACGT][ACGT]|T([CT][ACGT]|G[CGT]|A[CT])`
+
+```{mermaid}
+graph LR
+    D((D)) -->|A/C/G| A1((1))
+    A1 -->|A/C/G/T| A2((2))
+    A2 -->|A/C/G/T| F1((F))
+    D -->|T| B1((3))
+    B1 -->|C/T| B2a((4))
+    B2a -->|A/C/G/T| F2((F))
+    B1 -->|G| B2b((5))
+    B2b -->|C/G/T| F3((F))
+    B1 -->|A| B2c((6))
+    B2c -->|C/T| F4((F))
+    style D fill:#90EE90
+    style F1 fill:#FFC0CB
+    style F2 fill:#FFC0CB
+    style F3 fill:#FFC0CB
+    style F4 fill:#FFC0CB
+```
+
+---
+
+## Complete CDS Pattern
+
+`[ATG]TG([ACG][ACGT][ACGT]|T([CT][ACGT]|G[CGT]|A[CT]))+T(A[GA]|GA)`
+
+- Start codon
+- 1+ non-stop codons  
+- Stop codon
+
+```{mermaid}
+graph LR
+    D((D)) -->|A/T/G| 1((1))
+    1 -->|T| 2((2))
+    2 -->|G| 3((3))
+    3 --> 4((4))
+    4 -->|A/C/G| 5((5))
+    5 -->|A/C/G/T| 6((6))
+    6 -->|A/C/G/T| 7((7))
+    4 -->|T| 8((8))
+    8 -->|C/T| 9((9))
+    9 -->|A/C/G/T| 7
+    8 -->|G| 10((10))
+    10 -->|C/G/T| 7
+    8 -->|A| 11((11))
+    11 -->|C/T| 7
+    7 --> 4
+    7 -->|T| 12((12))
+    12 -->|A| 13((13))
+    13 -->|A/G| F((F))
+    12 -->|G| 14((14))
+    14 -->|A| F
+    style D fill:#90EE90
+    style F fill:#FFC0CB
+```
+
+---
+
+## Minimum Length CDS
+
+`[ATG]TG([ACG][ACGT][ACGT]|T([CT][ACGT]|G[CGT]|A[CT])){99,}T(A[GA]|GA)`
+
+Requires at least 100 amino acids (99 non-stop codons + stop)
+
+---
+
+## Summary
+
+- Regular expressions = text patterns
+- Symbol ambiguity: `.`, `[]`, `[^]`
+- Repetition: `?`, `*`, `+`, `{}`
+- Special chars: `^`, `$`, `\n`, `\t`
+- Powerful for biological sequence analysis

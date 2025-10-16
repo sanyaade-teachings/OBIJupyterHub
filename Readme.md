@@ -6,30 +6,69 @@ You must have docker running on your computer
 
 -   On MacOS, [OrbStack](https://orbstack.dev/ "A Docker implementation optimised for MacOS") is recommanded
 
-## 
-
 ## Installation Steps
 
 ### 1. Create Directory Structure
 
-``` bash
+```bash
 git clone https://forge.metabarcoding.org/MetabarcodingSchool/OBIJupyterHub.git
+```
+
+Enter into the `OBIJupyterHub` directory
+
+```bash
+cd OBIJupyterHub
 ```
 
 #### File Structure
 
-Your `~/OBIJupyterHub` directory should contain:
+Your `OBIJupyterHub` directory should contain:
 
 ```         
-~/OBIJupyterHub/
-├── Dockerfile                  # Image for students (already created)
-├── Dockerfile.hub              # Image for JupyterHub (new)
-├── jupyterhub_config.py        # Configuration
-├── docker-compose.yml          # Orchestration
-└── start-jupyterhub.sh         # Startup script
+OBIJupyterHub
+├── start-jupyterhub.sh                  - The script used to setup and start the server
+├── obijupyterhub                        - The files describing the docker images and the stack
+│   ├── Caddyfile
+│   ├── docker-compose.yml
+│   ├── Dockerfile
+│   ├── Dockerfile.hub
+│   ├── jupyterhub_config.py
+│   ├── sftpgo_config.json
+│   └── start-notebook.sh
+├── jupyterhub_volumes                   - The directory containing the docker volumes
+│   ├── caddy
+│   ├── course                           - Read only volume mounted on every student container
+│   │   ├── bin
+│   │   └── R_packages
+│   ├── jupyterhub
+│   ├── shared                           - Read write volume shared in every student container
+│   ├── users
+│   └── web
+│       ├── img
+│       │   └── welcome_metabar.webp
+│       ├── index.html
+│       └── pages
+├── Readme.md                            - This documentation
+├── tools
+│   ├── generate_pages_json.py
+│   └── install_packages.sh
+└─── web_src                             - The quarto document sources used to build the web site
+    ├── _output
+    ├── _quarto.yml
+    ├── 00_home.qmd
+    ├── lectures
+    │   └── computers
+    │       └── regex
+    │           ├── lecture_regex.qmd
+    │           ├── slides_regex.qmd
+    │           └── slides.css
+    └── scripts
+         └── copy-to-web.sh
 ```
 
 ### 2. Start JupyterHub
+
+From the terminal, in the `OBIJupyterHub` directory, run the following command:
 
 ``` bash
 ./start-jupyterhub.sh
@@ -39,13 +78,14 @@ Your `~/OBIJupyterHub` directory should contain:
 
 Open your browser and go to: **http://localhost:8888**
 
-You can log in with any username and password: `metabar2025`
+You can log in as a student with any username and password: `metabar2025`
 
 ## Useful Commands
 
 ### View JupyterHub logs
 
 ``` bash
+cd obijupyterhub
 docker-compose logs -f jupyterhub
 ```
 
@@ -58,24 +98,15 @@ docker ps | grep jupyterhub
 ### Stop JupyterHub
 
 ``` bash
+cd obijupyterhub
 docker-compose down
 ```
 
 ### Restart JupyterHub (after config modification)
 
 ``` bash
+cd obijupyterhub
 docker-compose restart jupyterhub
-```
-
-### Rebuild after Dockerfile modification
-
-``` bash
-# For student image
-docker build -t jupyterhub-student:latest -f Dockerfile .
-docker-compose restart jupyterhub
-
-# For hub image
-docker-compose up -d --build
 ```
 
 ### View logs for a specific student
@@ -84,12 +115,13 @@ docker-compose up -d --build
 docker logs jupyter-<username>
 ```
 
-Replace `<username>` by the actual user name of the student.
+Replace `<username>` by the actual username of the student.
 
 ### Clean up after lab
 
 ``` bash
 # Stop and remove all containers
+cd obijupyterhub
 docker-compose down
 
 # Remove student containers
@@ -111,7 +143,7 @@ docker volume prune -f
 Each student will see this directory structure in their JupyterLab (everything under `work/` is persistent):
 
 ```         
-work/                              # Personal workspace root (persistent)
+work/                             # Personal workspace root (persistent)
 ├── [student files]               # Their own files and notebooks
 ├── R_packages/                   # Personal R packages (writable by student)
 ├── shared/                       # Shared workspace (read/write, shared with all)
@@ -121,52 +153,46 @@ work/                              # Personal workspace root (persistent)
     └── [course materials]        # Your course files
 ```
 
-**R Package Priority:** 1. R checks `work/R_packages/` first (personal, writable) 2. Then `work/course/R_packages/` (shared, read-only, installed by prof) 3. Then system libraries
+**R Package Priority:** 
+
+1. R checks `work/R_packages/` first (personal, writable) 
+1. Then `work/course/R_packages/` (shared, read-only, installed by prof) 
+1. Then system libraries
 
 **Important:** Everything is under `work/`, so all student files are automatically saved in their persistent volume.
 
 ### User Accounts
 
-**Admin Account:** - Username: `admin` - Password: `admin2025` (change in docker-compose.yml: `JUPYTERHUB_ADMIN_PASSWORD`) - Can write to `course/` directory
+**Admin Account:** 
 
-**Student Accounts:** - Username: any name - Password: `metabar2025` (change in docker-compose.yml: `JUPYTERHUB_PASSWORD`) - Read-only access to `course/` directory
+- Username: `admin` 
+- Password: `admin2025` (change in docker-compose.yml: `JUPYTERHUB_ADMIN_PASSWORD`) 
+- Can write to `course/` directory
+
+**Student Accounts:** 
+
+- Username: any name 
+- Password: `metabar2025` (change in docker-compose.yml: `JUPYTERHUB_PASSWORD`) 
+- Read-only access to `course/` directory
 
 ### Installing R Packages (Admin Only)
 
 **From your Mac (recommended):**
 
 ``` bash
-chmod +x install-r-packages-admin.sh
-
 # Install packages
-./install-r-packages-admin.sh reshape2 plotly knitr
+tools/install_packages.sh reshape2 plotly knitr
 ```
 
 This script: - Installs packages in the `course/R_packages/` directory - All students can use them (read-only) - No need to rebuild the image
-
-**From admin notebook:**
-
-Login as `admin` and create an R notebook:
-
-``` r
-# Install packages in course/R_packages (admin only, available to all students)
-course_lib <- "/home/jovyan/work/course/R_packages"
-dir.create(course_lib, recursive = TRUE, showWarnings = FALSE)
-
-install.packages(c('reshape2', 'plotly', 'knitr'), 
-                 lib = course_lib,
-                 repos = 'http://cran.rstudio.com/')
-```
-
-Note: Admin account has write access to the course directory.
 
 **Students can also install their own packages:**
 
 Students can install packages in their personal `work/R_packages/`:
 
-``` r
+```r
 # Install in personal library (each student has their own)
-install.packages(c('mypackage'))  # Will install in work/R_packages/
+install.packages('mypackage')  # Will install in work/R_packages/
 ```
 
 ### Using R Packages (Students)
@@ -178,7 +204,11 @@ library(reshape2)  # R checks: 1) work/R_packages/ 2) work/course/R_packages/ 3)
 library(plotly)
 ```
 
-R automatically searches in this order: 1. Personal packages: `/home/jovyan/work/R_packages/` (R_LIBS_USER) 2. Prof packages: `/home/jovyan/work/course/R_packages/` (R_LIBS_SITE) 3. System packages
+R automatically searches in this order: 
+
+1. Personal packages: `/home/jovyan/work/R_packages/` (R_LIBS_USER) 
+1. Prof packages: `/home/jovyan/work/course/R_packages/` (R_LIBS_SITE) 
+1. System packages
 
 ### List Available Packages
 
@@ -212,34 +242,21 @@ docker run --rm \
   alpine sh -c "cp -r /source/* /target/"
 ```
 
-### Access Shared Files Between Students
-
-Students can collaborate via the `shared/` directory:
-
-``` python
-# In a notebook, to read a shared file
-import pandas as pd
-df = pd.read_csv('/home/jovyan/work/shared/group_data.csv')
-
-# To write a shared file
-df.to_csv('/home/jovyan/work/shared/alice_results.csv')
-```
-
 ### Retrieve Student Work
 
 ``` bash
 # List user volumes
-docker volume ls | grep jupyterhub-user
+docker volume ls | grep 'obijupyterhub_user-'
 
 # Copy files from a specific student
 docker run --rm \
-  -v jupyterhub-user-alice:/source \
+  -v obijupyterhub_user-alice:/source \
   -v ~/submissions:/target \
   alpine sh -c "cp -r /source/* /target/alice/"
 
 # Copy all shared work
 docker run --rm \
-  -v jupyterhub-shared:/source \
+  -v obijupyterhub_shared:/source \
   -v ~/submissions/shared:/target \
   alpine sh -c "cp -r /source/* /target/"
 ```
@@ -266,7 +283,11 @@ c.Authenticator.allow_all = True
 
 ## Kernel Verification
 
-Once logged in, create a new notebook and verify you have access to: - **Python 3** (default kernel) - **R** (R kernel) - **Bash** (bash kernel)
+Once logged in, create a new notebook and verify you have access to: 
+
+- **Python 3** (default kernel) 
+- **R** (R kernel) 
+- **Bash** (bash kernel)
 
 ## Customization for Your Labs
 
@@ -278,11 +299,10 @@ Modify the `Dockerfile` (before `USER ${NB_UID}`):
 RUN R -e "install.packages(c('your_package'), repos='http://cran.rstudio.com/')"
 ```
 
-Then rebuild:
+Then restart the server (it rebuilds the images if needed):
 
-``` bash
-docker build -t jupyterhub-student:latest -f Dockerfile .
-docker-compose restart jupyterhub
+```bash
+./start-jupyterhub.sh
 ```
 
 ### Add Python Packages
@@ -321,23 +341,29 @@ ports:
 
 ## Troubleshooting
 
-**Error "Cannot connect to Docker daemon"**: - Check that OrbStack is running - Verify the socket exists: `ls -la /var/run/docker.sock`
+**Error "Cannot connect to Docker daemon"**: 
 
-**Student containers don't start**: - Check logs: `docker-compose logs jupyterhub` - Verify student image exists: `docker images | grep jupyterhub-student`
+- Check that OrbStack is running 
+- Verify the socket exists: `ls -la /var/run/docker.sock`
 
-**Port 8000 already in use**: - Change port in `docker-compose.yml`
+**Student containers don't start**: 
 
-**After config modification, changes are not applied**:
+- Check logs: `docker-compose logs jupyterhub` 
+- Verify student image exists: `docker images | grep jupyterhub-student`
 
-``` bash
-docker-compose restart jupyterhub
-```
+**Port 8000 already in use**: 
+
+- Change port in `docker-compose.yml`
+
 
 **I want to start from scratch**:
 
 ``` bash
+push obijupyterhub
 docker-compose down -v
 docker rmi jupyterhub-hub jupyterhub-student
+popd
+
 # Then rebuild everything
 ./start-jupyterhub.sh
 ```

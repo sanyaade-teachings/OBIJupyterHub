@@ -1,13 +1,205 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Course Portal</title>
+<meta charset="UTF-8">
+<title>DNA Metabarcoding Learning Server</title>
+<style>
+    body {
+        margin: 0;
+        font-family: sans-serif;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* Sidebar */
+    nav {
+        width: 250px;
+        background-color: #2c3e50;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 20px 0;
+        overflow-y: auto;
+    }
+
+    nav ul {
+        list-style: none;
+        padding-left: 15px;
+        margin: 0;
+    }
+
+    nav li {
+        margin: 4px 0;
+    }
+
+    nav a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    nav a:hover {
+        background-color: #34495e;
+    }
+
+    /* Toggle icons */
+    .folder {
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+    }
+
+    .folder::before {
+        content: "▸";
+        display: inline-block;
+        margin-right: 6px;
+        transition: transform 0.2s ease;
+    }
+
+    .folder.open::before {
+        transform: rotate(90deg);
+    }
+
+    ul.collapsed {
+        display: none;
+    }
+
+    /* Admin links */
+    nav .admin-links {
+        border-top: 1px solid #34495e;
+        margin-top: 10px;
+        padding-top: 10px;
+    }
+
+    /* Main content */
+    main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        align-items: center;
+        background-color: #f7f7f7;
+    }
+
+    header img {
+        width: 100%;
+        max-width: 1000px;
+        height: auto;
+        display: block;
+    }
+
+    iframe#content-frame {
+        flex: 1;
+        width: 100%;
+        border: none;
+        max-width: 1000px;
+        background-color: white;
+    }
+
+    nav::-webkit-scrollbar {
+        width: 8px;
+    }
+    nav::-webkit-scrollbar-thumb {
+        background-color: #34495e;
+        border-radius: 4px;
+    }
+</style>
 </head>
 <body>
-    <h1>Welcome</h1>
-    <ul>
-        <li><a href="/jupyter/">JupyterHub</a></li>
-        <li><a href="/static/">Static Site</a></li>
-    </ul>
+    <nav>
+        <ul id="nav-menu"></ul>
+        <ul class="admin-links">
+            <li><a href="/jupyter/" target="_blank">JupyterHub</a></li>
+            <li><a href="/sftp/" target="_blank">Data Admin</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <header>
+            <img src="img/welcome_metabar.webp" alt="Welcome Banner">
+        </header>
+        <iframe id="content-frame" src=""></iframe>
+    </main>
+
+<script>
+const iframe = document.getElementById("content-frame");
+const navMenu = document.getElementById("nav-menu");
+
+/**
+ * Génère récursivement le menu à partir de l'arborescence JSON
+ */
+function buildMenu(items, parent) {
+    items.forEach(item => {
+        const li = document.createElement("li");
+
+        if (item.children) {
+            const folder = document.createElement("div");
+            folder.className = "folder";
+            folder.textContent = item.label;
+
+            const subUl = document.createElement("ul");
+            subUl.classList.add("collapsed");
+
+            folder.addEventListener("click", () => {
+                folder.classList.toggle("open");
+                subUl.classList.toggle("collapsed");
+            });
+
+            li.appendChild(folder);
+            li.appendChild(subUl);
+            parent.appendChild(li);
+
+            buildMenu(item.children, subUl);
+        } else if (item.file) {
+            const a = document.createElement("a");
+            a.href = "#";
+            a.textContent = item.label;
+            a.addEventListener("click", e => {
+                e.preventDefault();
+                iframe.src = "pages/" + item.file;
+                history.replaceState(null, null, "#" + item.file);
+            });
+            li.appendChild(a);
+            parent.appendChild(li);
+        }
+    });
+}
+
+fetch('pages/pages.json')
+    .then(resp => resp.json())
+    .then(pages => {
+        buildMenu(pages, navMenu);
+
+        // Charger la page par défaut (1ère sans enfants)
+        let defaultPage = null;
+        function findFirstFile(items) {
+            for (const it of items) {
+                if (it.file) return it.file;
+                if (it.children) {
+                    const child = findFirstFile(it.children);
+                    if (child) return child;
+                }
+            }
+            return null;
+        }
+        defaultPage = findFirstFile(pages);
+
+        if (location.hash) {
+            iframe.src = "pages/" + location.hash.substring(1);
+        } else if (defaultPage) {
+            iframe.src = "pages/" + defaultPage;
+        }
+    })
+    .catch(err => {
+        console.error("Erreur chargement pages.json", err);
+        iframe.srcdoc = "<p>Impossible de charger le contenu.</p>";
+    });
+</script>
 </body>
 </html>
