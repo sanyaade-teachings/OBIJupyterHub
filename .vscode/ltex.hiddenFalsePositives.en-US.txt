@@ -1,0 +1,1 @@
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QA password that secures access to the system\nA user number or UID (User IDentifier) that identifies the user on the machine\nA location on the hard disk to store the user's files, called Home or home\nA group of users, which allows working in groups on the machine (see later)\\E$"}

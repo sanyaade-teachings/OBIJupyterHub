@@ -1,0 +1,1201 @@
+---
+title: "Introduction to Unix"
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    code-tools: true
+    code-fold: true
+---
+
+# Introduction to Unix
+
+## Why Unix?
+
+Unix is more than a historical artifact; it's a foundational philosophy for modern computing. Its design, born at AT&T's Bell Labs in the late 1960s, has proven so effective that it powers most of the digital world today, from the servers that run the internet to the smartphones in our pockets.
+
+### A Legacy of Openness and Collaboration
+Unix's rapid growth was fueled by its initial distribution as source code. This openness allowed a community of academic and commercial developers to adapt and improve it, leading to many variants. Its design principles—simplicity, modularity, and composability—made it exceptionally powerful for programming and scientific computing, a reputation it still holds.
+
+### Unix Today: Certification and "Unix-like" Systems
+Strictly speaking, "UNIX" is a trademark owned by The Open Group^[http://www.opengroup.org], which sets standards and certifies compliant systems. The most prominent certified Unix system today is Apple's macOS.
+
+However, the most significant evolution of Unix is the family of "Unix-like" operating systems, primarily GNU/Linux^[http://www.gnu.org] and the BSD variants. Although not always formally certified, they adhere closely to the Unix design and are functionally similar. Linux, in particular, has become the dominant Unix-like OS, running on everything from tiny embedded devices to nearly all of the world's top supercomputers.
+
+In essence, understanding Unix is understanding the DNA of most modern operating systems outside of Windows.
+
+## The Unix System - General Overview
+
+Unix is a multi-user, multitasking operating system. This means it can support multiple people working on the same computer simultaneously, while allowing each user to run several programs in parallel. To manage this shared environment effectively, Unix implements sophisticated resource management and a permissions system that ensures one user's activities cannot interfere with another's. This framework requires careful management of user accounts, file access, and program execution modes.
+
+## Users
+
+To access a Unix system, each person requires a user account—essentially, authorization to use the machine. Every account is identified by a unique username, commonly referred to as a *login*.
+
+Each login is associated with several key attributes:
+
+- A **password** to secure account access
+- A numeric **User ID (UID)** that uniquely identifies the user to the system
+- A **home directory** where the user's personnel files are stored
+- A **primary group** that facilitates collaborative work and resource sharing (discussed later)
+
+This user information is typically stored in the system's `/etc/passwd` file, a plain-text database containing all user accounts.
+
+```{bash}
+#| label: passwd
+#| caption: >
+#|   Sample excerpt from an /etc/passwd file. Each line represents one user account,
+#|   with fields separated by colons. The fields show, in order: username, 
+#|   password placeholder, UID, group ID, descriptive name, home directory path, 
+#|   and default shell.
+
+cat /etc/passwd | head -15
+```
+
+
+## The File System
+
+The file system of an operating system corresponds to all the mechanisms for managing the computer's storage space (hard disks). Data or programs are stored on the computer in files. A file can therefore be assimilated to a small part of a hard disk dedicated to storing a set of data. In order to be able to unambiguously identify all files present in a computer, each of them has a name. This name is unique, meaning that one name corresponds to only one file.
+
+### Filenames
+
+In a Unix system, a file name describes a path in a tree. A file name begins with a `/` character and is composed of the succession of the labels of the nodes describing the file's place in the name tree. Each label is separated from the one preceding it by this same `/` character. For example, the file `/etc/passwd`, described earlier in the paragraph dedicated to user management, indicates that this file is located in the tree at the level of one of its nodes (directory) named `/etc`. The name of this directory indicates that it is itself located at the root of the file name tree `/` (see Figure @fig-fs-unix).
+
+```{bash}
+#| label: fig-fs-unix
+#| fig-cap: >
+#|   Example of part of the hierarchy of a Unix file system: The path marked in 
+#|   red corresponds to the filename `/etc/passwd`. This file contains all the 
+#|   information describing the users of a Unix system.
+
+tree -L 2 /
+```
+
+This naming system leads to saying that all files in a Unix system are arranged in a tree structure. In this structure, each internal node is designated as a directory, and each leaf of the tree is either a file or an empty directory.
+
+This tree structure contains certain directories that are found in many Unix systems. Among these we can mention:
+
+- `/etc` is a directory that contains system parameter files
+- `/var` is a directory that contains information about system operation
+- `/bin` is a directory that contains the system's basic programs
+- `/usr` is a directory that contains a large part of the system
+- `/usr/local` is a directory that contains all programs specific to a machine
+
+### Lexical Rules for Filenames
+
+The names of the labels constituting a file name can contain alphabetic characters (`a-z` and `A-Z`), numeric characters (`0-9`), and punctuation marks (`&`, `$`, `*`, `+`, `=`, `.`, etc.). However, the use of some of these signs can cause problems, so it is recommended to use only the signs: `.`, `%`, `-`, `_`, `:`, `=`.
+
+In Unix, uppercase and lowercase letters are different characters, so the names `FOO`, `foo`, `Foo`, and `FoO` are all different.
+
+File names beginning with the character '.' are hidden files and most often correspond to configuration files.
+
+### Some Subtleties in the File Name Tree
+
+#### Links
+
+The concept of a link (*link* in English) can be assimilated to the concept of a shortcut offered by other operating systems. A link is therefore a special file that creates additional edges in the file name tree. From a computer science point of view, the tree structure therefore becomes a *directed acyclic graph* or *DAG*, since there are for some nodes multiple paths from the root. Creating a link in a Unix file system amounts to creating a synonymy between the added link and the file pointed to by the link. In the example in Figure @fig-fs-link, the link `/home/bar/programs` points to the directory `/usr/bin`. There is therefore a relationship of synonymy between these two names. This relationship extends to all names located under the name `/usr/bin`. The name `/home/bar/programs/grep` is therefore synonymous with `/usr/bin/grep`. There are therefore two paths to go from the root node `/` to the node `grep`, the file tree is therefore in reality a *DAG*.
+
+```{bash}
+#| label: fig-fs-link
+#| fig-cap: >
+#|   `/home/bar/programs` a link to the directory `/usr/bin`: 
+#|   The special file `/home/bar/programs` is a so-called *symbolic* 
+#|   link to the directory `/usr/bin`. It creates a synonymy in the file 
+#|   tree between the names `/usr/bin` and `/home/bar/programs`.
+
+ls -la /home/bar/
+```
+
+#### The Directories "." and ".."
+{#point-pointpoint}
+
+The Unix system uses this link system to facilitate the use of the file name tree. When creating a directory node, the system automatically adds under this node two links named respectively *dot* "." and *dot dot* "..". The link "." is a shortcut to the directory that contains it, while the link ".." points to the parent directory of that directory (see Fig. @fig-fs-spdir).
+
+```{bash}
+#| label: fig-fs-spdir
+#| fig-cap: The links "." and ".." allow moving up the tree.
+
+ls -la
+```
+
+These links mean that for each file there is not one name but an infinity of possible names. The file `/home/bar/my_file` can also be named:
+
+- `/home/bar/./my_file`
+- `/home/bar/../../home/bar/my_file`
+- `/home/bar/./././my_file`
+
+The multiplicity of synonymous names for the same file may seem quite futile, but it becomes very useful with the concept of *relative filenames* discussed in the following paragraph.
+
+### The Current Directory and Relative Filenames
+
+The tree structure of Unix filenames is very powerful because it allows the classification of files in a hierarchical structure. The addition of the concept of links makes it possible to complexify this classification by basing it on a DAG rather than on a simple tree. But this naming method has the disadvantage of producing very long filenames that are absolutely not practical to use, especially if these names have to be entered on a keyboard. To overcome this problem, Unix offers the concept of *current directory* and *relative paths*.
+
+#### The Current Directory
+
+From a practical point of view, when working on a machine, we perform series of calculations on a set of data files. At a given moment, the set of files we use is mainly located in the same region of the name tree, because we normally store files corresponding to the same experiment in the same directory. It follows that all the names of these files begin in the same way. The part common to all these names is the name of the directory where all our files are stored. The idea of the *current directory* is therefore to store this common factor in an environment variable called `CWD` (Current Working Directory). By default, when we connect to our Unix account on a machine, this variable is initialized with the name of our *home* directory. The value of this variable can be modified using the Unix command `cd` (page @unix-cd).
+
+#### Relative Paths
+
+Relative file names or relative paths are expressed relative to this current directory. To know the real name corresponding to a relative name, you must concatenate the name of the current directory and the relative name.
+
+- Consider the following Unix filenames:
+  - `/home/foo/exp_1/sequence.fasta`
+  - `/home/foo/exp_1/expressions.dat`
+  - `/home/foo/exp_1/annotation.gff`
+
+- If the current directory is: `/home/foo/exp_1`, we can name these same files:
+  - `sequence.fasta`
+  - `expressions.dat`
+  - `annotation.gff`
+
+A relative name is recognized by the fact that it does not begin with the character "/". In opposition to the concept of a relative name or path, we speak of absolute paths or names for complete file names. They always begin with the character "/".
+
+### Access Rights
+
+Unix is a multi-user system. So that each user's data is safe from other users, each file belongs to a specific user (generally its creator) and to a group of users. In addition, each file is assigned a set of access rights that concern:
+
+- The owner of the file
+- The group to which the file belongs
+- All other users of the machine
+
+For each of these three categories of users, there is a read, write, and execute right.
+
+- The **read right** gives the right to read the file
+- The **write right** gives the authorization to modify or delete it
+- The **execute right** allows executing the file if it contains a program
+
+It should be noted that the execute right given to a directory indicates that you have the right to use it as an element of a file name. Thus, most often the file owner has read and write rights, and if necessary execute, while the group has only read rights and possibly execute, which allows sharing work within a team. Finally, the rest of the users have either rights similar to the group, or no rights. These rights can be modified by the file owner using the `chmod` instruction (page @unix-chmod).
+
+## Processes
+
+We previously explained that programs, like data, are stored in computer files. A program corresponds to a series of calculation instructions that the computer must execute to perform a task. If it is important to store this series of instructions in order to be able to reuse it regularly, it is also very important to be able to execute it. A process corresponds to the execution of a program. Since the Unix system is multitasking and multi-user, it is quite possible for the same program to be executed simultaneously by several processes. It is therefore important to clearly distinguish between program and process.
+
+### Anatomy of a Process
+
+To give a concrete aspect to our process, we can consider that it corresponds to a part of the computer's memory dedicated to the execution of a program. This piece of memory can be divided into three main parts: the environment, the data area, and the program area.
+
+```{bash}
+#| label: fig-process-anatomy
+#| fig-cap: >
+#|   Anatomy of a process: a process can be divided into three main parts 
+#|   that it inherits from its parent.
+
+ps aux
+```
+
+#### The Environment of a Process
+
+A process is an isolated memory area from the rest of the machine in which a program executes. The isolation secures the computer by preventing a program from corrupting the execution of others. Nevertheless, a program must during its execution interact with the rest of the computer, for example to retrieve the data on which it will work and return the results of these calculations.
+
+The environment of a process is dedicated to this interface task between the process and the rest of the system. It contains the description of the system elements that must be known to the process. Roughly, two main types of information are stored in a process's environment: environment variables and streams.
+
+Environment variables make it possible to associate a name with a value describing certain properties of the system. Some of these variables are of very general use, such as `CWD` which contains the "Current Working Directory" used for interpreting relative paths or `PATH` which contains the list of directories where the programs available on the machine are stored. Other variables have a more restricted use, for example `BLASTMAT` and `BLASTDB` are two environment variables used by the `blast` program from NCBI^[http://blast.ncbi.nlm.nih.gov/]. It is possible to obtain the list of environment variables set by the `env` command (page @unix-env). The Unix command to define or modify an environment variable depends on the Unix *shell* you are using. Under `csh` the command is `setenv` (page @unix-setenv).
+
+Streams are virtual pipes through which data flows. A stream operates either in reception or in data transmission. The other end of this pipe is directed either to a file or to another process. Streams, often called "*pipe*" in the Unix world, are the preferred means of data transmission between two processes working together. By default, at least three streams are associated with each process. The standard input stream "*stdin*" through which a Unix program normally receives its data, the standard output stream "*stdout*" which is used by the program to return its results, and the standard error output "*stderr*" used for transmitting error messages and information generated by the program during its execution. The use of these three streams is a Unix convention. A Unix system user therefore expects the program they are using to follow this standard. But it is the responsibility of the program designer to follow it, so some programs do not follow this model, which can sometimes confuse the uninformed user. Whenever a Unix program opens a file to read or write data, it actually modifies its environment by adding a new stream through which it can communicate with the rest of the system.
+
+The environment also contains some information specific to the process, such as its "Process IDentifier" (*PID*), a number allowing to unambiguously identify a process, and its "Parent Process IDentifier" (*PPID*), the *PID* of its parent process.
+
+#### The Code Area
+
+The code area contains a copy of the program to be executed. The program contained in this area can be replaced at any time by calling the `exec` system function so that the process can execute a new program.
+
+#### The Data Area
+
+It contains all the data used or produced at a time *t* by the execution of the program. It changes almost constantly in size and content since almost all instructions in the program lead to its modification to complete the calculations in progress.
+
+### The Genetics of Processes
+
+This paragraph could have been titled "Birth, Life and Death of a Process". Since your computer was turned on, a series of programs has been executed to initialize it and ensure its operation. All these programs are part of the operating system. Some of them are responsible for managing user connections to verify their *login* and password and to launch their first program: a Unix shell. This program will be responsible for launching the execution of other programs based on the Unix command lines entered by the user. We thus see that some programs of a Unix system during their own execution have the purpose of launching the execution of other programs. So a process is created by another process that we call "*parent*". Reciprocally, the new process is called "*child*". This notion of filiation leads me to draw an analogy between process management and a form of genetics that would be specific to them.
+
+Figure @fig-process-life presents graphically the stages of creation and destruction of a process. The important things to remember are:
+
+- Every process has a parent (except the initial process) and inherits all the properties of that parent: environment, data area, code of the program to be executed. If nothing is done, the same program therefore continues its execution in two independent processes. It is based on this principle that some programs parallelize their calculations on multiprocessor machines.
+
+- Every child must die before its parent. So when you close your Unix *shell* by disconnecting from the machine, you stop all your programs in progress unless you have detached them from their parent. Indeed, a good parent must kill his children before terminating. If he does not do so, the orphaned process will be adopted by the initial process.
+
+- A process is created by copying its parent, so it inherits all of its properties except the *PID* which is its own. In particular, the parent's environment will be preserved during the child's execution. It will therefore have the same environment variables and the same standard input/outputs.
+
+```{bash}
+#| label: fig-process-life
+#| fig-cap: >
+#|   Life and death of a process: Every process inherits through a more or less 
+#|   long chain of calls to the `fork` system function from the initial process 
+#|   with PID=1. When a process that we will call "parent" must create a child process, 
+#|   it calls the `fork` system function. This function creates a new process by duplicating 
+#|   the parent process identically. The only differences existing between these two processes 
+#|   are: the PID and the value returned by the `fork` function. The two processes, parent and 
+#|   child, then continue their execution (of the same program) at the level of the instruction
+#|   following the call to `fork`. The first thing a program must do after calling `fork` is to 
+#|   test the returned value to know whether it is executing in the parent or child process. At 
+#|   the end of its execution, the child process notifies its parent and enters a waiting state 
+#|   called "zombie" until the parent finishes destroying it.
+
+pstree
+```
+
+The normal chronology to create a new process is to call the `fork` function, to test after this call in which process the program continues its execution. In the child process, you must then call the `exec` function to replace the old program of the new process with the code of the new program to be executed. At the end of this execution, the parent is notified of the end of its child, it definitively releases the process.
+
+## The Shell - A Working Environment
+
+The shell is the most important program for a Unix user. It is through it that they interact with their computer. There is a graphical window system under Unix similar to those encountered under Windows or macOS, it is called XWindows or abbreviated X11. It has the advantage of functioning in client/server mode across the network. This means for a user that their program can run on one machine while they interact with it via their control windows from a second machine. However, we will not talk about this system further in this Unix presentation and we will content ourselves with interacting with our Unix machine in "text" mode via the shell.
+
+The Unix shell^[a shell, i.e., a small protected space in a large Unix machine from which it is possible to work] is a program capable of interpreting a command language. These commands allow the user to launch the execution of a program by specifying to it the data on which it must work, possibly some parameters to adjust its execution, and what should be done with the results. There are many shells. What differentiates them is that their command language is not strictly identical. Two shells are mainly used today: `bash` for "Bourn again shell" which is the modern version of the Bourn shell^[Bash website: http://www.gnu.org/software/bash] (`sh`) and `tcsh` for "Turbo C-Shell" the modern version of the C-Shell^[tcsh website: http://www.tcsh.org/Welcome] (`csh`). Other shells exist such as the Korn shell (`ksh`) developed by David Korn in the early 1980s or the Z-Shell (`zsh`) written by Paul Falstad in 1990 which is another improved version of the Bourn-Shell. Most of these shells allow performing the same operations but sometimes using different syntaxes. Some people prefer one or the other but their reasons are most often subjective. In the rest of this presentation, we will only use `tcsh`. By default on most Unix machines, the two shells: `bash` and `tcsh` are installed. When you connect to a Unix machine, one of the two is launched for you by default. It is possible to change your default shell using the `chsh` command (see page @unix-chsh) or to switch from one shell to another using the commands `bash` (see page @unix-bash) and `tcsh` (see page @unix-tcsh).
+
+### Basic Structure of a Unix Command
+
+A shell is therefore a program that interprets a computer language that allows easily launching the execution of other programs by indicating to them where to find their data and what to do with the results they produce. This language, like all others, has a vocabulary and a grammar. The languages of the different shells can be considered as dialects of the same language. Also, there are great similarities between them. All the explanations we provide here concern `tcsh` but for the most part, they are applicable to other shells.
+
+The language of a shell mainly defines a grammatical rule. This rule describes the structure of a basic Unix command. The purpose of a Unix command is to trigger the execution of a program by indicating all the information necessary for its proper execution. We can take as a principle that for every program installed on a Unix machine there corresponds a command usable from the shell that bears the name of the program and that reciprocally, every Unix command is the name of a program installed on the computer. The set of Unix commands is therefore infinite, since when you install or write a new program, this in fact adds a new command to your Unix system. However, there is a set of commands installed by default on all Unix systems. We give you on page @section-commandes-unix a list of the main commands that you can use on all Unix computers you will use.
+
+```{bash}
+#| label: fig-basic-command
+#| fig-cap: >
+#|   Basic structure of a Unix command line: a command line is divided into four main parts. 
+#|   Only the first is mandatory, it indicates the program to use. The others allow defining 
+#|   the program's operating modes as well as the data to use and what to do with the results.
+```
+
+A Unix command line can be divided into four main parts (see Fig. @fig-basic-command). Each of these parts plays a particular role. Only the first part that we will call *command* is mandatory; all the others are optional. It is therefore perfectly possible to build a command line consisting only of a command and an argument without any options or redirection instructions being specified.
+
+#### The Unix Command
+
+A Unix command is the name of a program installed on the machine. Thus, when you execute a Unix command like `ls` or `egrep`, you are actually launching the execution of a program of the same name installed on your computer. There is therefore somewhere stored in the hard disks of the latter a file that contains the code of the program to be executed. The question that then arises is: "How does the machine manage to find the file associated with a command when it is asked to interpret it?" It is obvious that if the computer had to search each time a Unix command is executed throughout its hard disks for the file to be executed, the search time would in most cases be longer than the program's calculation time. To allow a reasonable search time, program files are only searched for in a subset of the directories existing on the machine. This subset is described by a list of directories stored in an environment variable named `PATH`. It is possible to consult this list (see example @shell-path) or to modify it with the `setenv` command. The order of appearance of directories in this list plays a role if several programs exist with the same name in different directories in the list.
+
+```{bash}
+#| label: shell-path
+#| caption: >
+#|   Display the PATH environment variable: The PATH environment variable contains the list 
+#|   of directories containing the programs installed on the computer. Each directory name 
+#|   is separated from the others by the character ":". Programs are searched in each of the
+#|   directories in the order they appear in this list. If in two distinct directories, two 
+#|   programs exist with the same name, it is therefore the one that appears in the first 
+#|   directory that will be executed. Programs not installed in these directories must be 
+#|   used by specifying their location on the hard disk.
+
+echo $PATH
+```
+
+If you want to execute a program whose file is located in a directory not listed in the `PATH` variable, you must indicate as the command name the name of the file containing this program either by its absolute path or by its relative path (see example @shell-program). If the program is in the current working directory, you must precede its name with `./` to indicate where to find it (see example @shell-program-courant), the dot being an alias of the current directory (see page @point-pointpoint).
+
+```{bash}
+#| label: shell-program
+#| caption: >
+#|   Execute a program located in a non-standard directory: Suppose we have in our main directory 
+#|   a directory named `myprograms` in which I store all my analysis programs. In this directory, 
+#|   I have a script named `myscript.csh`. To execute it, I must indicate its name by the 
+#|   relative path of the file.
+
+ls -l
+ls -l myprograms/
+myprograms/myscript.csh turlututu
+```
+
+```{bash}
+#| label: shell-program-courant
+#| caption: >
+#|   Execute a program located in a non-standard directory: If the program is in the current 
+#|   directory, it is necessary to add `./` before its name to specify its location.
+
+cd myprograms/
+ls -l
+./myscript.csh tirlipompom
+```
+
+#### Command Options
+
+Command options allow altering its operation by adjusting its parameters. Options are easily recognized in a command line by the fact that they take either the form of a character preceded by the sign "-" or a complete word preceded by two minus signs. In the latter case, we speak of options in their long form. Many programs have two synonymous options, one in long form and the other in short form with one letter (see example @options-commande).
+
+```{bash}
+#| label: options-commande
+#| caption: >
+#|   Options modify the behavior of a program: the `egrep` command filters a text file to only 
+#|   let through the lines of it containing an instance of the searched pattern (`Root` in our
+#|   example. By default, `egrep` is case-sensitive. The option `-i` or `--ignore-case` in its 
+#|   long form allows ignoring case. The lines of the `/etc/passwd` file containing the word 
+#|   `root` in lowercase are therefore correctly found.
+
+egrep root /etc/passwd
+egrep Root /etc/passwd
+egrep -i Root /etc/passwd
+egrep --ignore-case Root /etc/passwd
+```
+
+Some options require arguments, for example the `-B` or `--before-context` option of the `egrep` command allows indicating how many lines located before a line normally printed by an `egrep` command should also be printed. These options therefore require an argument specifying the number of lines to add (see example @options-with-arguments). When using the short form of the option (`-B`), it is sufficient to add this number following the option, separated or not by a space: `-B 9` or `-B9`. If you use the long form, the argument is associated with its option by the sign "=": `--before-context=9`.
+
+```{bash}
+#| label: options-with-arguments
+#| caption: >
+#|   Options can require arguments: The `-B` and `--before-context` options require as an argument 
+#|   the number of lines of the filtered text that should be added before each of the lines that 
+#|   would normally be kept by an `egrep` command.
+
+grep -B 2 root /etc/passwd
+grep --before-context=1 root /etc/passwd
+```
+
+It is frequent when using several options of a program in their short form to group their names behind a single "-" sign (see example @options-concat). If one of these options requires an argument, it is mandatory to place it in last position so that the argument can be added after it. If several options require arguments, it will not be possible to concatenate them into a single group. This possibility of grouping options makes it possible to simplify the writing of options but is absolutely not mandatory. It is not possible with options in their long form.
+
+```{bash}
+#| label: options-concat
+#| caption: >
+#|   Short options can be concatenated: When several short options are used, their names can 
+#|   be concatenated behind a single "-" sign. If one of them requires an argument, it must be 
+#|   placed in last position.
+
+grep -iB 2 Root /etc/passwd
+```
+
+The order of appearance of arguments in a Unix command line is normally unimportant. If the order of options influences the behavior of the program, this will be specified in its manual.
+
+#### Command Arguments
+
+The argument part of a Unix command allows indicating to the program the data on which it must work apart from those possibly transmitted by the standard input. Depending on how it has been programmed, a program can accept one or more arguments. Each of these arguments can have a distinct role that depends on the program you are using. To know the role of each of the arguments passed to a program, it is necessary to consult its manual, its Unix man page via the `man` command, or its online help which is most often accessible by calling the program with the `-h` option.
+
+#### Standard Input/Output Redirection Orders
+
+This fourth part of a Unix command line is very important; it allows specifying how your program should set its standard inputs/outputs. This is certainly one of the most important things to understand to fully benefit from the Unix system. This is why all these redirection mechanisms will be explained in detail on page @subsection-redirections.
+
+### Filenames with Ambiguities
+{#fichier-star}
+
+It is very common in a Unix command to need to indicate the name of several files. When this number of files becomes very large, it can be tedious to enter these names one by one on the keyboard. This is all the more unfortunate if all the names of these files have common points. For example, I want to indicate all files whose name ends with `.txt`.
+
+To answer this problem, there is a series of "wildcard" characters that can be used to indicate the pattern of the file name you want. Three characters exist:
+
+| Character | Description |
+|-----------|-------------|
+| `*` | The asterisk replaces zero, one, or more characters. |
+| `?` | The question mark replaces one character. |
+| `[...]` | A list of characters between brackets replaces one of the characters in the list. |
+
+Each word in a Unix command line using one of these characters will be replaced during its execution by the list of file names existing on the computer and corresponding to this pattern. If no file name matches the indicated pattern, a "No match" error is generated by the shell.
+
+```{bash}
+#| label: cmd-bash
+#| caption: Examples of using filenames with ambiguities.
+
+ls -l
+echo *foo
+ls /
+echo /mach*
+echo /*.*
+echo /[AD]*
+echo /[uv]??
+```
+
+These filenames with ambiguities are most often used with file manipulation commands such as copy (`cp` command page @unix-cp), deletion (`rm` command page @unix-rm), or the `ls` command (page @unix-ls) allowing to obtain a list of files. They are also frequently used in loops that allow launching the same Unix command on a whole series of data sets.
+
+### Redirection of Standard Inputs-Outputs
+{#subsection-redirections}
+
+The property that certainly gives all its power to a shell is its system of redirection of standard inputs/outputs. Each process inherits from its parent process three standard data streams named:
+
+- stdin: the standard input stream
+- stdout: the standard output stream
+- stderr: the standard error stream
+
+Each of these streams has one of its ends connected to the process to allow it to receive and emit data. The other end can be connected at will to a file, a computer peripheral^[In Unix, all computer peripherals are seen by the system as files], or another process in order to be able to indicate to the program the origin of its data and the destination of its results.
+
+```{bash}
+#| label: fig-shell-inoutput
+#| fig-cap: Setting the standard inputs and outputs of the shell.
+```
+
+The shell is no exception to this rule. By default, its inputs and outputs are set as shown in Figure @fig-shell-inoutput. The *shell* reads its data from the keyboard, which allows us to enter the Unix command lines we want to execute. It writes its results as well as its error messages on our terminal screen, which allows us to visualize them. Since all the programs we launch through it are executed in processes of which it is the parent, each of them sees their inputs and outputs set in the same way.
+
+Thus, when we request the execution of an `ls` command, a new process is created by our *shell* to execute the code of this program. The `ls` program writes the list of files it must return to us on its standard output *stdout*. This output is inherited from its parent the shell and therefore points to our terminal. Finally, we can observe the result of the `ls` command displayed on our screen.
+
+#### Redirection of Standard Output
+
+The first interest of the redirection mechanism is to allow saving the results generated by a program in a file. Every Unix program programmed according to the rules of the art writes its results on its standard output. By default, they are therefore displayed on the screen. To redirect these results into a file so that they are saved, you must add to the end of the command line a standard output redirection instruction. It consists of a ">" character followed by a file name. The ">" character should be seen here as an arrow coming out of the process and not as a greater than sign.
+
+In example @stdout, the `ls` command is executed a first time in a classic way, then a second time by redirecting its standard output to the file `my_listing`. The third `ls` command allows us to verify that a new file `my_listing` now exists in our working directory. With the `cat` command, I can display the content of this file which indeed contains the list of files generated by the second call to the `ls` command.
+
+```{bash}
+#| label: stdout
+#| caption: Redirection of standard output.
+
+ls /
+ls / > my_listing
+ls -l
+cat my_listing
+```
+
+In this case, the connection diagram of the standard inputs and outputs of the process executing the `ls` program is presented in Figure @fig-ls-stdout. Only the standard output *stdout* is redirected. The error output remains connected to the terminal, which will therefore continue to retransmit any error messages generated.
+
+If the file `my_listing` does not exist, it is created and filled with the results of the command. If this file already exists, the existing file is deleted and a new file with the same name is substituted for it. You must therefore be careful: this redirection mechanism very easily allows deleting a file containing other results.
+
+If you want to add the results generated by our program to the end of an already existing file, you must replace the single character ">" with two characters stuck together: ">>". In this case, if the output file does not exist, it is created as before. If it exists, the results are added to the end of this file.
+
+```{bash}
+#| label: fig-ls-stdout
+#| fig-cap: Redirection of the standard output of an `ls` command.
+```
+
+#### Redirection of Standard Input
+
+The counterpart of standard output redirection is that of standard input. The purpose of this redirection is to indicate to a program reading its data on its standard input where to find them.
+
+The redirection of standard input is materialized in the redirection part of a command by the character "<" which, as before, should be seen as an arrow entering the process and not as a less than sign.
+
+```{bash}
+#| label: stdin
+#| caption: Redirection of standard input and standard output.
+
+egrep or < my_listing
+egrep or < my_listing > my_selection
+cat my_selection
+```
+
+The `egrep` command selects among the lines of text it receives on its standard input those containing a certain pattern (`or` in the case of example @stdin) to copy them to its standard output. To indicate to the process executing the `egrep` program that it should read the text to be analyzed from the file `my_listing`, it is sufficient to redirect its standard input *stdin*. Simultaneously with this redirection, it is also possible to redirect the standard output to a new file: `my_selection` in our example.
+
+#### Redirection of Standard Output to Another Process
+
+The last redirection mode allows linking the standard output of a first process to the standard input of a second. The first program produces as results the data of the second. The passage of data is done directly between the two processes without going through the intermediary of a file. We say that we create a pipe between the two processes. This system allows building a data processing pipeline where each process performs part of the data processing before providing it to the next process.
+
+From a syntactic point of view, the language of a shell allows achieving this effect by building a command line consisting of two or more commands, each with their options, arguments, and redirections joined by the character "|" (see Figure @fig-commande-tube).
+
+```{bash}
+#| label: fig-commande-tube
+#| fig-cap: Structure of a double command.
+```
+
+It should be noted that commands upstream of a pipe cannot redirect their standard output to a file since they are already redirecting it to the next command, and symmetrically, a command downstream of a pipe cannot redirect its standard input which is already linked to the standard output of the previous command.
+
+```{bash}
+#| label: pipe
+#| caption: Construction of a complex command with a pipe.
+
+ls / | grep or
+ls / | grep or > my_selection
+cat my_selection
+```
+
+In a complex command like the one presented in example @pipe, a process is created for each of the commands and it is just the data that flows from one process to the other (see Figure @fig-ls-egrep-pipe).
+
+```{bash}
+#| label: fig-ls-egrep-pipe
+#| fig-cap: Construction of a pipe between two processes.
+```
+
+### Building an Execution Loop
+
+The interest of a computer lies in its ability to automatically perform repetitive calculation tasks. Regularly, the user finds themselves in the situation where they must launch the same Unix command to perform a calculation on several data sets. If each of these data sets is saved in a different file and if we have taken care to name these files in a coherent manner (for example `gis_vercors.dat`, `gis_belledonne.dat`, `gis_chartreuse.dat`, and `gis_bauge.dat`), then it will be possible to take advantage of the loop structure offered by Unix shells.
+
+#### Shell Variables
+
+Working automatically and repetitively requires using variables to store useful information that changes at each iteration. For example, if your Unix command must execute by reading its data in different files from one execution to another, you can no longer write the file name in your command since it will not always be the same.
+
+You already know the environment variables that are set by the `setenv` command and that serve to store information relating to the configuration of your system. There are simple variables that allow you to store for the duration of your Unix session all the information you deem necessary. They are set by the `set` command. To retrieve the value contained in a variable, simply precede its name with the "$" character (see example @variable).
+
+```{bash}
+#| label: variable
+#| caption: Setting and displaying a variable.
+
+set myvariable="hello world"
+echo myvariable
+echo $myvariable
+```
+
+#### The `foreach` Loop
+
+For our problem, repeating the same Unix command several times by making it work on different data files, we are going to create a variable that will take in turn as value each of the elements of a list. In our case, this list will be a list of file names and it will be built using the ambiguity characters on file names presented on page @fichier-star. To build such a variable whose value changes automatically, you must not use the `set` command, but the `foreach` command. All Unix commands inserted between the `foreach` command and its associated keyword `end` are executed once for each value taken by the variable.
+
+```{bash}
+#| label: boucle1
+#| caption: Construction of a `foreach` loop.
+
+echo /[mnop]*
+foreach f ( /[mnop]* )
+  echo I am working with file $f
+end
+```
+
+## Some Essential Unix Commands in Alphabetical Order
+{#section-commandes-unix}
+
+The commands presented here are a subset of all commands available by default on a Unix system. Similarly, they are only presented with a subset of their options. If you want a complete description of their functionality, it is best to refer to the online help that corresponds to them and which is accessible via the `man` command.
+
+### `awk`: Aho, Weinberger, and Kernighan
+{#unix-awk}
+
+Named after the initials of its three authors: Alfred V. Aho, Peter J. Weinberger, and Brian W. Kernighan, `awk` is a real programming language. The complete details of this language will not be addressed here. This language has been perfectly described by its authors in their book: "The AWK programming language" [@Aho:87:00].
+
+#### Prototype
+
+```bash
+awk [-F separator] program [data_file]
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-F` | Allows indicating the column separator. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `program` | A character string describing in the `awk` language the program to execute to transform the text. |
+| `data_file` | The file containing the text to transform. If this argument is absent, the standard input is taken as the data source. |
+
+### `bash`: Bourn-again shell
+{#unix-bash}
+
+Allows launching a `bash` shell. To quit this new shell, you must, when you are just after a prompt, press the keys `Ctrl+d`.
+
+#### Prototype
+
+```bash
+bash
+```
+
+The `bash` command allows launching the execution of a new `bash` shell that will henceforth interpret your commands until you quit it. Some commands and syntactic forms change between `tcsh` and `bash`. Among these, the commands for managing environment variables. The command is `export` under `bash` and `setenv` under `tcsh`. We can therefore use this trick to quickly determine in which type of shell environment our commands are executed.
+
+#### Example of Use
+
+```{bash}
+#| label: cmd-bash
+#| caption: Launch a `bash` shell.
+
+setenv foo
+export foo
+bash
+setenv foo
+export foo
+exit
+```
+
+### `bg`: Send a Process to Background
+{#unix-bg}
+
+Resumes the execution of a process suspended by pressing the `Ctrl+z` keys as a background task.
+
+#### Prototype
+
+```bash
+bg [%job]
+```
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `%job` | The job number to send to the background. This number is written preceded by the sign `%`. It is possible to obtain the list of suspended jobs using the `jobs` command. If no argument is provided, the last suspended job is taken by default. |
+
+#### Example of Use
+
+```{bash}
+#| label: cmd-bg
+#| caption: Sending a job to the background. The `sleep` command does nothing except wait for the indicated number of seconds. `^Z` symbolizes pressing the `Ctrl+z` keys.
+
+sleep 30
+# Press Ctrl+Z here
+jobs
+bg %1
+jobs
+jobs
+```
+
+### `cat`: Catalog
+{#unix-cat}
+
+Reads the content of one or more data streams and copies it identically to its standard output.
+
+#### Prototype
+
+```bash
+cat [file_name ...]
+```
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `file_name` | One or more file names can be provided as arguments. They will be read in turn and then written to the standard output of the process. If no file name is indicated, then the data is read from the standard input. |
+
+### `cd`: Change Directory
+{#unix-cd}
+
+Changes the current working directory.
+
+#### Prototype
+
+```bash
+cd [directory_name]
+```
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `directory_name` | The name of the new current working directory. In the absence of this, the `cd` command repositions you in your home directory. |
+
+#### Example of Use
+
+```{bash}
+#| label: cmd-cd
+#| caption: Changing directory.
+
+pwd
+ls -l
+cd myprograms/
+pwd
+cd ../..
+pwd
+cd
+pwd
+```
+
+### `chmod`: Change Mode of Files
+{#unix-chmod}
+
+Changes the access rights to a file.
+
+#### Prototype
+
+```bash
+chmod [-R] mode file_name
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-R` | Allows acting recursively on all elements contained in a directory if the `file_name` argument corresponds to a directory. This option has no effect if `file_name` points to a simple file. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `mode` | A character string describing the changes to be made to the file access rights. This string is composed of three parts. The first consists of one or more of the following three letters: "ugo" to indicate respectively *user*, *group*, and *other* the target of the rights to modify. The second part is the sign "+" to add a right or "-" to remove it. The third part consists of one or more of the following three letters: "rwx" for *read*, *write*, and *execute*. These last letters indicate the type of rights to modify. |
+| `file_name` | The name or names of the files whose mode should be changed. |
+
+### `chsh`: Change Shell
+{#unix-chsh}
+
+Changes the shell launched by default when you connect to your machine.
+
+#### Prototype
+
+```bash
+chsh -s new_shell
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-s` | Absolute path indicating the new shell to use by default at the next connection. |
+
+#### Example of Use
+
+```{bash}
+#| label: cmd-chsh
+#| caption: Changing shell.
+
+chsh -s /bin/tcsh
+```
+
+### `cp`: Copy Files
+{#unix-cp}
+
+Copies a file.
+
+#### Prototype
+
+```bash
+cp [-R] source_file target_file
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-R` | Allows acting recursively on all elements contained in a directory if the `source_file` argument corresponds to a directory. This option has no effect if `source_file` points to a simple file. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `source_file` | One or more file names to be copied. If one of these names is a directory name, then the `-R` option must be added to recursively copy the content of it. |
+| `target_file` | The name of the file copy. This name can be that of a directory, especially if there are several source files to copy. In this case, the file is copied under its same name in the indicated directory. The destination directory can be simply designated by the character "." which designates the current directory. |
+
+### `egrep`: Extended Global Regular Expression Print Tool
+{#unix-egrep}
+
+The regular expressions described in chapter @chap-expression-reguliere (page @chap-expression-reguliere) are very commonly used in Unix commands.
+
+#### Prototype
+
+```bash
+egrep [-i -R -v] pattern [file...]
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-R` | Allows acting recursively on all elements contained in a directory if the `file` argument corresponds to a directory. This option has no effect if `file` points to a simple file. |
+| `-i` | Performs a search without distinguishing between uppercase and lowercase. |
+| `-v` | Inverts the line selection. Only lines without an occurrence of the pattern are printed. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `pattern` | The pattern to be searched for in the filtered text. |
+| `file` | The name or names of files containing the text to transform. If this argument is absent, the standard input is taken as the data source. |
+
+### `env`: Environment of a Process
+{#unix-env}
+
+Visualizes all environment variables and allows launching a Unix command in a modified environment.
+
+#### Prototype
+
+```bash
+env [name=value ...] [command [argument ...]]
+```
+
+#### Example of Use
+
+```{bash}
+#| label: cmd-env
+#| caption: Configuring your execution environment.
+
+setenv hello "hello friends"
+env
+env hello="goodbye" env
+```
+
+### `diff`: Difference
+{#unix-diff}
+
+Finds the differences between two files containing text.
+
+#### Prototype
+
+```bash
+diff file1 file2
+```
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `file1` | The original file to compare. |
+| `file2` | The new version of the file. |
+
+### `fg`: Send a Process to Foreground
+{#unix-fg}
+
+Resumes the execution of a process suspended by pressing the `Ctrl+z` keys as a main task (foreground).
+
+#### Prototype
+
+```bash
+fg [%job]
+```
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `%job` | The job number to send to the foreground. This number is written preceded by the sign `%`. It is possible to obtain the list of suspended jobs using the `jobs` command. If no argument is provided, the last suspended job is taken by default. |
+
+### `head`: Head of a Text File
+{#unix-head}
+
+Retrieves the first lines of a text file.
+
+#### Prototype
+
+```bash
+head [-num] [file]
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-num` | `num` must be replaced by a number indicating the number of first lines of the file that should be kept. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `file` | The name or names of files containing the text to filter. If this argument is absent, the standard input is taken as the data source. |
+
+### `join`: Join Two Text Files
+{#unix-join}
+
+Performs a join operation between two files.
+
+#### Prototype
+
+```bash
+join [-1 numcol] [-2 numcol] [-o format] file1 file2
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-1` | Indicates the column number to use for the join in the first file. |
+| `-2` | Indicates the column number to use for the join in the second file. |
+| `-o` | Allows specifying the output file format. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `file1` | The first file to merge. |
+| `file2` | The second file to merge. |
+
+### `kill`: Send a Signal to a Process
+{#unix-kill}
+
+Sends a signal to a process. Sending signals is one of the means that processes have to communicate with each other. There is a whole series of signals. The signal most used from the shell is the signal asking the recipient process to terminate (to kill itself). Hence the name of this Unix command.
+
+#### Prototype
+
+```bash
+kill [-signal | -l] pid
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-signal` | `signal` represents the signal number or its symbol. For example `-9` or its equivalent `-KILL` requests the stop of the target process. |
+| `-l` | Allows obtaining the list of signals. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `pid` | The number or numbers of the target processes. |
+
+### `ln`: Link Files
+{#unix-ln}
+
+Builds a link pointing to an existing file in the computer's file system hierarchy.
+
+#### Prototype
+
+```bash
+ln -s file [link_name]
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-s` | Indicates that the link should be created in symbolic mode. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `file` | Name of the file from which the link should be made. |
+| `link_name` | Name of the created link. If this name is absent, the name of the original file is used for the link. |
+
+### `ls`: Obtain a List of Files
+{#unix-ls}
+
+`ls` allows obtaining a list of file names meeting certain criteria.
+
+#### Prototype
+
+```bash
+ls [-altr] [file]
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-a` | Displays all files, even hidden files whose name begins with a ".". |
+| `-l` | Returns a list of files in its long form. |
+| `-t` | Sorts files by date order. |
+| `-r` | Reverses the sort order. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `file` | Name of the file or directories that the command should list. |
+
+### `man`: Obtain the Manual of a Command
+{#unix-man}
+
+`man` allows obtaining the user manual of a Unix command.
+
+#### Prototype
+
+```bash
+man command_name
+```
+
+### `mkdir`: Make a Directory
+{#unix-mkdir}
+
+`mkdir` creates a new directory.
+
+#### Prototype
+
+```bash
+mkdir [-p] directory ...
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-p` | Creates intermediate directories if they do not exist. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `directory` | Name of the directory or directories that the command should create. |
+
+### `mv`: Move Files
+{#unix-mv}
+
+Allows renaming a file. Since the full name of the file indicates its location in the hierarchy of a file system, renaming a file is equivalent to moving it in this tree. This explains the name of the command `mv` for move.
+
+#### Prototype
+
+```bash
+mv source_file target_file
+
+mv source_file ... directory
+```
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `source_file` | One or more file names to be moved or renamed. |
+| `target_file` | The name of the file copy. This name can be that of a directory, especially if there are several source files to move. In this case, the file is copied under its same name in the indicated directory. The destination directory can be simply designated by the character "." which designates the current directory. |
+
+### `paste`: Paste Two Files Line by Line
+{#unix-paste}
+
+Pastes two files line by line.
+
+#### Prototype
+
+```bash
+paste file1 file2
+```
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `file1` | The name of the first file to merge. |
+| `file2` | The name of the second file to merge. |
+
+### `ps`: Process List
+{#unix-ps}
+
+Displays a list of processes existing on the machine at the time of execution of this command.
+
+#### Prototype
+
+```bash
+ps [-aux] [-U username]
+```
+
+### `pwd`: Print Working Directory
+{#unix-pwd}
+
+The `pwd` command returns the name of the current directory that is used in the management of relative paths by the Unix system.
+
+#### Prototype
+
+```bash
+pwd
+```
+
+#### Example of Use
+
+```{bash}
+#| label: cmd-pwd
+#| caption: Display the current directory.
+
+pwd
+```
+
+### `rm`: Remove Files
+{#unix-rm}
+
+Deletes a file.
+
+#### Prototype
+
+```bash
+rm [-r] [-f | -i] file ...
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-r` | Puts the `rm` command in recursive mode to delete directories and their contents. |
+| `-f` | Activates "forced" mode which causes the deletion of all indicated files without confirmation. |
+| `-i` | Activates "interactive" mode which causes the deletion of all indicated files with a confirmation for each of them. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `file` | Name of the file or directories to be deleted. |
+
+### `sed`: Stream Editor
+{#unix-sed}
+
+The line text editor (stream). It allows automatically modifying a text file by following the sequence of instructions contained in a small program. This program is written in a language specific to `sed`.
+
+#### Prototype
+
+```bash
+sed [-E] program [file ...]
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-E` | Allows using extended regular expressions in a `sed` program. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `program` | A character string describing in the `sed` language the program to execute to transform the text. |
+| `data_file` | The file containing the text to transform. If this argument is absent, the standard input is taken as the data source. |
+
+### `setenv`: Set Environment Variable
+{#unix-setenv}
+
+Creates or modifies an environment variable. This command is specific to `tcsh`. A roundabout but simple way to check that our shell is indeed `tcsh` is to execute this command.
+
+#### Prototype
+
+```bash
+setenv [variable] [value]
+```
+
+### `sort`: Sort Lines of a File
+{#unix-sort}
+
+Sorts the lines of a file.
+
+#### Prototype
+
+```bash
+sort [-rn] [-k num] [file ...]
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-r` | The sort is performed in reverse order. |
+| `-n` | The sort is performed in numerical mode and not alphabetical. |
+| `-k` | Performs the sort on the column `num` of the file. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `file` | The name or names of files containing the text to sort. If this argument is absent, the standard input is taken as the data source. |
+
+### `tail`: Tail of a Text File
+{#unix-tail}
+
+Retrieves the last lines of a text file.
+
+#### Prototype
+
+```bash
+tail [-num] [file]
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-num` | `num` must be replaced by a number indicating the number of end lines of the file that should be kept. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `file` | The name or names of files containing the text to filter. If this argument is absent, the standard input is taken as the data source. |
+
+### `tcsh`: Turbo C-Shell
+{#unix-tcsh}
+
+Allows launching a `tcsh` shell. To quit this new shell, you must, when you are just after a prompt, press the keys `Ctrl+d`.
+
+#### Prototype
+
+```bash
+tcsh
+```
+
+### `uniq`: Unique Lines of a File
+{#unix-uniq}
+
+Replaces consecutive identical lines of a file with a single one.
+
+#### Prototype
+
+```bash
+uniq [-c] [file ...]
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-c` | Adds in the first column of each unique line the number of occurrences in the original file. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `file` | The name or names of files containing the text to filter. If this argument is absent, the standard input is taken as the data source. |
+
+### `wc`: Word Count
+{#unix-wc}
+
+Counts the letters, words, and lines of a text file.
+
+#### Prototype
+
+```bash
+wc [-l | -w | -c] [file]
+```
+
+#### Main Options
+
+| Option | Description |
+|--------|-------------|
+| `-l` | Only displays the number of lines contained in the file. |
+| `-w` | Only displays the number of words contained in the file. |
+| `-c` | Only displays the number of characters contained in the file. |
+
+#### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `file` | The name or names of files containing the text to filter. If this argument is absent, the standard input is taken as the data source. |
+
+## References
