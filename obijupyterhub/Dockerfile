@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     r-base r-base-dev \
     libcurl4-openssl-dev libssl-dev libxml2-dev \
     build-essential git curl \
+    texlive-xetex texlive-fonts-recommended texlive-plain-generic \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install R kernel + useful packages

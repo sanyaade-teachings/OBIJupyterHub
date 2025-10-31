@@ -5,7 +5,7 @@ format:
     toc: true
     toc-depth: 3
     code-tools: true
-    code-fold: true
+    code-fold: false
 ---
 
 # Introduction to Unix
@@ -43,6 +43,7 @@ This user information is typically stored in the system's `/etc/passwd` file, a 
 
 ```{bash}
 #| label: passwd
+#| eval: false
 #| caption: >
 #|   Sample excerpt from an /etc/passwd file. Each line represents one user account,
 #|   with fields separated by colons. The fields show, in order: username, 
@@ -50,6 +51,26 @@ This user information is typically stored in the system's `/etc/passwd` file, a 
 #|   and default shell.
 
 cat /etc/passwd | head -15
+```
+
+```{bash}
+#| echo: false
+#| output: asis
+echo "root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin"
 ```
 
 
@@ -63,12 +84,37 @@ In a Unix system, a file name describes a path in a tree. A file name begins wit
 
 ```{bash}
 #| label: fig-fs-unix
+#| eval: false
 #| fig-cap: >
 #|   Example of part of the hierarchy of a Unix file system: The path marked in 
 #|   red corresponds to the filename `/etc/passwd`. This file contains all the 
 #|   information describing the users of a Unix system.
 
 tree -L 2 /
+```
+
+```
+/
+├── bin -> usr/bin
+├── boot
+├── dev
+├── etc
+│   ├── passwd
+│   ├── group
+│   └── ...
+├── home
+│   ├── user1
+│   └── user2
+├── proc
+├── root
+├── tmp
+├── usr
+│   ├── bin
+│   ├── lib
+│   └── ...
+└── var
+    ├── log
+    └── ...
 ```
 
 This naming system leads to saying that all files in a Unix system are arranged in a tree structure. In this structure, each internal node is designated as a directory, and each leaf of the tree is either a file or an empty directory.
@@ -97,6 +143,7 @@ The concept of a link (*link* in English) can be assimilated to the concept of a
 
 ```{bash}
 #| label: fig-fs-link
+#| eval: false
 #| fig-cap: >
 #|   `/home/bar/programs` a link to the directory `/usr/bin`: 
 #|   The special file `/home/bar/programs` is a so-called *symbolic* 
@@ -106,6 +153,14 @@ The concept of a link (*link* in English) can be assimilated to the concept of a
 ls -la /home/bar/
 ```
 
+```
+total 12
+drwxr-xr-x 3 bar users 4096 Jan 15 10:30 .
+drwxr-xr-x 4 root root 4096 Jan 10 14:22 ..
+lrwxrwxrwx 1 bar users    8 Jan 15 10:30 programs -> /usr/bin
+-rw-r--r-- 1 bar users  123 Jan 15 10:25 document.txt
+```
+
 #### The Directories "." and ".."
 {#point-pointpoint}
 
@@ -113,9 +168,18 @@ The Unix system uses this link system to facilitate the use of the file name tre
 
 ```{bash}
 #| label: fig-fs-spdir
+#| eval: false
 #| fig-cap: The links "." and ".." allow moving up the tree.
 
 ls -la
+```
+
+```
+total 4
+drwxr-xr-x 3 user users 4096 Jan 15 10:30 .
+drwxr-xr-x 4 user users 4096 Jan 10 14:22 ..
+-rw-r--r-- 1 user users  123 Jan 15 10:25 file1.txt
+-rw-r--r-- 1 user users  456 Jan 15 10:26 file2.txt
 ```
 
 These links mean that for each file there is not one name but an infinity of possible names. The file `/home/bar/my_file` can also be named:
@@ -176,11 +240,21 @@ To give a concrete aspect to our process, we can consider that it corresponds to
 
 ```{bash}
 #| label: fig-process-anatomy
+#| eval: false
 #| fig-cap: >
 #|   Anatomy of a process: a process can be divided into three main parts 
 #|   that it inherits from its parent.
 
 ps aux
+```
+
+```
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.0 168016 10832 ?        Ss   Jan15   0:01 /sbin/init
+root         2  0.0  0.0      0     0 ?        S    Jan15   0:00 [kthreadd]
+root         3  0.0  0.0      0     0 ?        I<   Jan15   0:00 [rcu_gp]
+user      1234  0.1  0.5 172340 44512 pts/0    Ss   10:30   0:00 bash
+user      5678  0.0  0.2 162324 23456 pts/0    R+   10:31   0:00 ps aux
 ```
 
 #### The Environment of a Process
@@ -189,7 +263,7 @@ A process is an isolated memory area from the rest of the machine in which a pro
 
 The environment of a process is dedicated to this interface task between the process and the rest of the system. It contains the description of the system elements that must be known to the process. Roughly, two main types of information are stored in a process's environment: environment variables and streams.
 
-Environment variables make it possible to associate a name with a value describing certain properties of the system. Some of these variables are of very general use, such as `CWD` which contains the "Current Working Directory" used for interpreting relative paths or `PATH` which contains the list of directories where the programs available on the machine are stored. Other variables have a more restricted use, for example `BLASTMAT` and `BLASTDB` are two environment variables used by the `blast` program from NCBI^[http://blast.ncbi.nlm.nih.gov/]. It is possible to obtain the list of environment variables set by the `env` command (page @unix-env). The Unix command to define or modify an environment variable depends on the Unix *shell* you are using. Under `csh` the command is `setenv` (page @unix-setenv).
+Environment variables make it possible to associate a name with a value describing certain properties of the system. Some of these variables are of very general use, such as `CWD` which contains the "Current Working Directory" used for interpreting relative paths or `PATH` which contains the list of directories where the programs available on the machine are stored. Other variables have a more restricted use, for example `BLASTMAT` and `BLASTDB` are two environment variables used by the `blast` program from NCBI^[http://blast.ncbi.nlm.nih.gov/]. It is possible to obtain the list of environment variables set by the `env` command (page @unix-env). The Unix command to define or modify an environment variable depends on the Unix *shell* you are using. Under `bash` the command is `export` (page @unix-export).
 
 Streams are virtual pipes through which data flows. A stream operates either in reception or in data transmission. The other end of this pipe is directed either to a file or to another process. Streams, often called "*pipe*" in the Unix world, are the preferred means of data transmission between two processes working together. By default, at least three streams are associated with each process. The standard input stream "*stdin*" through which a Unix program normally receives its data, the standard output stream "*stdout*" which is used by the program to return its results, and the standard error output "*stderr*" used for transmitting error messages and information generated by the program during its execution. The use of these three streams is a Unix convention. A Unix system user therefore expects the program they are using to follow this standard. But it is the responsibility of the program designer to follow it, so some programs do not follow this model, which can sometimes confuse the uninformed user. Whenever a Unix program opens a file to read or write data, it actually modifies its environment by adding a new stream through which it can communicate with the rest of the system.
 
@@ -217,6 +291,7 @@ Figure @fig-process-life presents graphically the stages of creation and destruc
 
 ```{bash}
 #| label: fig-process-life
+#| eval: false
 #| fig-cap: >
 #|   Life and death of a process: Every process inherits through a more or less 
 #|   long chain of calls to the `fork` system function from the initial process 
@@ -233,22 +308,33 @@ Figure @fig-process-life presents graphically the stages of creation and destruc
 pstree
 ```
 
+```
+systemd─┬─NetworkManager───2*[{NetworkManager}]
+        ├─accounts-daemon───2*[{accounts-daemon}]
+        ├─avahi-daemon───avahi-daemon
+        ├─bash───pstree
+        ├─cron
+        ├─dbus-daemon
+        └─2*[systemd───(sd-pam)]
+```
+
 The normal chronology to create a new process is to call the `fork` function, to test after this call in which process the program continues its execution. In the child process, you must then call the `exec` function to replace the old program of the new process with the code of the new program to be executed. At the end of this execution, the parent is notified of the end of its child, it definitively releases the process.
 
 ## The Shell - A Working Environment
 
 The shell is the most important program for a Unix user. It is through it that they interact with their computer. There is a graphical window system under Unix similar to those encountered under Windows or macOS, it is called XWindows or abbreviated X11. It has the advantage of functioning in client/server mode across the network. This means for a user that their program can run on one machine while they interact with it via their control windows from a second machine. However, we will not talk about this system further in this Unix presentation and we will content ourselves with interacting with our Unix machine in "text" mode via the shell.
 
-The Unix shell^[a shell, i.e., a small protected space in a large Unix machine from which it is possible to work] is a program capable of interpreting a command language. These commands allow the user to launch the execution of a program by specifying to it the data on which it must work, possibly some parameters to adjust its execution, and what should be done with the results. There are many shells. What differentiates them is that their command language is not strictly identical. Two shells are mainly used today: `bash` for "Bourn again shell" which is the modern version of the Bourn shell^[Bash website: http://www.gnu.org/software/bash] (`sh`) and `tcsh` for "Turbo C-Shell" the modern version of the C-Shell^[tcsh website: http://www.tcsh.org/Welcome] (`csh`). Other shells exist such as the Korn shell (`ksh`) developed by David Korn in the early 1980s or the Z-Shell (`zsh`) written by Paul Falstad in 1990 which is another improved version of the Bourn-Shell. Most of these shells allow performing the same operations but sometimes using different syntaxes. Some people prefer one or the other but their reasons are most often subjective. In the rest of this presentation, we will only use `tcsh`. By default on most Unix machines, the two shells: `bash` and `tcsh` are installed. When you connect to a Unix machine, one of the two is launched for you by default. It is possible to change your default shell using the `chsh` command (see page @unix-chsh) or to switch from one shell to another using the commands `bash` (see page @unix-bash) and `tcsh` (see page @unix-tcsh).
+The Unix shell^[a shell, i.e., a small protected space in a large Unix machine from which it is possible to work] is a program capable of interpreting a command language. These commands allow the user to launch the execution of a program by specifying to it the data on which it must work, possibly some parameters to adjust its execution, and what should be done with the results. There are many shells. What differentiates them is that their command language is not strictly identical. Two shells are mainly used today: `bash` for "Bourn again shell" which is the modern version of the Bourn shell^[Bash website: http://www.gnu.org/software/bash] (`sh`) and `tcsh` for "Turbo C-Shell" the modern version of the C-Shell^[tcsh website: http://www.tcsh.org/Welcome] (`csh`). Other shells exist such as the Korn shell (`ksh`) developed by David Korn in the early 1980s or the Z-Shell (`zsh`) written by Paul Falstad in 1990 which is another improved version of the Bourn-Shell. Most of these shells allow performing the same operations but sometimes using different syntaxes. Some people prefer one or the other but their reasons are most often subjective. In the rest of this presentation, we will only use `bash`. By default on most Unix machines, the two shells: `bash` and `tcsh` are installed. When you connect to a Unix machine, one of the two is launched for you by default. It is possible to change your default shell using the `chsh` command (see page @unix-chsh) or to switch from one shell to another using the commands `bash` (see page @unix-bash) and `tcsh` (see page @unix-tcsh).
 
 ### Basic Structure of a Unix Command
 
-A shell is therefore a program that interprets a computer language that allows easily launching the execution of other programs by indicating to them where to find their data and what to do with the results they produce. This language, like all others, has a vocabulary and a grammar. The languages of the different shells can be considered as dialects of the same language. Also, there are great similarities between them. All the explanations we provide here concern `tcsh` but for the most part, they are applicable to other shells.
+A shell is therefore a program that interprets a computer language that allows easily launching the execution of other programs by indicating to them where to find their data and what to do with the results they produce. This language, like all others, has a vocabulary and a grammar. The languages of the different shells can be considered as dialects of the same language. Also, there are great similarities between them. All the explanations we provide here concern `bash` but for the most part, they are applicable to other shells.
 
 The language of a shell mainly defines a grammatical rule. This rule describes the structure of a basic Unix command. The purpose of a Unix command is to trigger the execution of a program by indicating all the information necessary for its proper execution. We can take as a principle that for every program installed on a Unix machine there corresponds a command usable from the shell that bears the name of the program and that reciprocally, every Unix command is the name of a program installed on the computer. The set of Unix commands is therefore infinite, since when you install or write a new program, this in fact adds a new command to your Unix system. However, there is a set of commands installed by default on all Unix systems. We give you on page @section-commandes-unix a list of the main commands that you can use on all Unix computers you will use.
 
 ```{bash}
 #| label: fig-basic-command
+#| eval: false
 #| fig-cap: >
 #|   Basic structure of a Unix command line: a command line is divided into four main parts. 
 #|   Only the first is mandatory, it indicates the program to use. The others allow defining 
@@ -259,7 +345,7 @@ A Unix command line can be divided into four main parts (see Fig. @fig-basic-com
 
 #### The Unix Command
 
-A Unix command is the name of a program installed on the machine. Thus, when you execute a Unix command like `ls` or `egrep`, you are actually launching the execution of a program of the same name installed on your computer. There is therefore somewhere stored in the hard disks of the latter a file that contains the code of the program to be executed. The question that then arises is: "How does the machine manage to find the file associated with a command when it is asked to interpret it?" It is obvious that if the computer had to search each time a Unix command is executed throughout its hard disks for the file to be executed, the search time would in most cases be longer than the program's calculation time. To allow a reasonable search time, program files are only searched for in a subset of the directories existing on the machine. This subset is described by a list of directories stored in an environment variable named `PATH`. It is possible to consult this list (see example @shell-path) or to modify it with the `setenv` command. The order of appearance of directories in this list plays a role if several programs exist with the same name in different directories in the list.
+A Unix command is the name of a program installed on the machine. Thus, when you execute a Unix command like `ls` or `egrep`, you are actually launching the execution of a program of the same name installed on your computer. There is therefore somewhere stored in the hard disks of the latter a file that contains the code of the program to be executed. The question that then arises is: "How does the machine manage to find the file associated with a command when it is asked to interpret it?" It is obvious that if the computer had to search each time a Unix command is executed throughout its hard disks for the file to be executed, the search time would in most cases be longer than the program's calculation time. To allow a reasonable search time, program files are only searched for in a subset of the directories existing on the machine. This subset is described by a list of directories stored in an environment variable named `PATH`. It is possible to consult this list (see example @shell-path) or to modify it with the `export` command. The order of appearance of directories in this list plays a role if several programs exist with the same name in different directories in the list.
 
 ```{bash}
 #| label: shell-path
@@ -279,6 +365,7 @@ If you want to execute a program whose file is located in a directory not listed
 
 ```{bash}
 #| label: shell-program
+#| eval: false
 #| caption: >
 #|   Execute a program located in a non-standard directory: Suppose we have in our main directory 
 #|   a directory named `myprograms` in which I store all my analysis programs. In this directory, 
@@ -292,6 +379,7 @@ myprograms/myscript.csh turlututu
 
 ```{bash}
 #| label: shell-program-courant
+#| eval: false
 #| caption: >
 #|   Execute a program located in a non-standard directory: If the program is in the current 
 #|   directory, it is necessary to add `./` before its name to specify its location.
@@ -307,6 +395,7 @@ Command options allow altering its operation by adjusting its parameters. Option
 
 ```{bash}
 #| label: options-commande
+#| eval: false
 #| caption: >
 #|   Options modify the behavior of a program: the `egrep` command filters a text file to only 
 #|   let through the lines of it containing an instance of the searched pattern (`Root` in our
@@ -320,10 +409,20 @@ egrep -i Root /etc/passwd
 egrep --ignore-case Root /etc/passwd
 ```
 
+```{bash}
+#| echo: false
+#| output: asis
+echo "root:x:0:0:root:/root:/bin/bash"
+echo "# (no output for second command)"
+echo "root:x:0:0:root:/root:/bin/bash"
+echo "root:x:0:0:root:/root:/bin/bash"
+```
+
 Some options require arguments, for example the `-B` or `--before-context` option of the `egrep` command allows indicating how many lines located before a line normally printed by an `egrep` command should also be printed. These options therefore require an argument specifying the number of lines to add (see example @options-with-arguments). When using the short form of the option (`-B`), it is sufficient to add this number following the option, separated or not by a space: `-B 9` or `-B9`. If you use the long form, the argument is associated with its option by the sign "=": `--before-context=9`.
 
 ```{bash}
 #| label: options-with-arguments
+#| eval: false
 #| caption: >
 #|   Options can require arguments: The `-B` and `--before-context` options require as an argument 
 #|   the number of lines of the filtered text that should be added before each of the lines that 
@@ -333,16 +432,43 @@ grep -B 2 root /etc/passwd
 grep --before-context=1 root /etc/passwd
 ```
 
+```
+ames:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+```
+
 It is frequent when using several options of a program in their short form to group their names behind a single "-" sign (see example @options-concat). If one of these options requires an argument, it is mandatory to place it in last position so that the argument can be added after it. If several options require arguments, it will not be possible to concatenate them into a single group. This possibility of grouping options makes it possible to simplify the writing of options but is absolutely not mandatory. It is not possible with options in their long form.
 
 ```{bash}
 #| label: options-concat
+#| eval: false
 #| caption: >
 #|   Short options can be concatenated: When several short options are used, their names can 
 #|   be concatenated behind a single "-" sign. If one of them requires an argument, it must be 
 #|   placed in last position.
 
 grep -iB 2 Root /etc/passwd
+```
+
+```
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
 ```
 
 The order of appearance of arguments in a Unix command line is normally unimportant. If the order of options influences the behavior of the program, this will be specified in its manual.
@@ -372,6 +498,7 @@ Each word in a Unix command line using one of these characters will be replaced 
 
 ```{bash}
 #| label: cmd-bash
+#| eval: false
 #| caption: Examples of using filenames with ambiguities.
 
 ls -l
@@ -381,6 +508,16 @@ echo /mach*
 echo /*.*
 echo /[AD]*
 echo /[uv]??
+```
+
+```
+file1.txt  file2.txt  myprograms/
+# (no *foo files)
+bin  boot  dev  etc  home  lib  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+# (no /mach* files)
+# (no /*.* files)
+# (no /[AD]* files)
+# (no /[uv]?? files)
 ```
 
 These filenames with ambiguities are most often used with file manipulation commands such as copy (`cp` command page @unix-cp), deletion (`rm` command page @unix-rm), or the `ls` command (page @unix-ls) allowing to obtain a list of files. They are also frequently used in loops that allow launching the same Unix command on a whole series of data sets.
@@ -398,6 +535,7 @@ Each of these streams has one of its ends connected to the process to allow it t
 
 ```{bash}
 #| label: fig-shell-inoutput
+#| eval: false
 #| fig-cap: Setting the standard inputs and outputs of the shell.
 ```
 
@@ -413,12 +551,38 @@ In example @stdout, the `ls` command is executed a first time in a classic way, 
 
 ```{bash}
 #| label: stdout
+#| eval: false
 #| caption: Redirection of standard output.
 
 ls /
 ls / > my_listing
 ls -l
 cat my_listing
+```
+
+```
+bin  boot  dev  etc  home  lib  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+# (redirected to file)
+total 
+-rw-r--r-- 1 user users  123 Jan 15 10:35 my_listing
+bin
+boot
+dev
+etc
+home
+lib
+media
+mnt
+opt
+proc
+root
+run
+sbin
+srv
+sys
+tmp
+usr
+var
 ```
 
 In this case, the connection diagram of the standard inputs and outputs of the process executing the `ls` program is presented in Figure @fig-ls-stdout. Only the standard output *stdout* is redirected. The error output remains connected to the terminal, which will therefore continue to retransmit any error messages generated.
@@ -429,6 +593,7 @@ If you want to add the results generated by our program to the end of an already
 
 ```{bash}
 #| label: fig-ls-stdout
+#| eval: false
 #| fig-cap: Redirection of the standard output of an `ls` command.
 ```
 
@@ -440,11 +605,20 @@ The redirection of standard input is materialized in the redirection part of a c
 
 ```{bash}
 #| label: stdin
+#| eval: false
 #| caption: Redirection of standard input and standard output.
 
 egrep or < my_listing
 egrep or < my_listing > my_selection
 cat my_selection
+```
+
+```
+proc
+sbin"
+echo "# (redirected to file)"
+echo "proc
+sbin
 ```
 
 The `egrep` command selects among the lines of text it receives on its standard input those containing a certain pattern (`or` in the case of example @stdin) to copy them to its standard output. To indicate to the process executing the `egrep` program that it should read the text to be analyzed from the file `my_listing`, it is sufficient to redirect its standard input *stdin*. Simultaneously with this redirection, it is also possible to redirect the standard output to a new file: `my_selection` in our example.
@@ -457,6 +631,7 @@ From a syntactic point of view, the language of a shell allows achieving this ef
 
 ```{bash}
 #| label: fig-commande-tube
+#| eval: false
 #| fig-cap: Structure of a double command.
 ```
 
@@ -464,6 +639,7 @@ It should be noted that commands upstream of a pipe cannot redirect their standa
 
 ```{bash}
 #| label: pipe
+#| eval: false
 #| caption: Construction of a complex command with a pipe.
 
 ls / | grep or
@@ -471,10 +647,19 @@ ls / | grep or > my_selection
 cat my_selection
 ```
 
+```
+proc
+sbin
+# (redirected to file)"
+proc
+sbin
+```
+
 In a complex command like the one presented in example @pipe, a process is created for each of the commands and it is just the data that flows from one process to the other (see Figure @fig-ls-egrep-pipe).
 
 ```{bash}
 #| label: fig-ls-egrep-pipe
+#| eval: false
 #| fig-cap: Construction of a pipe between two processes.
 ```
 
@@ -486,29 +671,38 @@ The interest of a computer lies in its ability to automatically perform repetiti
 
 Working automatically and repetitively requires using variables to store useful information that changes at each iteration. For example, if your Unix command must execute by reading its data in different files from one execution to another, you can no longer write the file name in your command since it will not always be the same.
 
-You already know the environment variables that are set by the `setenv` command and that serve to store information relating to the configuration of your system. There are simple variables that allow you to store for the duration of your Unix session all the information you deem necessary. They are set by the `set` command. To retrieve the value contained in a variable, simply precede its name with the "$" character (see example @variable).
+You already know the environment variables that are set by the `export` command and that serve to store information relating to the configuration of your system. There are simple variables that allow you to store for the duration of your Unix session all the information you deem necessary. They are set by simple assignment. To retrieve the value contained in a variable, simply precede its name with the "$" character (see example @variable).
 
 ```{bash}
 #| label: variable
 #| caption: Setting and displaying a variable.
 
-set myvariable="hello world"
+myvariable="hello world"
 echo myvariable
 echo $myvariable
 ```
 
-#### The `foreach` Loop
+#### The `for` Loop
 
-For our problem, repeating the same Unix command several times by making it work on different data files, we are going to create a variable that will take in turn as value each of the elements of a list. In our case, this list will be a list of file names and it will be built using the ambiguity characters on file names presented on page @fichier-star. To build such a variable whose value changes automatically, you must not use the `set` command, but the `foreach` command. All Unix commands inserted between the `foreach` command and its associated keyword `end` are executed once for each value taken by the variable.
+For our problem, repeating the same Unix command several times by making it work on different data files, we are going to create a variable that will take in turn as value each of the elements of a list. In our case, this list will be a list of file names and it will be built using the ambiguity characters on file names presented on page @fichier-star. To build such a variable whose value changes automatically, you must use the `for` command. All Unix commands inserted between the `for` command and its associated keyword `done` are executed once for each value taken by the variable.
 
 ```{bash}
 #| label: boucle1
-#| caption: Construction of a `foreach` loop.
+#| eval: false
+#| caption: Construction of a `for` loop.
 
 echo /[mnop]*
-foreach f ( /[mnop]* )
-  echo I am working with file $f
-end
+for f in /[mnop]*; do
+  echo "I am working with file $f"
+done
+```
+
+```
+media  mnt  opt  proc"
+I am working with file media
+I am working with file mnt
+I am working with file opt
+I am working with file proc
 ```
 
 ## Some Essential Unix Commands in Alphabetical Order
@@ -556,14 +750,13 @@ The `bash` command allows launching the execution of a new `bash` shell that wil
 #### Example of Use
 
 ```{bash}
-#| label: cmd-bash
+#| label: cmd-bash-2
+#| eval: false
 #| caption: Launch a `bash` shell.
 
-setenv foo
-export foo
+export foo=bar
 bash
-setenv foo
-export foo
+export foo=baz
 exit
 ```
 
@@ -588,6 +781,7 @@ bg [%job]
 
 ```{bash}
 #| label: cmd-bg
+#| eval: false
 #| caption: Sending a job to the background. The `sleep` command does nothing except wait for the indicated number of seconds. `^Z` symbolizes pressing the `Ctrl+z` keys.
 
 sleep 30
@@ -636,6 +830,7 @@ cd [directory_name]
 
 ```{bash}
 #| label: cmd-cd
+#| eval: false
 #| caption: Changing directory.
 
 pwd
@@ -693,9 +888,10 @@ chsh -s new_shell
 
 ```{bash}
 #| label: cmd-chsh
+#| eval: false
 #| caption: Changing shell.
 
-chsh -s /bin/tcsh
+chsh -s /bin/bash
 ```
 
 ### `cp`: Copy Files
@@ -765,7 +961,7 @@ env [name=value ...] [command [argument ...]]
 #| label: cmd-env
 #| caption: Configuring your execution environment.
 
-setenv hello "hello friends"
+export hello="hello friends"
 env
 env hello="goodbye" env
 ```
@@ -1080,15 +1276,15 @@ sed [-E] program [file ...]
 | `program` | A character string describing in the `sed` language the program to execute to transform the text. |
 | `data_file` | The file containing the text to transform. If this argument is absent, the standard input is taken as the data source. |
 
-### `setenv`: Set Environment Variable
-{#unix-setenv}
+### `export`: Set Environment Variable
+{#unix-export}
 
-Creates or modifies an environment variable. This command is specific to `tcsh`. A roundabout but simple way to check that our shell is indeed `tcsh` is to execute this command.
+Creates or modifies an environment variable. This command is specific to `bash`.
 
 #### Prototype
 
 ```bash
-setenv [variable] [value]
+export [variable]=[value]
 ```
 
 ### `sort`: Sort Lines of a File
