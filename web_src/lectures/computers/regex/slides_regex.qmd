@@ -3,6 +3,7 @@ title: "Regular Expressions"
 format:
   revealjs:
     theme: beige   # thème des slides
+    css: ../../slides.css
     transition: fade   # effet de transition entre les slides
 ---
 

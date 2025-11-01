@@ -76,6 +76,7 @@ c.DockerSpawner.volume_driver_opts = {
     'device': '/volumes',
     'o': 'bind'
 }
+
 # Memory and CPU configuration (adjust according to your needs)
 c.DockerSpawner.mem_limit = '2G'
 c.DockerSpawner.cpu_limit = 1.0

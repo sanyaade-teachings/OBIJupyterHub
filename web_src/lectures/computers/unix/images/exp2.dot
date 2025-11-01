@@ -1,0 +1,13 @@
+digraph finite_state_machine {
+	rankdir=LR;
+        {
+		node [style = invis]; I;
+	}
+	node [shape = doublecircle]; 3;
+	node [shape = circle];
+        I -> 0
+	0 -> 1 [ label = "A" ];
+	1 -> 2 [ label = "T" ];
+	2 -> 3 [ label = "G" ];
+
+}

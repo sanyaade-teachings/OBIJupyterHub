@@ -9,7 +9,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="210mm"
-   height="297mm"
+   height="100mm"
    id="svg2"
    sodipodi:version="0.32"
    inkscape:version="0.46+devel"
@@ -54,7 +54,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.01"
-     inkscape:cx="348.57747"
+     inkscape:cx="100"
      inkscape:cy="757.62376"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -62,7 +62,7 @@
      inkscape:window-width="1440"
      inkscape:window-height="823"
      inkscape:window-x="0"
-     inkscape:window-y="22" />
+     inkscape:window-y="12" />
   <metadata
      id="metadata7">
     <rdf:RDF>

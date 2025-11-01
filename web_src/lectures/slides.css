@@ -1,4 +1,9 @@
 /* Centre toutes les images dans les slides */
+
+.reveal {
+  font-size: 1.5em;
+}
+
 .quarto-figure-default {
   display: block;
   margin-left: auto;

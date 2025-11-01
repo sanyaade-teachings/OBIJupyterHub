@@ -1,484 +1,975 @@
 ---
-title: "Unix Essentials — Modern Bash Edition"
-subtitle: "A practical, color‑blind‑friendly introduction"
-author: "Your Name"
+title: "Introduction to Unix by Example"
+subtitle: "A Modern Approach for Bioinformaticians"
+author: "Updated Course Material"
+date: today
 format:
   html:
     toc: true
     toc-depth: 3
-    code-tools: true
+    number-sections: true
     code-fold: false
     theme: cosmo
-    smooth-scroll: true
-    include-in-header:
-      text: |
-        <style>
-        .quarto-figure img, .quarto-figure svg {
-          display: block;
-          margin: 0 auto;
-          vertical-align: middle;
-          overflow: visible;
-        }
-        </style>
-execute:
-  echo: true
-  warning: false
-  message: false
-mermaid:
-  theme: neutral
-  background: transparent
-  width: 100%
-page-layout: article
 ---
 
-# Introduction to Unix
+# Why Unix?
 
-Unix is a family of operating systems and a set of design ideas—small programs that do one thing well, text as a universal interface, and easy composition through pipes. Those ideas power Linux servers, macOS, iOS, Android (via Linux), and most cloud infrastructure today. Learning Unix is learning the lingua franca of modern computing.
+The Unix operating system was born in AT&T laboratories in the United States, then known as "Bell Labs". Created in the late 1960s, it derives from Multics, another system from the same laboratory about ten years earlier. Unix spread rapidly because Bell Labs distributed its new system as freely modifiable source code. This led to the emergence of Unix families produced by the system's main users: research laboratories on one hand and major computer manufacturers on the other.
 
-## Certified UNIX vs. Unix‑like
+From the beginning, Unix development has been closely linked to scientific computing. These intrinsic qualities explain why this operating system is still widely used in many research fields today.
 
-“UNIX” is a trademark of The Open Group for systems that pass the POSIX/SUS conformance tests. macOS is certified; Linux distributions and BSDs are “Unix‑like”—they follow the same model and standards. For our purposes, you can treat them similarly.
+Today, Unix is a registered trademark of The Open Group, which standardizes all Unix systems. However, there is a broader definition that includes "Unix-like" systems such as GNU/Linux. Despite proclaiming in its name not to be Unix (GNU is Not Unix), this family of operating systems has such functional similarities with its ancestor that it's difficult to explain how it isn't Unix.
 
-> This course uses **bash** exclusively. Commands and syntax target modern GNU/*BSD/macOS shells and core utilities. When an option is GNU‑specific, we’ll note it.
+Nowadays, a Unix system can be installed on virtually any machine, from personal computers to large computing servers. Notably, for several years, Apple's standard operating system on Macintosh computers, macOS, has been a certified Unix system.
 
-# Users and Accounts
+# Unix System Overview
 
-Each person has a **user account** (username/login) with a numeric **UID**, a **primary group**, a **home directory**, and a **default shell**. User account metadata lives in `/etc/passwd` (user list) and `/etc/shadow` (password hashes, not world‑readable).
-
-```{bash}
-#| label: ex-passwd-head
-#| eval: false
-#| caption: Inspecting the user database (first lines of /etc/passwd).
-head -15 /etc/passwd
-```
-
-# The Unix File System
-
-The filesystem is a single rooted hierarchy (`/`). Directories are nodes; files are leaves; symbolic links add extra edges (making it a DAG).
-
-![](fs.svg){style="display:block;margin:0;padding:0;" fig-cap="A simplified Unix filesystem tree. The highlighted path resolves to `/etc/passwd`." #fig-fs-unix}
-
-Common top‑level directories:
-
-- `/etc` – system configuration
-- `/var` – variable state (logs, spool, caches)
-- `/bin`, `/usr/bin` – essential and additional executables
-- `/usr`, `/usr/local` – the main system and locally installed software
-- `/home` (or `/Users` on macOS) – user homes
-
-## Filenames and Rules
-
-- Case matters: `Foo.txt` ≠ `foo.txt`.
-- Avoid spaces and exotic punctuation in names; prefer letters, digits, `. - _`.
-- Names starting with `.` are “hidden” (e.g., `~/.bashrc`).
-
-## Links
-
-Two kinds of links:
-
-- **Hard link**: an additional directory entry pointing to the same inode (same file). Cannot span filesystems; not for directories (with rare admin exceptions).
-- **Symbolic link**: a small file that points to a path (can cross filesystems).
-
-![](fs-link.svg){fig-cap="Symbolic link creates an extra path to the same target." #fig-fs-link}
-
-## `.` and `..`
-
-Every directory contains entries `.` (itself) and `..` (parent). They make relative navigation and scripting concise.
-
-![](fs-spdir.svg){fig-cap="Special entries `.` and `..` help navigate without absolute paths." #fig-fs-spdir}
-
-## Current Working Directory and Relative Paths
-
-Your **current working directory** (CWD) is where relative paths are resolved. Use `pwd` to show it and `cd` to change it.
-
-```{bash}
-#| eval: false
-pwd
-cd /usr
-pwd
-cd -    # jump back
-```
-
-## Permissions (Mode), Ownership, and Umask
-
-Each file has an **owner** (user), a **group**, and three permission triplets (r,w,x) for **user**, **group**, and **others**:
-
-```{bash}
-#| eval: false
-# long listing shows mode, owner, group, size, date, name
-ls -l /bin/bash
-# change permissions: add user execute, remove group write
-chmod u+x,g-w script.sh
-# change owner/group (requires privileges)
-sudo chown alice:science data.tsv
-# show and set default creation mask
-umask         # e.g., 0022
-umask 0002    # collaborative group-writable defaults
-```
-
-# Processes
-
-A **program** is code on disk; a **process** is a running instance with its own memory, environment, and open file descriptors. Each process has a **PID** and a **PPID** (parent PID).
-
-```{bash}
-#| eval: false
-ps aux | head -5
-pstree -a | head -20   # on macOS: brew install pstree; or use 'pgrep -lf .'
-```
-
-## The Process “Anatomy”
-
-- **Code** (the program image)
-- **Data/Heap/Stack**
-- **Environment** (variables like `PATH`, `HOME`)
-- **Standard streams**: `stdin` (0), `stdout` (1), `stderr` (2)
-
-![](process.svg){fig-cap="A process has code, data, environment, and standard streams." #fig-process-anatomy}
-
-## Lifecycle and Inheritance
-
-Processes are created by **fork/exec**. Children inherit the parent’s environment and open descriptors unless changed. When a child exits, it becomes a **zombie** until the parent reaps it.
+Unix is a multitasking and multi-user operating system. This means it can manage the simultaneous use of the same computer by multiple people, and for each person, it allows parallel execution of multiple programs. The multiplicity of users and running programs on the same machine requires particular resource management, involving restricted rights for each user so that one person's work doesn't interfere with another's.
 
 ```{mermaid}
-%%| echo: false
-%%| code-fold: false
-graph TD
-A["Parent process"] -->|fork| B["Child (COW)"]
-B -->|exec| C["New program image"]
-C -->|exit| D{Parent waits}
-D -- yes --> E["Child reaped"]
-D -- no --> F["Zombie until parent waits"]
+flowchart TB
+    U1["User 1"] --> S1["Shell<br/>(Command Interpreter)"]
+    U2["User 2"] --> S1
+    U3["User N"] --> S1
+    
+    subgraph Unix ["Unix Operating System"]
+        S1["Shell<br/>(Command Interpreter)"] --> K1["Kernel<br/>(Core System)"]
+        K1 --> R1["CPU"]
+        K1 --> R2["Memory"]
+        K1 --> R3["Disk Storage"]
+        K1 --> R4["Network"]
+    end
 ```
 
-# The Shell (bash)
+## Users
 
-The shell is a command interpreter and a scripting language. We’ll use **bash** only.
+Each Unix system user needs an account or "machine access right" to work. Each account is identified by a login name.
 
-## Structure of a Command Line
+Associated with each login:
 
-```text
-command [OPTIONS...] [ARGUMENTS...] [REDIRECTIONS/PIPES]
+- A password that secures system access
+- A user ID (UID) that identifies the user on the machine
+- A location on the hard drive to store user files, called Home directory
+- A user group, allowing collaborative work (see later)
+
+Information about all users on a machine is typically stored in a text file: `/etc/passwd`
+
+```bash
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+alice:x:1000:1000:Alice Smith:/home/alice:/bin/bash
+bob:x:1001:1001:Bob Jones:/home/bob:/bin/bash
 ```
 
-- **Command**: executable name or path
-- **Options**: short `-l` or long `--long`
-- **Arguments**: files, patterns, values
-- **Redirections/Pipes**: `>`, `>>`, `<`, `2>`, `|`, `|&`, `<<<`
+Each line corresponds to a user. Information is separated by `:` characters. In order: login, encoded password, UID, group ID, full name, home directory, and default shell.
 
-```{bash}
-#| label: ex-path
-#| caption: PATH lists directories searched for commands, left to right.
-echo "$PATH"
-command -v bash   # show full path to the executable bash will run
+## The File System
+
+The file system of an operating system encompasses all mechanisms for managing storage space (hard drives) on the computer. Data and programs are stored in files. A file can be thought of as a small part of a hard drive dedicated to storing a set of data.
+
+### File Names
+
+In a Unix system, a file name describes a path in a tree. A file name starts with a `/` character and consists of successive node labels describing the file's location in the name tree. Each label is separated from the preceding one by the `/` character.
+
+```{mermaid}
+graph TB
+    root["/"]
+    root --> bin["/bin"]
+    root --> etc["/etc"]
+    root --> home["/home"]
+    root --> usr["/usr"]
+    root --> var["/var"]
+    
+    etc --> passwd["passwd"]
+    etc --> hosts["hosts"]
+    
+    home --> alice["alice"]
+    home --> bob["bob"]
+    
+    alice --> documents["documents"]
+    alice --> data["data.txt"]
+    
+    usr --> local["/local"]
+    usr --> usrbin["/bin"]
+    
+    style passwd fill:#e1f5ff
+    style root fill:#ffe1e1
 ```
 
-If a program isn’t on `PATH`, run it via a path (absolute or relative):
+For example, the file `/etc/passwd` indicates that this file is located at a node (directory) named `/etc`, which itself is located at the root of the file name tree `/`.
 
-```{bash}
-#| eval: false
-./mytool --help
-/home/alice/bin/mytool --version
+### Standard Directory Structure
+
+Certain directories are found in many Unix systems:
+
+- `/etc` - Contains system configuration files
+- `/var` - Contains system operation information
+- `/bin` - Contains basic system programs
+- `/usr` - Contains a large part of the system
+- `/usr/local` - Contains programs specific to a machine
+- `/home` - Contains user home directories
+- `/tmp` - Temporary files
+
+### Lexical Rules for File Names
+
+File name labels can contain:
+
+- Alphabetic characters (a-z and A-Z)
+- Numeric characters (0-9)
+- Punctuation marks (& , $ , * , + , = , . , etc.)
+
+However, using some of these signs can cause problems. It's recommended to use only: `. , % , - , _ , : , =`
+
+**Important**: Unix is case-sensitive. `TODO`, `todo`, `Todo`, and `ToTo` are all different names.
+
+File names starting with a dot `.` are hidden files and typically correspond to configuration files.
+
+### Links
+
+The concept of a link can be compared to a shortcut in other operating systems. A link is a special file that creates additional edges in the file name tree. From a computer science perspective, the tree structure becomes a Directed Acyclic Graph (DAG).
+
+```{mermaid}
+graph LR
+    root["/"]
+    usr["/usr"]
+    bin["/bin"]
+    home["/home"]
+    alice["alice"]
+    programs["programs<br/>(link)"]
+    grep["grep"]
+    
+    root --> usr
+    root --> home
+    usr --> bin
+    home --> alice
+    alice --> programs
+    bin --> grep
+    programs -.->|symbolic link| bin
+    
+    style programs fill:#fff2cc
+    style grep fill:#e1f5ff
 ```
 
-## Modern Note on `grep`
+Creating a link in a Unix file system creates a synonym between the link name and the target file.
 
-`egrep` and `fgrep` are deprecated. Use `grep -E` (extended regex) and `grep -F` (fixed strings).
+### The `.` and `..` Directories
 
-```{bash}
-#| eval: false
-grep -E 'root|daemon' /etc/passwd
-grep -Fi 'error' /var/log/system.log
+Unix uses links to facilitate navigation in the file name tree. When creating a directory node, the system automatically adds two links under this node named `.` and `..`:
+
+- `.` links to the directory containing it
+- `..` points to the parent directory
+
+```{mermaid}
+graph TB
+    root["/"]
+    home["/home"]
+    alice["alice"]
+    dot[". (alice)"]
+    dotdot[".. (home)"]
+    docs["documents"]
+    
+    root --> home
+    home --> alice
+    alice --> dot
+    alice --> dotdot
+    alice --> docs
+    
+    dot -.-> alice
+    dotdot -.-> home
+    
+    style dot fill:#fff2cc
+    style dotdot fill:#fff2cc
 ```
 
-# Globs (Filename Patterns)
+These links mean that for each file, there isn't just one name but an infinite number of possible names. The file `/home/alice/myfile` can also be named:
 
-The shell expands patterns **before** running the command:
+- `/home/alice/./myfile`
+- `/home/alice/../../home/alice/myfile`
+- `/home/alice/./././myfile`
 
-| Pattern | Meaning |
-|---|---|
-| `*` | any string (including empty) |
-| `?` | any single char |
-| `[abc]` | any of listed chars |
-| `{a,b,c}` | brace expansion (not a glob; bash feature) |
+### Current Directory and Relative Paths
 
-```{bash}
-#| eval: false
-echo *.txt
-ls -ld /[uv]??
-printf '%s\n' project/{data,docs,src}
+The hierarchical tree structure of Unix file names is powerful but produces often very long file names. To work around this problem, Unix offers the concept of current directory and relative paths.
+
+**Current Directory**: When working on a machine, you typically work on a set of files located in the same region of the name tree. The common part of all these names is stored in an environment variable called `PWD` (Present Working Directory).
+
+By default, when you log into your Unix account, this variable is initialized with your home directory name. You can change this variable's value using the `cd` command.
+
+**Relative Paths**: Relative file names are expressed relative to the current directory. To know the true name corresponding to a relative name, you concatenate the current directory name and the relative name.
+
+Example:
+```bash
+# If current directory is: /home/alice/experiment_1
+# These files:
+/home/alice/experiment_1/sequence.fasta
+/home/alice/experiment_1/expression.dat
+/home/alice/experiment_1/annotation.gff
+
+# Can be named simply:
+sequence.fasta
+expression.dat
+annotation.gff
 ```
 
-# Redirection and Pipes
+A relative name is recognized by the fact it doesn't start with `/`. In contrast, complete file names are called absolute paths and always start with `/`.
 
-Standard streams: `stdin` (0), `stdout` (1), `stderr` (2).
+### Access Rights
 
-![](shell-inout.svg){fig-cap="Default streams: keyboard → stdin; stdout/stderr → terminal." #fig-shell-inoutput}
+Unix is a multi-user system. To protect each user's data from others, each file belongs to a specific user (usually its creator) and a user group. Additionally, each file has access rights concerning:
 
-## Redirect to/From Files
+- The file owner
+- The group to which the file belongs
+- All other system users
 
-```{bash}
-#| eval: false
-ls / > listing.txt           # stdout to file (overwrite)
-ls / >> listing.txt          # append
-grep -E 'log' < listing.txt  # stdin from file
-grep -E 'log' listing.txt > matches.txt 2> errors.log
+For each of these three user categories, there are read, write, and execute rights:
+
+- **Read right**: Allows reading the file
+- **Write right**: Authorizes modifying or deleting the file
+- **Execute right**: Allows executing the file if it contains a program
+
+For directories, execute right indicates permission to use it as an element of a file name.
+
+```bash
+# Example of file permissions
+$ ls -l
+-rw-r--r--  1 alice  staff   1024 Nov 03 10:30 data.txt
+-rwxr-xr-x  1 alice  staff   2048 Nov 03 10:31 script.sh
+drwxr-xr-x  2 alice  staff    512 Nov 03 10:32 results
 ```
 
-## Pipelines
+Rights can be modified by the file owner using the `chmod` instruction.
 
-`|` connects stdout of left command to stdin of right command. Use `|&` to pipe both stdout and stderr (bash).
+## Processes
 
-![](commande-tube.svg){fig-cap="A two‑stage pipeline: stdout of cmd1 becomes stdin of cmd2." #fig-commande-tube}
+A program corresponds to a sequence of calculation instructions that the computer must execute to perform a task. While it's important to store this instruction sequence for regular reuse, it's equally important to execute it. A process corresponds to the execution of a program.
 
-```{bash}
-#| eval: false
-ls -l /usr/bin | head -n 5
-journalctl -u ssh |& grep -Ei 'fail|error'   # GNU/Linux
+Since Unix is multitasking and multi-user, the same program can be executed simultaneously by multiple processes. It's therefore important to distinguish between program and process.
+
+### Process Anatomy
+
+A process can be considered as part of the computer's memory dedicated to program execution. This memory chunk can be divided into three main parts: the environment, data area, and program area.
+
+```{mermaid}
+flowchart TB
+    subgraph Process["Process Memory Space"]
+        direction TB
+        Env["Environment<br/>- Variables<br/>- File descriptors<br/>- PID/PPID"]
+        Code["Code Area<br/>- Program instructions"]
+        Data["Data Area<br/>- Variables<br/>- Computation results"]
+    end
+    
+    Parent["Parent Process"] -.->|fork| Process
+    
+    style Env fill:#e1f5ff
+    style Code fill:#ffe1e1
+    style Data fill:#e1ffe1
 ```
 
-![](ls-stdout.svg){fig-cap="Redirecting `ls` output into a file." #fig-ls-stdout}
-![](gnome-fs-regular.svg){fig-cap="Regular file."}
-![](gnome-fs-directory.svg){fig-cap="Directory."}
-![](gnome-fs-home.svg){fig-cap="Home directory icon."}
-![](gnome-fs-regular.svg){fig-cap="Regular file (again, for legend grouping)."}
-![](gnome-fs-slink.svg){fig-cap="Symbolic link (legend)."}
+### Process Environment
 
-# Loops, Variables, and Scripting
+A process is an isolated memory area where a program executes. Isolation secures the computer by preventing a program from corrupting others' execution. However, during execution, a program must interact with the rest of the computer.
 
-## Variables
+The process environment is dedicated to this interface task. It contains descriptions of system elements the process needs to know. Two main types of information are stored:
 
-Create with `name=value`. Read with `$name`. Export to children with `export name`.
+**Environment Variables**: Associate a name with a value describing certain system properties. Examples:
 
-```{bash}
-#| label: ex-vars
-greeting="hello world"
-echo "$greeting"
-export PATH="$HOME/bin:$PATH"
+- `PWD`: Current Working Directory for interpreting relative paths
+- `PATH`: List of directories where available programs are stored
+- `HOME`: User's home directory
+- `USER`: Current username
+
+**Streams**: Virtual pipes through which data transits. By default, three streams are associated with each process:
+
+- `stdin` (standard input): How a Unix program normally receives data
+- `stdout` (standard output): Used by the program to return results
+- `stderr` (standard error): Used for error messages and information
+
+```{mermaid}
+flowchart LR
+    Input[("Input<br/>Source")] --> stdin["stdin<br/>(0)"]
+    stdin --> Process["Process"]
+    Process --> stdout["stdout<br/>(1)"]
+    Process --> stderr["stderr<br/>(2)"]
+    stdout --> Output[("Output<br/>Destination")]
+    stderr --> Error[("Error<br/>Log")]
+    
+    style stdin fill:#e1f5ff
+    style stdout fill:#e1ffe1
+    style stderr fill:#ffe1e1
 ```
 
-## `for` Loops
+### Process Lifecycle
 
-```{bash}
-#| eval: false
-for f in /var/log/*.log; do
-  echo "Checking: $f"
-  grep -Eci 'error|warning' "$f"
+Every process has a parent (except the initial process) and inherits all its properties: environment, data area, and program code to execute.
+
+```{mermaid}
+stateDiagram-v2
+    [*] --> Init: System Boot
+    Init --> Parent: fork()
+    Parent --> Child1: fork()
+    Parent --> Child2: fork()
+    Child1 --> [*]: exit()
+    Child2 --> [*]: exit()
+    Parent --> [*]: All children terminated
+    
+    note right of Parent
+        PID: 1234
+        Creates child processes
+    end note
+    
+    note right of Child1
+        PID: 1235
+        Inherits parent environment
+    end note
+```
+
+Important points:
+
+- Every process has a parent and inherits all its properties
+- A child process must terminate before its parent
+- When you close your shell, all running programs are terminated unless detached
+- A process is created by copying its parent, inheriting its properties except PID
+
+The normal chronology for creating a new process:
+
+1. Call the `fork()` function
+2. Test which process continues execution
+3. In the child process, call `exec()` to replace the program code
+4. At execution end, notify the parent and wait for cleanup
+
+# The Unix Shell - A Working Environment
+
+The Unix shell is the most important program for a Unix user. It's how they interact with their computer. There's a graphical window system under Unix similar to Windows or macOS, called X Window System (X11), which can operate in client/server mode across networks. However, we'll focus on interacting with Unix in "text" mode via the shell.
+
+The Unix shell is a program capable of interpreting a command language. These commands allow users to launch program execution by specifying:
+
+- Data to work on
+- Parameters to adjust execution
+- What to do with results
+
+Several Unix shells exist, differing mainly in their command language syntax. The two most commonly used today are:
+
+- **bash** (Bourne Again Shell): Modern version of the Bourne shell (sh)
+- **zsh** (Z Shell): Enhanced version with additional features
+
+This course focuses on **bash**, the default shell on most Linux systems and macOS.
+
+## Basic Command Structure
+
+A shell command describes how to trigger program execution with all necessary information. As a principle, every program installed on a Unix machine corresponds to a usable command from the shell bearing the program's name, and conversely, every Unix command is the name of an installed program.
+
+```{mermaid}
+flowchart LR
+    Command["Command<br/>(program name)"] --> Options["Options<br/>(flags)"]
+    Options --> Arguments["Arguments<br/>(input files)"]
+    Arguments --> Redirection["I/O Redirection<br/>(< > |)"]
+    
+    style Command fill:#ffe1e1
+    style Options fill:#e1f5ff
+    style Arguments fill:#e1ffe1
+    style Redirection fill:#fff2cc
+```
+
+A Unix command line has four main parts:
+
+1. **Command** (required): Program name
+2. **Options** (optional): Adjust program behavior
+3. **Arguments** (optional): Specify data to process
+4. **Redirection** (optional): Control input/output
+
+### The Unix Command
+
+A Unix command is the name of a program installed on the machine. When you execute a command like `ls` or `grep`, you're actually launching execution of an eponymous program stored somewhere on your hard drives.
+
+The machine searches for program files only in a subset of existing directories, described by a list stored in the `PATH` environment variable.
+
+```bash
+$ echo $PATH
+/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+```
+
+Directories are searched in order. If programs with the same name exist in different directories, the first one found is executed.
+
+To execute a program in a directory not listed in `PATH`, specify its location:
+
+```bash
+# Using absolute path
+$ /home/alice/myprograms/myscript.sh
+
+# Using relative path (if in the directory)
+$ ./myscript.sh
+```
+
+The `./` prefix is necessary to indicate the current directory location.
+
+### Command Options
+
+Options alter command functionality by adjusting parameters. Options are recognizable as:
+
+- Short form: Single character preceded by `-` (e.g., `-l`)
+- Long form: Complete word preceded by `--` (e.g., `--list`)
+
+Many programs offer both forms for the same option.
+
+```bash
+# Short option
+$ grep -i root /etc/passwd
+
+# Long option (equivalent)
+$ grep --ignore-case root /etc/passwd
+```
+
+Some options require arguments:
+
+```bash
+# Short form with argument
+$ grep -B 2 root /etc/passwd
+$ grep -B2 root /etc/passwd  # No space also works
+
+# Long form with argument
+$ grep --before-context=2 root /etc/passwd
+```
+
+Multiple short options can be combined:
+
+```bash
+# Separate options
+$ grep -i -n root /etc/passwd
+
+# Combined options
+$ grep -in root /etc/passwd
+```
+
+If an option requires an argument, it must be placed last in the group.
+
+### Command Arguments
+
+Arguments indicate data the program should process, beyond data potentially transmitted through standard input. Depending on how it's programmed, a program can accept one or multiple arguments. Each argument may have a distinct role depending on the program.
+
+To understand each argument's role, consult the program's manual page via `man` command or online help, usually accessible with the `-h` option.
+
+```bash
+# Example with multiple arguments
+$ cp source.txt destination.txt
+
+# Example with patterns
+$ grep "pattern" file1.txt file2.txt file3.txt
+```
+
+### I/O Redirection Instructions
+
+This fourth part of a Unix command line is crucial, allowing you to specify how your program should configure its standard inputs/outputs. This is one of the most important things to understand to fully benefit from the Unix system.
+
+## File Name Patterns with Wildcards
+
+It's very common in a Unix command to need to specify multiple file names. When the number of files becomes large, typing these names one by one can be tedious, especially if all file names share common characteristics.
+
+To address this, there's a series of "wildcard" characters to indicate the form of desired file names:
+
+| Wildcard | Matches |
+|----------|---------|
+| `*` | Zero, one, or more characters |
+| `?` | Exactly one character |
+| `[...]` | One character from the list |
+| `[^...]` | One character NOT in the list |
+| `[a-z]` | One character in the range |
+
+Each word in a Unix command line using these characters is replaced during execution by the list of existing file names matching the pattern.
+
+```bash
+# List all text files
+$ ls *.txt
+
+# Files starting with 'data' and any single character
+$ ls data?
+
+# Files starting with uppercase letter
+$ ls [A-Z]*
+
+# Files NOT starting with lowercase letter
+$ ls [^a-z]*
+
+# Complex pattern
+$ ls experiment_[0-9][0-9].dat
+```
+
+If no file matches the pattern, a "No match" error is generated.
+
+```bash
+$ echo *toto
+bash: no matches found: *toto
+
+$ ls /
+Applications  Library   bin   home   opt   usr
+Desktop       Network   cores sbin   private   var
+Developer     System    dev   etc    tmp
+
+$ echo /mach*
+/mach.sym /mach_kernel /mach_kernel.ctfsys
+
+$ echo /*.*
+/atp.mol /mach.sym /mach_kernel.ctfsys /untitled.log
+
+$ echo /[AD]*
+/Applications /Desktop_DB /Desktop_DF /Developer
+
+$ echo /[uv]??
+/usr /var
+```
+
+These file name patterns are most often used with file manipulation commands like copying (`cp`), deletion (`rm`), or listing (`ls`). They're also frequently used in loops to launch the same command on an entire series of datasets.
+
+## Standard I/O Redirection
+
+The property that gives a Unix shell its full power is the standard input/output redirection system. Each process inherits three standard data streams from its parent:
+
+- `stdin`: Standard input stream (file descriptor 0)
+- `stdout`: Standard output stream (file descriptor 1)
+- `stderr`: Standard error stream (file descriptor 2)
+
+```{mermaid}
+flowchart TB
+    subgraph Default["Default Configuration"]
+        Keyboard[("Keyboard")] --> stdin1["stdin"]
+        stdin1 --> Shell1["Shell Process"]
+        Shell1 --> stdout1["stdout"]
+        Shell1 --> stderr1["stderr"]
+        stdout1 --> Screen1[("Screen")]
+        stderr1 --> Screen1
+    end
+    
+    style stdin1 fill:#e1f5ff
+    style stdout1 fill:#e1ffe1
+    style stderr1 fill:#ffe1e1
+```
+
+### Redirecting Standard Output
+
+To save results generated by a program to a file, add an output redirection instruction at the end of the command line: `>` followed by a file name.
+
+```bash
+$ ls /
+Applications  Desktop  Developer  Library  System
+bin  cores  dev  etc  home  usr  var
+
+$ ls / > my_listing
+
+$ ls -l
+total 8
+drwxr-xr-x  2 alice  staff  102 Nov 27 17:18 myprograms
+-rw-r--r--  1 alice  staff  241 Dec  3 16:50 my_listing
+
+$ cat my_listing
+Applications
+Desktop
+Developer
+Library
+System
+bin
+cores
+dev
+etc
+home
+usr
+var
+```
+
+```{mermaid}
+flowchart LR
+    stdin["stdin"] --> Process["ls /"]
+    Process --> stdout["stdout"]
+    Process --> stderr["stderr"]
+    stdout --> File[("my_listing")]
+    stderr --> Screen[("Screen")]
+    
+    style stdout fill:#e1ffe1
+    style stderr fill:#ffe1e1
+```
+
+Important notes:
+
+- If the file doesn't exist, it's created and filled with results
+- If the file exists, it's erased and replaced with a new file
+- **Be careful**: This can easily overwrite existing files
+
+To append results to an existing file instead of replacing it, use `>>`:
+
+```bash
+$ echo "First line" > output.txt
+$ echo "Second line" >> output.txt
+$ cat output.txt
+First line
+Second line
+```
+
+### Redirecting Standard Input
+
+Input redirection indicates where a program reading from standard input should find its data. Input redirection uses the `<` character.
+
+```bash
+$ grep or < my_listing
+Network
+cores
+
+$ grep or < my_listing > my_selection
+
+$ cat my_selection
+Network
+cores
+```
+
+The `grep` command selects lines of text containing a pattern (or in this example) and copies them to standard output. Input redirection tells the process to read from `my_listing`, and output redirection saves results to `my_selection`.
+
+### Redirecting Output to Another Process (Pipes)
+
+The most powerful redirection mode connects one process's standard output to another's standard input. The first program's results become the second's data. Data passes directly between processes without going through an intermediate file. This creates a "pipe" between processes.
+
+```{mermaid}
+flowchart LR
+    stdin1["stdin"] --> P1["ls /"]
+    P1 --> pipe["|<br/>pipe"]
+    pipe --> P2["grep or"]
+    P2 --> stdout2["stdout"]
+    P2 --> stderr2["stderr"]
+    stdout2 --> Screen[("Screen")]
+    stderr2 --> Screen
+    
+    style pipe fill:#fff2cc
+    style stdout2 fill:#e1ffe1
+    style stderr2 fill:#ffe1e1
+```
+
+Syntactically, this is achieved by joining two or more commands with the `|` character:
+
+```bash
+$ ls / | grep or
+Network
+cores
+
+$ ls / | grep or > my_selection
+
+$ cat my_selection
+Network
+cores
+```
+
+In a complex command, a process is created for each command, and data simply transits from one to another.
+
+**Important restrictions:**
+
+- Commands before a pipe cannot redirect stdout to a file (already piped to next command)
+- Commands after a pipe cannot redirect stdin from a file (already receiving from previous command)
+
+You can chain multiple pipes:
+
+```bash
+# Count lines containing "error" in log file
+$ cat logfile.txt | grep error | wc -l
+
+# Sort unique email addresses
+$ cat emails.txt | sort | uniq
+```
+
+## Building Execution Loops
+
+A computer's value lies in its ability to automatically perform repetitive calculation tasks. Users often find themselves needing to launch the same Unix command for calculations on multiple datasets. If each dataset is saved in a different file with coherent naming (e.g., `gis_vercors.dat`, `gis_belledonne.dat`, `gis_chartreuse.dat`), it's possible to leverage loop structures offered by Unix shells.
+
+### Shell Variables
+
+Working automatically and repetitively requires using variables to store useful, changing information at each iteration. For example, if your Unix command must read data from different files for each execution, you cannot write the file name in your command since it won't always be the same.
+
+You already know environment variables, set up by the `export` command, used to store system configuration information. There are simple variables allowing you to store any information you deem necessary during your Unix session. They're set up with simple assignment:
+
+```bash
+$ myvar="hello everyone"
+$ echo myvar
+myvar
+$ echo $myvar
+hello everyone
+```
+
+To retrieve the value contained in a variable, precede its name with the `$` character.
+
+### The `for` Loop
+
+To solve our problem of repeating the same Unix command multiple times while working on different data files, we'll create a variable that takes each element of a list as its value in turn. In our case, this list will be a list of file names constructed using file name ambiguity characters.
+
+```bash
+$ echo /[mnop]*
+/mach.sym /mach_kernel /mach_kernel.ctfsys /net /opt /private
+
+$ for f in /[mnop]*; do
+>   echo "Working with file $f"
+> done
+Working with file /mach.sym
+Working with file /mach_kernel
+Working with file /mach_kernel.ctfsys
+Working with file /net
+Working with file /opt
+Working with file /private
+```
+
+```{mermaid}
+flowchart TD
+    Start([Start]) --> Init["Initialize loop variable<br/>with first item"]
+    Init --> Check{More items<br/>in list?}
+    Check -->|Yes| Execute["Execute commands<br/>in loop body"]
+    Execute --> Next["Move to next item"]
+    Next --> Check
+    Check -->|No| End([End])
+    
+    style Execute fill:#e1ffe1
+```
+
+The syntax is:
+
+```bash
+for variable in list; do
+    commands using $variable
 done
 ```
 
-## Safer Bash
+All Unix commands inserted between `do` and `done` are executed once for each value taken by the variable.
 
-- Always quote expansions: `"$var"`
-- Enable strict mode in scripts:
-  ```bash
-  set -Eeuo pipefail
-  IFS=$'\n\t'
-  ```
-- Prefer `mktemp` for temp files
-- Use `printf` instead of `echo` for exact output
-
-## Color‑Blind‑Friendly Tips
-
-Use **shapes**, **labels**, and **line styles** rather than relying solely on color in outputs and diagrams. In Mermaid use dashed/solid edges and different node shapes:
-
-```{mermaid}
-%%| echo: false
-%%| code-fold: false
-flowchart LR
-  classDef solid stroke-width:2;
-  classDef dashed stroke-dasharray: 5 5, stroke-width:2;
-  A([File]):::solid --> B{{Grep}}:::dashed
-  B --> C[[Matches]]
-```
-
-# Essential Commands (Modernized, Bash‑centric)
-
-Below are concise prototypes. Use `--help` and `man` for details.
-
-## `awk` — Pattern scanning and processing
+Practical examples:
 
 ```bash
-awk [-F SEP] 'PROGRAM' [FILE...]
+# Process multiple data files
+$ for file in data*.txt; do
+>   echo "Processing $file"
+>   ./analyze.sh $file > results_$file
+> done
+
+# Rename multiple files
+$ for file in *.jpeg; do
+>   mv "$file" "${file%.jpeg}.jpg"
+> done
+
+# Create numbered directories
+$ for i in {1..10}; do
+>   mkdir experiment_$i
+> done
 ```
 
-- `-F` field separator. Example: `awk -F: '{print $1,$3}' /etc/passwd`
+### Conditional Execution
 
-## `bash` — The shell
+Bash also provides conditional structures:
 
 ```bash
-bash            # start a new interactive shell
-bash script.sh  # run a script
+# if-then-else
+$ if [ -f "data.txt" ]; then
+>   echo "File exists"
+> else
+>   echo "File not found"
+> fi
+
+# Test file properties
+$ for file in *.txt; do
+>   if [ -s "$file" ]; then
+>     echo "$file is not empty"
+>   fi
+> done
 ```
 
-## `bg` / `fg` / `jobs` — Job control
+Common test operators:
 
+| Test | Meaning |
+|------|---------|
+| `-f file` | File exists and is regular file |
+| `-d dir` | Directory exists |
+| `-s file` | File exists and is not empty |
+| `-r file` | File is readable |
+| `-w file` | File is writable |
+| `-x file` | File is executable |
+
+# Essential Unix Commands (Alphabetical)
+
+The commands presented here are a subset of all commands available by default on a Unix system. They're presented with a subset of their options. For a complete description of their functionality, refer to online help accessible via the `man` command.
+
+## `awk` - Pattern Scanning and Processing
+
+Named after its authors (Aho, Weinberger, Kernighan), `awk` is a complete programming language. A full description is beyond this course's scope but was perfectly described in "The AWK Programming Language" by its authors.
+
+**Synopsis:**
 ```bash
-sleep 60 &   # run in background
-jobs         # list jobs
-fg %1        # bring job 1 to foreground
-bg %1        # resume job 1 in background
+awk [-F separator] 'program' [data_file]
 ```
 
-## `cat` — Concatenate files
+**Main options:**
 
+- `-F` - Specify column separator
+
+**Examples:**
 ```bash
-cat file1 [file2 ...] > out
+# Print second column
+$ awk '{print $2}' file.txt
+
+# Sum numbers in first column
+$ awk '{sum += $1} END {print sum}' numbers.txt
+
+# Process CSV file
+$ awk -F',' '{print $1, $3}' data.csv
 ```
 
-## `cd` — Change directory
+## `bash` - Bourne-Again Shell
 
+Launches a bash Unix shell. To exit this new shell, press `Ctrl-D` at a prompt.
+
+**Synopsis:**
 ```bash
-cd [DIR]   # no arg: go to $HOME
+bash
 ```
 
-## `chmod` — Change permissions
-
+**Example:**
 ```bash
-chmod [-R] MODE FILE...
-chmod u+rwx,g+rx,o-rwx FILE
+$ bash
+bash-5.1$ export test_var="hello"
+bash-5.1$ exit
+$
 ```
 
-## `chsh` — Change login shell
+## `bg` - Send Process to Background
 
+Resumes execution of a process suspended by `Ctrl-Z` in the background.
+
+**Synopsis:**
 ```bash
-chsh -s /bin/bash
+bg [%job]
 ```
 
-## `cp` — Copy files
+**Arguments:**
 
+- `%job` - Job number (preceded by %). Get list with `jobs` command.
+
+**Example:**
 ```bash
-cp [-R] SRC... DEST
+$ sleep 30
+^Z
+[1]+  Stopped                 sleep 30
+$ jobs
+[1]+  Stopped                 sleep 30
+$ bg %1
+[1]+ sleep 30 &
+$ jobs
+[1]+  Running                 sleep 30 &
 ```
 
-## `diff` — Text diffs
+## `cat` - Concatenate Files
 
+Reads content from one or more data streams and copies it identically to standard output.
+
+**Synopsis:**
 ```bash
-diff -u old.txt new.txt | less
+cat [file ...]
 ```
 
-## `env` / `export` — Environment
+**Arguments:**
 
+- `file` - One or more file names. If none provided, reads from stdin.
+
+**Examples:**
 ```bash
-env | sort
-export VAR=value
+# Display file content
+$ cat file.txt
+
+# Concatenate multiple files
+$ cat file1.txt file2.txt > combined.txt
+
+# Number lines
+$ cat -n file.txt
 ```
 
-## `grep` — Search text (replaces `egrep`/`fgrep`)
+## `cd` - Change Directory
 
+Changes the current working directory.
+
+**Synopsis:**
 ```bash
-grep [-E|-F] [-iR] PATTERN [FILE...]
+cd [directory]
 ```
 
-## `head` / `tail` — File ends
+**Arguments:**
 
+- `directory` - New working directory name. Without argument, returns to home.
+
+**Examples:**
 ```bash
-head -n 20 FILE
-tail -n 50 FILE
-tail -f /var/log/syslog   # follow
+$ pwd
+/home/alice
+$ cd /usr/local
+$ pwd
+/usr/local
+$ cd ../../home/alice
+$ pwd
+/home/alice
+$ cd
+$ pwd
+/home/alice
 ```
 
-## `join` — Join lines on a field
+## `chmod` - Change File Mode
 
+Changes file access permissions.
+
+**Synopsis:**
 ```bash
-join -1 1 -2 1 file1 file2
+chmod [-R] mode file
 ```
 
-## `kill` — Send signals
+**Main options:**
 
+- `-R` - Recursive operation on directory contents
+
+**Arguments:**
+
+- `mode` - Permission change description (e.g., `u+x`, `go-w`, `755`)
+- `file` - File(s) whose mode should be changed
+
+**Examples:**
 ```bash
-kill -SIGTERM PID
-kill -9 PID      # last resort
-kill -l          # list signals
+# Add execute permission for user
+$ chmod u+x script.sh
+
+# Remove write permission for group and others
+$ chmod go-w data.txt
+
+# Set specific permissions with octal
+$ chmod 755 program
+
+# Recursive permission change
+$ chmod -R 644 documents/
 ```
 
-## `ln` — Create links
+## `cp` - Copy Files
 
+Copies a file or directory.
+
+**Synopsis:**
 ```bash
-ln FILE LINKNAME       # hard link
-ln -s TARGET LINKNAME  # symlink
+cp [-R] source destination
 ```
 
-## `ls` — List files
+**Main options:**
 
+- `-R` - Recursive copy for directories
+
+**Arguments:**
+
+- `source` - File(s) to be copied
+- `destination` - Copy destination name or directory
+
+**Examples:**
 ```bash
-ls -la
-ls -ltrh /var/log
-```
+# Copy file
+$ cp source.txt backup.txt
 
-## `man` — Manuals
+# Copy to directory
+$ cp file.txt documents/
 
-```bash
-man ls
-man -k network    # search by keyword
-```
+# Copy directory recursively
+$ cp -R project/ project_backup/
 
-## `mkdir` — Make directories
-
-```bash
-mkdir -p project/{data,docs,src}
-```
-
-## `mv` — Move/rename
-
-```bash
-mv old new
-mv file*.txt dir/
-```
-
-## `paste` — Merge lines side by side
-
-```bash
-paste file1 file2
-```
-
-## `ps` — Process status
-
-```bash
-ps aux | grep -E '[n]ginx'
-ps -U "$USER" -o pid,ppid,stat,cmd
-```
-
-## `pwd` — Current directory
-
-```bash
-pwd
-```
-
-## `rm` — Remove files (dangerous)
-
-```bash
-rm [-rf] PATH...
-```
-
-> Tip: Use `trash`/`gio trash` on desktops when possible.
-
-## `sed` — Stream editor
-
-```bash
-sed -E 's/old/new/g' FILE
-```
-
-## `sort` / `uniq` — Sorting and deduping
-
-```bash
-sort -u names.txt
-sort -k2,2n data.tsv | uniq -c
-```
-
-## `wc` — Counts
-
-```bash
-wc -lwc FILE
-```
-
-# Practice: Putting It Together
-
-```{bash}
-#| eval: false
-# Find the 10 most common failed SSH sources today (GNU/Linux example)
-journalctl -u ssh --since today \
-| grep -Ei 'failed|authentication failure' \
-| awk '{print $(NF)}' \
-| sort | uniq -c | sort -k1,1nr | head -10
-```
-
+# Copy multiple files to directory
+$
