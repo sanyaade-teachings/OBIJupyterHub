@@ -30,6 +30,7 @@ RUN apt-get update && apt-get install -y \
     r-base \
     libcurl4-openssl-dev libssl-dev libxml2-dev \
     curl \
+    git \
     texlive-xetex texlive-fonts-recommended texlive-plain-generic \
     ruby ruby-dev \
     vim nano \
@@ -37,9 +38,16 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Installer R et packages
-RUN R -e "install.packages(c('IRkernel','tidyverse','vegan','ade4','BiocManager','remotes'), repos='http://cran.rstudio.com/')" && \
+RUN R -e "install.packages(c('IRkernel','tidyverse','vegan','ade4','BiocManager','remotes','igraph'), \
+                             dependencies=TRUE, \
+                             repos='http://cran.rstudio.com/')" && \
     R -e "BiocManager::install('biomformat')" && \
     R -e "remotes::install_github('metabaRfactory/metabaR')" && \
+    R -e "remotes::install_git('https://forge.metabarcoding.org/obitools/ROBIUtils.git')" && \
+    R -e "remotes::install_git('https://forge.metabarcoding.org/obitools/ROBITaxonomy.git')" && \
+    R -e "remotes::install_git('https://forge.metabarcoding.org/obitools/ROBITools.git')" && \
+    R -e "remotes::install_git('https://forge.metabarcoding.org/obitools/ROBITaxonomy.git')" && \
+    R -e "remotes::install_git('https://forge.metabarcoding.org/MetabarcodingSchool/biodiversity-metrics.git')" && \
     R -e "IRkernel::installspec(user = FALSE)" && \
     rm -rf /tmp/Rtmp*
 

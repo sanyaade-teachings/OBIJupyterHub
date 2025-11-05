@@ -10,7 +10,8 @@ c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
 c.JupyterHub.log_level = 'DEBUG'
 c.Spawner.debug = True
 
-VOLUMES_BASE_PATH = '/volumes'
+VOLUMES_BASE_PATH = '/volumes/users'  # Path as seen from JupyterHub container (for user dirs)
+HOST_VOLUMES_PATH = os.environ.get('HOST_VOLUMES_PATH', '/volumes')  # Real path on host machine (parent dir)
 
 # Docker image to use for student containers
 c.DockerSpawner.image = 'jupyterhub-student:latest'
@@ -52,29 +53,26 @@ c.DockerSpawner.notebook_dir = notebook_dir
 async def create_user_dir(spawner):
     """Create user directory if it doesn't exist"""
     user_dir = os.path.join(VOLUMES_BASE_PATH, spawner.user.name)
-    spawner.log.info(f"Ensured user directory exists: {user_dir}")
     Path(user_dir).mkdir(parents=True, exist_ok=True)
+
+    # Change owner to jovyan user (UID 1000, GID 100 in Jupyter images)
+    os.chown(user_dir, 1000, 100)
     os.chmod(user_dir, 0o755)
+
+    spawner.log.info(f"Created user directory with correct permissions: {user_dir}")
 
 c.Spawner.pre_spawn_hook = create_user_dir
 
 c.DockerSpawner.volumes = {
-    # Personal volume (persistent) - root directory
-    'obijupyterhub_shared-{username}' : '/home/jovyan/work',
+    # Personal volume - bind mount from REAL host path
+    f'{HOST_VOLUMES_PATH}/users/{{username}}': '/home/jovyan/work',
     # Shared volume between all students - under work/
-    'obijupyterhub_shared': '/home/jovyan/work/shared',
+    f'{HOST_VOLUMES_PATH}/shared': '/home/jovyan/work/shared',
     # Shared read-only volume for course files - under work/
-    'obijupyterhub_course': {
+    f'{HOST_VOLUMES_PATH}/course': {
         'bind': '/home/jovyan/work/course',
         'mode': 'ro'  # read-only
     }
-}
-
-c.DockerSpawner.volume_driver = 'local'
-c.DockerSpawner.volume_driver_opts = {
-    'type': 'none',
-    'device': '/volumes',
-    'o': 'bind'
 }
 
 # Memory and CPU configuration (adjust according to your needs)

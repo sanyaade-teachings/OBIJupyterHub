@@ -49,18 +49,27 @@ docker ps -aq --filter name=jupyter- | xargs -r docker rm -f 2>/dev/null || true
 # Build student image
 echo ""
 echo -e "${BLUE}🔨 Building student image...${NC}"
-docker build -t jupyterhub-student:latest -f Dockerfile .
+#docker build -t jupyterhub-student:latest -f Dockerfile .
 
 # Build hub image
 echo ""
 echo -e "${BLUE}🔨 Building JupyterHub image...${NC}"
-docker build -t jupyterhub-hub:latest -f Dockerfile.hub .
+#docker build -t jupyterhub-hub:latest -f Dockerfile.hub .
 
 # Compile the web site
 echo ""
 echo  -e "${BLUE}🔨 Building web site...${NC}"
 pushd ../web_src
 quarto render
+find . -name '*.pdf' -print \
+| while read pdfname ; do 
+    dest="../jupyterhub_volumes/web/pages/${pdfname}"
+	dirdest=$(dirname "$dest")
+	mkdir -p "$dirdest"
+    echo "cp '${pdfname}' '${dest}'"  
+  done \
+| bash
+python3 ../tools/generate_pdf_galleries.py
 python3 ../tools/generate_pages_json.py
 popd
 

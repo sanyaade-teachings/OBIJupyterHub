@@ -4,5 +4,8 @@
 /jupyterhub_volumes/jupyterhub
 /jupyterhub_volumes/caddy
 /**/.DS_Store
-
+/web_src/**/*.RData
+/web_src/**/*.pdf
+/web_src/**/*_files
+/web_src/**/*_cache
 /.luarc.json

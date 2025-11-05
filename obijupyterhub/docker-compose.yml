@@ -13,8 +13,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       # JupyterHub database persistence
       - data:/srv/jupyterhub
-      # The Jupyter user volumes
-      - users:/volumes
+      # Mount the parent volumes directory to access users/, shared/, course/
+      - ../jupyterhub_volumes:/volumes
       # Mount config file directly (for easy modifications)
       - ./jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro
     networks:
@@ -27,6 +27,8 @@ services:
       JUPYTERHUB_ADMIN_PASSWORD: admin2025
       # Optional environment variables
       DOCKER_NOTEBOOK_DIR: /home/jovyan/work
+      # Use PWD to get absolute path relative to docker-compose.yml location
+      HOST_VOLUMES_PATH: ${PWD}/../jupyterhub_volumes
 
   # ---------- Nginx ----------
 
