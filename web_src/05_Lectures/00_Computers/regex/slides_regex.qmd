@@ -2,9 +2,11 @@
 title: "Regular Expressions"
 format:
   revealjs:
-    theme: beige   # thème des slides
     css: ../../slides.css
-    transition: fade   # effet de transition entre les slides
+    transition: slide
+    scrollable: true
+    theme: beige 
+    html-math-method: mathjax
 ---
 
 

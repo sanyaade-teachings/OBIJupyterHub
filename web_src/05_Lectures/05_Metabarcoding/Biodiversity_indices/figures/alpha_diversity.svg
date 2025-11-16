@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 2021 852" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <g transform="matrix(1,0,0,1,-187,-683)">
+        <g>
+            <g>
+                <g transform="matrix(0.824429,0,0,0.824429,40.8885,111.226)">
+                    <rect x="195.263" y="711.481" width="997.627" height="997.627" style="fill:rgb(235,235,235);stroke-width:20.22px;stroke:black;"/>
+                </g>
+                <g>
+                    <g transform="matrix(1,0,0,1,324.539,-65.9235)">
+                        <ellipse cx="477.16" cy="995.163" rx="110.023" ry="109.093" style="fill:rgb(248,0,230);"/>
+                    </g>
+                    <g transform="matrix(1.76539,0,0,1.76539,-62.3224,-805.515)">
+                        <text x="472.748px" y="995.259px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">B</text>
+                    </g>
+                </g>
+                <g>
+                    <ellipse cx="477.16" cy="995.163" rx="110.023" ry="109.093" style="fill:rgb(82,110,255);"/>
+                    <g transform="matrix(1.76539,0,0,1.76539,-386.861,-739.592)">
+                        <text x="472.748px" y="995.259px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">A</text>
+                    </g>
+                </g>
+                <g>
+                    <g transform="matrix(1,0,0,1,291.652,223.089)">
+                        <ellipse cx="477.16" cy="995.163" rx="110.023" ry="109.093" style="fill:rgb(109,255,87);"/>
+                    </g>
+                    <g transform="matrix(1.76539,0,0,1.76539,-97.6439,-516.503)">
+                        <text x="472.748px" y="995.259px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">D</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,-17.2537,10.505)">
+                    <text x="245.684px" y="752.356px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">Environment 1</text>
+                </g>
+                <g>
+                    <g transform="matrix(1,0,0,1,-9.40327,285.266)">
+                        <ellipse cx="477.16" cy="995.163" rx="110.023" ry="109.093" style="fill:rgb(255,255,49);"/>
+                    </g>
+                    <g transform="matrix(1.76539,0,0,1.76539,-398.699,-454.326)">
+                        <text x="472.748px" y="995.259px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">C</text>
+                    </g>
+                </g>
+            </g>
+            <g>
+                <g transform="matrix(0.824429,0,0,0.824429,1209.24,111.226)">
+                    <rect x="195.263" y="711.481" width="997.627" height="997.627" style="fill:rgb(235,235,235);stroke-width:20.22px;stroke:black;"/>
+                </g>
+                <g transform="matrix(0.333632,0,0,0.333632,1745.99,939.675)">
+                    <g transform="matrix(1,0,0,1,324.539,-65.9235)">
+                        <ellipse cx="477.16" cy="995.163" rx="110.023" ry="109.093" style="fill:rgb(80,254,255);"/>
+                    </g>
+                    <g transform="matrix(1.76539,0,0,1.76539,-62.3224,-805.515)">
+                        <text x="472.748px" y="995.259px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">G</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,1165.64,10.505)">
+                    <text x="245.684px" y="752.356px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">Environment 2</text>
+                </g>
+                <g transform="matrix(0.333632,0,0,0.333632,1563.39,529.401)">
+                    <g transform="matrix(1,0,0,1,324.539,-65.9235)">
+                        <ellipse cx="477.16" cy="995.163" rx="110.023" ry="109.093" style="fill:rgb(248,0,230);"/>
+                    </g>
+                    <g transform="matrix(1.76539,0,0,1.76539,-62.3224,-805.515)">
+                        <text x="472.748px" y="995.259px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">B</text>
+                    </g>
+                </g>
+                <g transform="matrix(0.333632,0,0,0.333632,1745.51,807.014)">
+                    <g transform="matrix(1,0,0,1,324.539,-65.9235)">
+                        <ellipse cx="477.16" cy="995.163" rx="110.023" ry="109.093" style="fill:rgb(255,201,226);"/>
+                    </g>
+                    <g transform="matrix(1.76539,0,0,1.76539,-62.3224,-805.515)">
+                        <text x="472.748px" y="995.259px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">F</text>
+                    </g>
+                </g>
+                <g transform="matrix(0.333632,0,0,0.333632,1711.84,590.465)">
+                    <g transform="matrix(1,0,0,1,324.539,-65.9235)">
+                        <ellipse cx="477.16" cy="995.163" rx="110.023" ry="109.093" style="fill:rgb(255,95,111);"/>
+                    </g>
+                    <g transform="matrix(1.76539,0,0,1.76539,-62.3224,-805.515)">
+                        <text x="472.748px" y="995.259px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">E</text>
+                    </g>
+                </g>
+                <g transform="matrix(1.74862,0,0,1.74862,827.639,-680.448)">
+                    <ellipse cx="477.16" cy="995.163" rx="110.023" ry="109.093" style="fill:rgb(82,110,255);"/>
+                    <g transform="matrix(1.76539,0,0,1.76539,-386.861,-739.592)">
+                        <text x="472.748px" y="995.259px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">A</text>
+                    </g>
+                </g>
+                <g transform="matrix(0.468295,0,0,0.468295,1493.29,758.779)">
+                    <g transform="matrix(1,0,0,1,291.652,223.089)">
+                        <ellipse cx="477.16" cy="995.163" rx="110.023" ry="109.093" style="fill:rgb(109,255,87);"/>
+                    </g>
+                    <g transform="matrix(1.76539,0,0,1.76539,-97.6439,-516.503)">
+                        <text x="472.748px" y="995.259px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">D</text>
+                    </g>
+                </g>
+                <g transform="matrix(0.311548,0,0,0.311548,1336.31,890.508)">
+                    <g transform="matrix(1,0,0,1,-9.40327,285.266)">
+                        <ellipse cx="477.16" cy="995.163" rx="110.023" ry="109.093" style="fill:rgb(255,255,49);"/>
+                    </g>
+                    <g transform="matrix(1.76539,0,0,1.76539,-398.699,-454.326)">
+                        <text x="472.748px" y="995.259px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;fill:black;">C</text>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

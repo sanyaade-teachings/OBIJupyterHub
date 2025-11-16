@@ -6,12 +6,11 @@ title: |
 author: frederic.boyer@univ-grenoble-alpes.fr
 format: 
   revealjs:
-    theme: beige
     css: ../../slides.css
-    transition: fade
-    width: 1280
-    height: 720
-    center: true
+    transition: slide
+    scrollable: true
+    theme: beige 
+    html-math-method: mathjax
 ---
 
 # Introduction to Unix
