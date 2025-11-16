@@ -265,7 +265,7 @@ grep -B 2 root < /etc/passwd
 grep -B 2 root < /etc/passwd > result
 ```
 
-![Redirect stdout](images/command-grep3.svg){width = 40%}
+![Redirect stdout](images/command-grep3.svg){ width=20% }
 
 ## A basic `Unix` command: Piping a stream into another command
 
@@ -277,7 +277,7 @@ grep -B 2 root < /etc/passwd > result
 grep -B 2 root < /etc/passwd | less
 ```
 
-![Pipe between commands](/images/command-grepless.svg){width = 20%} 
+![Pipe between commands](images/command-grepless.svg){ width=20% } 
 
 ## RTFM: Bash redirections
 
@@ -293,171 +293,3 @@ grep -B 2 root < /etc/passwd | less
 
 
 
-# The `OBITools`
-
-![OBITools](images/obitools.png){width = 80%}  
-
-## RTFM !
-
-The [documentation](http://obitools4.metabarcoding.org) is available online.
-
-![An OBITools command](images/OBITools-web.png){width = 80%} 
-
-## An `OBITools` command
-
-![An OBITools command](images/obitools-command.svg){width = 80%} 
-
-
-## Decorated fasta sequences
-
-Basic fasta sequence:
-
-```
->my_sequence this is my pretty sequence
-ACGTTGCAGTACGTTGCAGTACGTTGCAGTACGTTGCAGTACGTTGCAGTACGTTGCAGT
-GTGCTGACGTTGCAGTACGTTGCAGTACGTTGCAGTACGTTGCAGTACGTTGCAGTGTTT
-AACGACGTTGCAGTACGTTGCAGT
-```
-
-*Decorated* fasta sequence:
-
-```
->my_sequence taxid=3456; direct=True; sample=A354; this is my pretty sequence
-ACGTTGCAGTACGTTGCAGTACGTTGCAGTACGTTGCAGTACGTTGCAGTACGTTGCAGT
-GTGCTGACGTTGCAGTACGTTGCAGTACGTTGCAGTACGTTGCAGTACGTTGCAGTGTTT
-AACGACGTTGCAGTACGTTGCAGT
-```
-*decoration* can be any set of `key=value;` couples
-
-## Main OBITools commands (1/2)
-
-
-- Metabarcode design and quality assessment
-  - `ecoPCR`: in silico PCR
-  - `ecoPrimers`: new barcode markers and primers
-  - `ecotaxstat`: getting the coverage of an ecoPCR output compared to the original ecoPCR database
-  - `ecotaxspecificity`: Evaluates barcode resolution
-
-- File format conversions
-  - `obiconvert`: converts sequence files to different output formats
-  - `obitab`: converts a sequence file to a tabular file
-
-- Sequence annotations
-  - `ecotag`: assigns sequences to taxa
-  - `obiannotate`: adds/edits sequence record annotations
-
-## Main OBITools commands (2/2)
-
-- Computations on sequences
-  - `illuminapairedend`: aligns paired-end Illumina reads
-  - `ngsfilter`: Assigns sequence records to the corresponding experiment/sample based on DNA tags and primers
-  - `obiclean`: tags a set of sequences for PCR/sequencing errors identification
-  - `obiuniq`: groups and dereplicates sequences
-
-- Sequence sampling and filtering
-  - `obigrep`: filters sequence file
-  - `obihead`: extracts the first sequence records
-
-- Statistics over sequence file
-  - `obicount`: counts the number of sequence records
-  - `obistat`: computes basic statistics for attribute values
-
-
-## Regular expressions: Regex
-
-> In computing, a regular expression is a specific pattern that provides concise and flexible means to "match" (specify and recognize) strings of text, such as particular characters, words, or patterns of characters.
-> 
-> Common abbreviations for "regular expression" include regex and regexp.
-> - http://en.wikipedia.org/wiki/Regular_expression
-
-## Graphical representation
-
-A regular expression can be represented by an *automata*
-
-![Automata](images/automata.svg){ width=50% }
-
-## Occurrence of a regular pattern
-
-If one can get to the final state, the text `match` the regular expression.
-
-
-![tot*o](images/exp1.svg){ width=50% }
-
-> Tutu et **_toto_** sont sur un bateau. Toto tombe à l’eau.
-
-> Obama: «If daughters get tat**_too_**s, we will **_too_**»
-
-## Exemples of regular expressions
-
-Regular expressions defined on DNA &rarr; &Sigma;={A,C,G,T}
-
-| Regular expression            | Automata                                                            |
-|-------------------------------|---------------------------------------------------------------------|
-| `ATG` (start codon)           | ![ATG](images/exp2.svg){ width=100% } |
-| `[ATG]TG` <br> `[^C]TG`(all start codons)  | ![[ATG]TG](images/exp3.svg){ width=100% } |
-
-## Exemples of regular expressions
-
-Regular expressions defined on DNA &rarr; &Sigma;={A,C,G,T}
-
-| Regular expression            | Automata                                                            |
-|-------------------------------|---------------------------------------------------------------------|
-| `.TG` <br> `[ACGT]TG` (all codons ending with TG) | ![.TG](images/exp4.svg){ width=100% } |
-| `TTA+TT` <br> `TTAA*TT` (TT, at least one A, TT)  | ![TTAT+TT](images/exp5.svg){ width=100% } |
-
-## Exemples of regular expressions
-
-Regular expressions defined on DNA &rarr; &Sigma;={A,C,G,T}
-
-| Regular expression            | Automata                                                            |
-|-------------------------------|---------------------------------------------------------------------|
-| `TAA`&#124;`TAG`&#124;`TGA` <br> `T(AA`&#124;`AG`&#124;`GA)` (All stop codons) | ![All stops](images/exp6.svg){ width=100% } |
-
-## Syntax of regular expressions
-
-| Syntax            | What it matches                                  |
-|-------------------|--------------------------------------------------|
-| `^`               | begining of the line                             |
-| `$`               | end of the line                                  |
-| `[]`              | set of characters                                |
-| `[^]`             | all characters but these ones (ex: `TTA{3,5}TT`) |
-| &#124;            | multiple choices                                 |
-| `{}`              | repetitions                                      |
-| `*`               | any number of times                              |
-| `+`               | at least once                                    |
-| `?`               | none or once                                     |
-| `\*`              | the `*` character (same for `+`, `(`, `[`, ...)  |
-
-## Special characters: Regular expression extensions
-
-| Special characters| What it matches                                  |
-|-------------------|--------------------------------------------------|
-| `()`              | used to define sub-expressions                   |
-| `\n`              | used to reuse the text matched by the `n`th sub-expression               |
-
-## Syntax of extended regular expressions
-
-Extended regular expressions defined on DNA &rarr; &Sigma;={A,C,G,T}
-
-| Regular expression            | Automata                                                            |
-|-------------------------------|---------------------------------------------------------------------|
-| `([ACGT]{3})\1{9,}` (matching a stretch of at least the same codon 10 times) | As the langage described is not regular, no automaton can be used to represent the expression |
-
-
-[What is my regular expression engine capable of ?](https://en.wikipedia.org/wiki/Comparison_of_regular_expression_engines)
-
-## Regular expressions and `obigrep`
-
-Regular expressions can be used with `obigrep` to filter sequences with the appropriate options:
-
-    -s <REGULAR_PATTERN>, --sequence=<REGULAR_PATTERN>
-                        regular expression pattern used to select the
-                        sequence. The pattern is case insensitive
-    -D <REGULAR_PATTERN>, --definition=<REGULAR_PATTERN>
-                        regular expression pattern matched against the
-                        definition of the sequence. The pattern is case
-                        sensitive
-    -I <REGULAR_PATTERN>, --identifier=<REGULAR_PATTERN>
-                        regular expression pattern matched against the
-                        identifier of the sequence. The pattern is case
-                        sensitive

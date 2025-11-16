@@ -5,7 +5,7 @@ RUN pip install dockerspawner
 
 # Copy configuration
 COPY jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py
-
+COPY jupyterhub_templates/login.html /srv/venv/share/jupyterhub/templates/login.html
 # Expose port
 EXPOSE 8000
 

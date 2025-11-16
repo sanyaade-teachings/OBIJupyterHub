@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
+  DNA Patterns
+  #
+
+DNA patterns are useful for describing short DNA sequences like oligonucleotides. They are used by several OBITools
+         like 
+    obimultiplex
+    , 
+    obipcr
+     or 
+    obigrep
+    . The advantage of using DNA patterns over classical regular expressions is that they can be matched with errors. Allowed errors can be simple mismatches, or mismatches and insertions/deletions.">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://metabar:8888/obidoc/docs/patterns/dnagrep/">
+  <meta property="og:site_name" content="OBITools4 documentation">
+  <meta property="og:title" content="DNA Patterns">
+  <meta property="og:description" content="DNA Patterns # DNA patterns are useful for describing short DNA sequences like oligonucleotides. They are used by several OBITools like obimultiplex , obipcr or obigrep . The advantage of using DNA patterns over classical regular expressions is that they can be matched with errors. Allowed errors can be simple mismatches, or mismatches and insertions/deletions.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+<title>DNA Patterns | OBITools4 documentation</title>
+<link rel="icon" href="/obidoc/favicon.png" >
+<link rel="manifest" href="/obidoc/manifest.json">
+<link rel="canonical" href="http://metabar:8888/obidoc/docs/patterns/dnagrep/">
+<link rel="stylesheet" href="/obidoc/book.min.5fd7b8e2d1c0ae15da279c52ff32731130386f71b58f011468f20d0056fe6b78.css" integrity="sha256-X9e44tHArhXaJ5xS/zJzETA4b3G1jwEUaPINAFb&#43;a3g=" crossorigin="anonymous">
+  <script defer src="/obidoc/fuse.min.js"></script>
+  <script defer src="/obidoc/en.search.min.4da51bdd2d833922fdbc0e19df517221387fc625ffb68ee140d605b3c5b68058.js" integrity="sha256-TaUb3S2DOSL9vA4Z31FyITh/xiX/to7hQNYFs8W2gFg=" crossorigin="anonymous"></script>
+
+  <script defer src="/obidoc/sw.min.32af8eafce4180aa1c5dea66d99fb26ba9043ea7c7a4c706138c91d9051b285e.js" integrity="sha256-Mq&#43;Or85BgKocXepm2Z&#43;ya6kEPqfHpMcGE4yR2QUbKF4=" crossorigin="anonymous"></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  <link rel="stylesheet" type="text/css" href="http://metabar:8888/obidoc/hugo-cite.css" />
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/obidoc/"><img src="/obidoc/obitools_logo.jpg" alt="Logo" class="book-icon" /><span>OBITools4 documentation</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Docs</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/about/" class="">About</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/installation/" class="">Installation</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/principles/" class="">General operating principles</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-08756b4c1f14be6ee584ece005b9f621" class="toggle"  />
+    <label for="section-08756b4c1f14be6ee584ece005b9f621" class="flex justify-between">
+      <a role="button" class="">File formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-933c2e64b905b84e22aa5273cea2d0bd" class="toggle"  />
+    <label for="section-933c2e64b905b84e22aa5273cea2d0bd" class="flex justify-between">
+      <a role="button" class="">Sequence file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fasta/" class="">FASTA file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fastq/" class="">FASTQ file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/genbank/" class="">GenBank Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/embl/" class="">EMBL Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/csv/" class="">CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/json/" class="">JSON format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/annotations/" class="">Annotation of sequences</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-0258ae1c222f9a38cc1b75254c93b0f4" class="toggle"  />
+    <label for="section-0258ae1c222f9a38cc1b75254c93b0f4" class="flex justify-between">
+      <a role="button" class="">Taxonomy file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/csv_taxdump/" class="">CSV formatted taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/ncbi_taxdump/" class="">NCBI taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/csv/" class="">The CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-70b1e6e5ec7f3ccab643155fa50659b6" class="toggle" checked />
+    <label for="section-70b1e6e5ec7f3ccab643155fa50659b6" class="flex justify-between">
+      <a role="button" class="">Patterns</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/regular/" class="">Regular Expressions</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/dnagrep/" class="active">DNA Patterns</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8223f464911a1fe6c655972143684e93" class="toggle"  />
+    <label for="section-8223f464911a1fe6c655972143684e93" class="flex justify-between">
+      <a role="button" class="">The OBITools4 commands</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/options/" class="">Shared command options</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8921ea65523c266b128dd4263232b0fc" class="toggle"  />
+    <label for="section-8921ea65523c266b128dd4263232b0fc" class="flex justify-between">
+      <a role="button" class="">Basics</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiannotate/" class="">obiannotate</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicomplement/" class="">obicomplement</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconvert/" class="">obiconvert</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicount/" class="">obicount</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicsv/" class="">obicsv</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidemerge/" class="">obidemerge</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidistribute/" class="">obidistribute</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obigrep/" class="">obigrep</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obijoin/" class="">obijoin</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimatrix/" class="">obimatrix</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisplit/" class="">obisplit</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisummary/" class="">obisummary</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiuniq/" class="">obiuniq</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-dbdf1bb5377572439394e60e08c30f50" class="toggle"  />
+    <label for="section-dbdf1bb5377572439394e60e08c30f50" class="flex justify-between">
+      <a role="button" class="">Demultiplexing samples</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimultiplex/" class="">obimultiplex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitagpcr/" class="">obitagpcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-aa98fedd067b51150db59691a8ea8edd" class="toggle"  />
+    <label for="section-aa98fedd067b51150db59691a8ea8edd" class="flex justify-between">
+      <a role="button" class="">Sequence alignments</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiclean/" class="">obiclean</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7433746525d8c2b29b033f765c869acd" class="toggle"  />
+    <label for="section-7433746525d8c2b29b033f765c869acd" class="flex justify-between">
+      <a href="/obidoc/obitools/obipairing/" class="">obipairing</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/fasta-like/" class="">The FASTA-like alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/exact-alignment/" class="">Exact alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obipcr/" class="">obipcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obirefidx/" class="">obirefidx</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitag/" class="">obitag</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-5746f699d10490780dec8e30ab2dd3ce" class="toggle"  />
+    <label for="section-5746f699d10490780dec8e30ab2dd3ce" class="flex justify-between">
+      <a role="button" class="">Taxonomy</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitaxonomy/" class="">obitaxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-3f50c4fe7ab436a56ae92897d5444956" class="toggle"  />
+    <label for="section-3f50c4fe7ab436a56ae92897d5444956" class="flex justify-between">
+      <a role="button" class="">Advanced tools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiscript/" class="">obiscript</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-549be3934679fcb82a232f6bd5435563" class="toggle"  />
+    <label for="section-549be3934679fcb82a232f6bd5435563" class="flex justify-between">
+      <a role="button" class="">Others</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimicrosat/" class="">obimicrosat</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-ceca4455173761e30cbc0a6dc2327167" class="toggle"  />
+    <label for="section-ceca4455173761e30cbc0a6dc2327167" class="flex justify-between">
+      <a role="button" class="">Experimentals</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicleandb/" class="">obicleandb</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconsensus/" class="">obiconsensus</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obilandmark/" class="">obilandmark</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/tags/" class="">Glossary of tags</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9b1bcd52530c59dc4819b1f61c128f54" class="toggle"  />
+    <label for="section-9b1bcd52530c59dc4819b1f61c128f54" class="flex justify-between">
+      <a role="button" class="">Cookbook</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/illumina/" class="">Analysing an Illumina data set</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/ecoprimers/" class="">Designing new barcodes</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/local_genbank/" class="">Prepare a local copy of Genbank</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/reference_db/" class="">Build a reference database</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/minion/" class="">Oxford Nanopore data analysis</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Programming OBITools</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/expression/" class="">Expression language</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-6d580829a667b5cca790b286d99a10fe" class="toggle"  />
+    <label for="section-6d580829a667b5cca790b286d99a10fe" class="flex justify-between">
+      <a href="/obidoc/docs/programming/lua/" class="">Lua: for scripting OBITools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-2fb081dac812d624eea5f4268fca9e26" class="toggle"  />
+    <label for="section-2fb081dac812d624eea5f4268fca9e26" class="flex justify-between">
+      <a role="button" class="">Obitools Classes</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequence/" class="">BioSequence</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequenceslice/" class="">BioSequenceSlice</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxonomy/" class="">Taxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxon/" class="">Taxon</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/mutex/" class="">Mutex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/obidoc/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>DNA Patterns</h3>
+
+  <label for="toc-control">
+    
+    <img src="/obidoc/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#dna-patterns">DNA Patterns</a>
+      <ul>
+        <li><a href="#syntax-of-a-dna-pattern">Syntax of a DNA Pattern</a></li>
+        <li><a href="#iupac-codes-for-ambiguous-bases">IUPAC Codes for Ambiguous Bases</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="dna-patterns">
+  DNA Patterns
+  <a class="anchor" href="#dna-patterns">#</a>
+</h1>
+<p>DNA patterns are useful for describing short DNA sequences like oligonucleotides. They are used by several <abbr title="A set of unix command line tools for manipulating DNA metabarcoding data">OBITools</abbr>
+         like <a href="http://metabar:8888/obidoc/obitools/obimultiplex/">
+    <abbr title="obimultiplex: "><code>obimultiplex</code></abbr>
+    </a>, <a href="http://metabar:8888/obidoc/obitools/obipcr/">
+    <abbr title="obipcr: the electronic PCR tool"><code>obipcr</code></abbr>
+    </a> or <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a>. The advantage of using DNA patterns over classical regular expressions is that they can be matched with errors. Allowed errors can be simple mismatches, or mismatches and insertions/deletions.</p>
+<h2 id="syntax-of-a-dna-pattern">
+  Syntax of a DNA Pattern
+  <a class="anchor" href="#syntax-of-a-dna-pattern">#</a>
+</h2>
+<ul>
+<li>Patterns are limited to sequences up to 63 bases long.</li>
+<li>As all DNA sequences, they are represented from the 5&rsquo; end to the 3&rsquo; end.</li>
+<li>Each base is represented by a single letter (A, C, G, T).</li>
+<li>IUPAC codes can be used to represent ambiguous bases (N, M, K, R, Y, S, W, B, D, H, V, N, see table below).</li>
+<li>Ambiguous positions can also be denoted by a range of base characters (<em>i.e.</em> <code>ATGC</code>) surrounded by square brackets (<code>[]</code>) : <code>[ATC]</code>.</li>
+<li>A range of bases can negate by prefixing it with a <code>!</code> : <code>[!AC]</code>.</li>
+<li>Patterns do not allow for ambiguity on the number of occurrences of a base.</li>
+<li>Positions where errors are not allowed, are denoted by a sharp (<code>#</code>) symbol after the base.</li>
+<li>Patterns are case unsensitive.</li>
+</ul>
+
+            <link rel="stylesheet" href="/obidoc/css/vendors/admonitions.5c73bad2903e7d2d44ad118370ebd8c2cf5f239d4d93c283e55c00f2f8d30746.css" integrity="sha256-XHO60pA&#43;fS1ErRGDcOvYws9fI51Nk8KD5VwA8vjTB0Y=" crossorigin="anonymous">
+    <div class="admonition example">
+      <div class="admonition-header"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M192 96a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm-8 384l0-128 16 0 0 128c0 17.7 14.3 32 32 32s32-14.3 32-32l0-288 56 0 64 0 16 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-16 0 0-64 192 0 0 192-192 0 0-32-64 0 0 48c0 26.5 21.5 48 48 48l224 0c26.5 0 48-21.5 48-48l0-224c0-26.5-21.5-48-48-48L368 0c-26.5 0-48 21.5-48 48l0 80-76.9 0-65.9 0c-33.7 0-64.9 17.7-82.3 46.6l-58.3 97c-9.1 15.1-4.2 34.8 10.9 43.9s34.8 4.2 43.9-10.9L120 256.9 120 480c0 17.7 14.3 32 32 32s32-14.3 32-32z"/></svg>
+        <span>Example</span>
+      </div>
+      <div class="admonition-content">
+        <p>A DNA pattern corresponding to the forward primer of the <em>Euka02</em> marker with no errors allowed
+at the two last bases on the 3&rsquo; end:</p>
+<p><code>TTTGTCTGSTTAATTSC#G#</code></p>
+      </div>
+    </div>
+    <div class="admonition example">
+      <div class="admonition-header"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M192 96a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm-8 384l0-128 16 0 0 128c0 17.7 14.3 32 32 32s32-14.3 32-32l0-288 56 0 64 0 16 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-16 0 0-64 192 0 0 192-192 0 0-32-64 0 0 48c0 26.5 21.5 48 48 48l224 0c26.5 0 48-21.5 48-48l0-224c0-26.5-21.5-48-48-48L368 0c-26.5 0-48 21.5-48 48l0 80-76.9 0-65.9 0c-33.7 0-64.9 17.7-82.3 46.6l-58.3 97c-9.1 15.1-4.2 34.8 10.9 43.9s34.8 4.2 43.9-10.9L120 256.9 120 480c0 17.7 14.3 32 32 32s32-14.3 32-32z"/></svg>
+        <span>Example</span>
+      </div>
+      <div class="admonition-content">
+        <p>The same pattern using base ranges for indicating the second <code>S</code> ambiguity:</p>
+<p><code>TTTGTCTGSTTAATT[CG]C#G#</code></p>
+      </div>
+    </div><h2 id="iupac-codes-for-ambiguous-bases">
+  IUPAC Codes for Ambiguous Bases
+  <a class="anchor" href="#iupac-codes-for-ambiguous-bases">#</a>
+</h2>
+<table border="1"> 
+    <caption>
+        IUPAC DNA ambiguity codes
+      </caption>
+    <tbody><tr align="center"> 
+      <th>Symbol</th><th>Bases</th><th>Origin of designation</th></tr> 
+    <tr align="center"><td>G</td><td>G</td><td>Guanine</td></tr> 
+    <tr align="center"><td>A</td><td>A</td><td>Adenine</td></tr> 
+    <tr align="center"><td>T</td><td>T</td><td>Thymine</td></tr> 
+    <tr align="center"><td>C</td><td>C</td><td>Cytosine</td></tr> 
+    <tr align="center"><td>R</td><td>G or A</td><td>puRine</td></tr> 
+    <tr align="center"><td>Y</td><td>T or C</td><td>pYrimidine</td></tr> 
+    <tr align="center"><td>M</td><td>A or C</td><td>aMino</td></tr> 
+    <tr align="center"><td>K</td><td>G or T</td><td>Keto</td></tr> 
+    <tr align="center"><td>S</td><td>G or C</td><td>Strong interaction (3 H bonds)</td></tr> 
+    <tr align="center"><td>W</td><td>A or T</td><td>Weak interaction (2 H bonds)</td></tr> 
+    <tr align="center"><td>H</td><td>A or C or T</td><td>not-G, H follows G in the alphabet</td></tr> 
+    <tr align="center"><td>B</td><td>G or T or C</td><td>not-A, B follows A</td></tr> 
+    <tr align="center"><td>V</td><td>G or C or A</td><td>not-T (not-U), V follows U</td></tr> 
+    <tr align="center"><td>D</td><td>G or A or T</td><td>not-C, D follows C</td></tr> 
+    <tr align="center"><td>N</td><td>G or A or T or C</td><td>aNy</td></tr> 
+  </tbody>
+</table>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#dna-patterns">DNA Patterns</a>
+      <ul>
+        <li><a href="#syntax-of-a-dna-pattern">Syntax of a DNA Pattern</a></li>
+        <li><a href="#iupac-codes-for-ambiguous-bases">IUPAC Codes for Ambiguous Bases</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

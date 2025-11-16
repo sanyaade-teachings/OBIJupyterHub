@@ -1,0 +1,2316 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
+  obiclean: a PCR aware denoising algorithm
+  #
+
+
+  Description
+  #
+
+
+    obiclean
+     implements the denoising algorithms provided by OBITools4.
+The original 
+    obiclean
+     algorithm is a denoising (clustering) algorithm designed to filter out potential PCR-generated spurious sequences.
+This new version of 
+    obiclean
+     adds two additional filters:
+
+A filter to set a threshold for the minimum number of samples (PCRs) a sequence must be present to be retained (default: 1, can be changed using the --min-sample-count option).
+A naive chimera detection algorithm. This is an experimental feature. It is not run by default. It can be enabled with the --dectect-chimera option.
+
+
+    obiclean
+     can run in two modes:">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://metabar:8888/obidoc/obitools/obiclean/">
+  <meta property="og:site_name" content="OBITools4 documentation">
+  <meta property="og:title" content="obiclean">
+  <meta property="og:description" content="obiclean: a PCR aware denoising algorithm # Description # obiclean implements the denoising algorithms provided by OBITools4.
+The original obiclean algorithm is a denoising (clustering) algorithm designed to filter out potential PCR-generated spurious sequences.
+This new version of obiclean adds two additional filters:
+A filter to set a threshold for the minimum number of samples (PCRs) a sequence must be present to be retained (default: 1, can be changed using the --min-sample-count option). A naive chimera detection algorithm. This is an experimental feature. It is not run by default. It can be enabled with the --dectect-chimera option. obiclean can run in two modes:">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+<title>obiclean | OBITools4 documentation</title>
+<link rel="icon" href="/obidoc/favicon.png" >
+<link rel="manifest" href="/obidoc/manifest.json">
+<link rel="canonical" href="http://metabar:8888/obidoc/obitools/obiclean/">
+<link rel="stylesheet" href="/obidoc/book.min.5fd7b8e2d1c0ae15da279c52ff32731130386f71b58f011468f20d0056fe6b78.css" integrity="sha256-X9e44tHArhXaJ5xS/zJzETA4b3G1jwEUaPINAFb&#43;a3g=" crossorigin="anonymous">
+  <script defer src="/obidoc/fuse.min.js"></script>
+  <script defer src="/obidoc/en.search.min.4da51bdd2d833922fdbc0e19df517221387fc625ffb68ee140d605b3c5b68058.js" integrity="sha256-TaUb3S2DOSL9vA4Z31FyITh/xiX/to7hQNYFs8W2gFg=" crossorigin="anonymous"></script>
+
+  <script defer src="/obidoc/sw.min.32af8eafce4180aa1c5dea66d99fb26ba9043ea7c7a4c706138c91d9051b285e.js" integrity="sha256-Mq&#43;Or85BgKocXepm2Z&#43;ya6kEPqfHpMcGE4yR2QUbKF4=" crossorigin="anonymous"></script>
+<link rel="alternate" type="application/rss+xml" href="http://metabar:8888/obidoc/obitools/obiclean/index.xml" title="OBITools4 documentation" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  <link rel="stylesheet" type="text/css" href="http://metabar:8888/obidoc/hugo-cite.css" />
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/obidoc/"><img src="/obidoc/obitools_logo.jpg" alt="Logo" class="book-icon" /><span>OBITools4 documentation</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Docs</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/about/" class="">About</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/installation/" class="">Installation</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/principles/" class="">General operating principles</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-08756b4c1f14be6ee584ece005b9f621" class="toggle"  />
+    <label for="section-08756b4c1f14be6ee584ece005b9f621" class="flex justify-between">
+      <a role="button" class="">File formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-933c2e64b905b84e22aa5273cea2d0bd" class="toggle"  />
+    <label for="section-933c2e64b905b84e22aa5273cea2d0bd" class="flex justify-between">
+      <a role="button" class="">Sequence file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fasta/" class="">FASTA file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fastq/" class="">FASTQ file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/genbank/" class="">GenBank Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/embl/" class="">EMBL Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/csv/" class="">CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/json/" class="">JSON format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/annotations/" class="">Annotation of sequences</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-0258ae1c222f9a38cc1b75254c93b0f4" class="toggle"  />
+    <label for="section-0258ae1c222f9a38cc1b75254c93b0f4" class="flex justify-between">
+      <a role="button" class="">Taxonomy file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/csv_taxdump/" class="">CSV formatted taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/ncbi_taxdump/" class="">NCBI taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/csv/" class="">The CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-70b1e6e5ec7f3ccab643155fa50659b6" class="toggle"  />
+    <label for="section-70b1e6e5ec7f3ccab643155fa50659b6" class="flex justify-between">
+      <a role="button" class="">Patterns</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/regular/" class="">Regular Expressions</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/dnagrep/" class="">DNA Patterns</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8223f464911a1fe6c655972143684e93" class="toggle" checked />
+    <label for="section-8223f464911a1fe6c655972143684e93" class="flex justify-between">
+      <a role="button" class="">The OBITools4 commands</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/options/" class="">Shared command options</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8921ea65523c266b128dd4263232b0fc" class="toggle"  />
+    <label for="section-8921ea65523c266b128dd4263232b0fc" class="flex justify-between">
+      <a role="button" class="">Basics</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiannotate/" class="">obiannotate</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicomplement/" class="">obicomplement</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconvert/" class="">obiconvert</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicount/" class="">obicount</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicsv/" class="">obicsv</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidemerge/" class="">obidemerge</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidistribute/" class="">obidistribute</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obigrep/" class="">obigrep</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obijoin/" class="">obijoin</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimatrix/" class="">obimatrix</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisplit/" class="">obisplit</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisummary/" class="">obisummary</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiuniq/" class="">obiuniq</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-dbdf1bb5377572439394e60e08c30f50" class="toggle"  />
+    <label for="section-dbdf1bb5377572439394e60e08c30f50" class="flex justify-between">
+      <a role="button" class="">Demultiplexing samples</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimultiplex/" class="">obimultiplex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitagpcr/" class="">obitagpcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-aa98fedd067b51150db59691a8ea8edd" class="toggle" checked />
+    <label for="section-aa98fedd067b51150db59691a8ea8edd" class="flex justify-between">
+      <a role="button" class="">Sequence alignments</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiclean/" class="active">obiclean</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7433746525d8c2b29b033f765c869acd" class="toggle"  />
+    <label for="section-7433746525d8c2b29b033f765c869acd" class="flex justify-between">
+      <a href="/obidoc/obitools/obipairing/" class="">obipairing</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/fasta-like/" class="">The FASTA-like alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/exact-alignment/" class="">Exact alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obipcr/" class="">obipcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obirefidx/" class="">obirefidx</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitag/" class="">obitag</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-5746f699d10490780dec8e30ab2dd3ce" class="toggle"  />
+    <label for="section-5746f699d10490780dec8e30ab2dd3ce" class="flex justify-between">
+      <a role="button" class="">Taxonomy</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitaxonomy/" class="">obitaxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-3f50c4fe7ab436a56ae92897d5444956" class="toggle"  />
+    <label for="section-3f50c4fe7ab436a56ae92897d5444956" class="flex justify-between">
+      <a role="button" class="">Advanced tools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiscript/" class="">obiscript</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-549be3934679fcb82a232f6bd5435563" class="toggle"  />
+    <label for="section-549be3934679fcb82a232f6bd5435563" class="flex justify-between">
+      <a role="button" class="">Others</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimicrosat/" class="">obimicrosat</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-ceca4455173761e30cbc0a6dc2327167" class="toggle"  />
+    <label for="section-ceca4455173761e30cbc0a6dc2327167" class="flex justify-between">
+      <a role="button" class="">Experimentals</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicleandb/" class="">obicleandb</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconsensus/" class="">obiconsensus</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obilandmark/" class="">obilandmark</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/tags/" class="">Glossary of tags</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9b1bcd52530c59dc4819b1f61c128f54" class="toggle"  />
+    <label for="section-9b1bcd52530c59dc4819b1f61c128f54" class="flex justify-between">
+      <a role="button" class="">Cookbook</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/illumina/" class="">Analysing an Illumina data set</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/ecoprimers/" class="">Designing new barcodes</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/local_genbank/" class="">Prepare a local copy of Genbank</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/reference_db/" class="">Build a reference database</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/minion/" class="">Oxford Nanopore data analysis</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Programming OBITools</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/expression/" class="">Expression language</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-6d580829a667b5cca790b286d99a10fe" class="toggle"  />
+    <label for="section-6d580829a667b5cca790b286d99a10fe" class="flex justify-between">
+      <a href="/obidoc/docs/programming/lua/" class="">Lua: for scripting OBITools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-2fb081dac812d624eea5f4268fca9e26" class="toggle"  />
+    <label for="section-2fb081dac812d624eea5f4268fca9e26" class="flex justify-between">
+      <a role="button" class="">Obitools Classes</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequence/" class="">BioSequence</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequenceslice/" class="">BioSequenceSlice</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxonomy/" class="">Taxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxon/" class="">Taxon</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/mutex/" class="">Mutex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/obidoc/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>obiclean</h3>
+
+  <label for="toc-control">
+    
+    <img src="/obidoc/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#obiclean-a-pcr-aware-denoising-algorithm"><code>obiclean</code>: a PCR aware denoising algorithm</a>
+      <ul>
+        <li><a href="#description">Description</a></li>
+        <li><a href="#the-clustering-algorithm">The clustering algorithm</a>
+          <ul>
+            <li><a href="#tags-added-to-each-sequence-by-the-clustering-algorithm">Tags added to each sequence by the clustering algorithm</a></li>
+          </ul>
+        </li>
+        <li><a href="#the-chimera-detection-algorithm">The Chimera Detection Algorithm</a>
+          <ul>
+            <li><a href="#tags-added-to-each-chimeric-sequence-by-the-chimera-detection-algorithm">Tags added to each chimeric sequence by the chimera detection algorithm</a></li>
+          </ul>
+        </li>
+        <li><a href="#filtering-the-output">Filtering the output</a>
+          <ul>
+            <li><a href="#removal-of-sequences-annotated-as-artifacts">Removal of sequences annotated as artifacts.</a></li>
+            <li><a href="#remove-sequences-occurring-in-less-than-k-samples-pcrs">Remove sequences occurring in less than <em>k</em> samples (PCRs)</a></li>
+          </ul>
+        </li>
+        <li><a href="#synopsis">Synopsis</a></li>
+        <li><a href="#options">Options</a>
+          <ul>
+            <li><a href="#obiclean-specific-options"><em>obiclean</em> specific options</a></li>
+            <li><a href="#shared-options">shared options</a></li>
+          </ul>
+        </li>
+        <li><a href="#examples">Examples</a>
+          <ul>
+            <li><a href="#determining-the-ratio-parameter">Determining the ratio parameter</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="obiclean-a-pcr-aware-denoising-algorithm">
+  <code>obiclean</code>: a PCR aware denoising algorithm
+  <a class="anchor" href="#obiclean-a-pcr-aware-denoising-algorithm">#</a>
+</h1>
+<h2 id="description">
+  Description
+  <a class="anchor" href="#description">#</a>
+</h2>
+<p><a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> implements the denoising algorithms provided by <em>OBITools4</em>.</p>
+<p>The original <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> algorithm is a denoising (clustering) algorithm designed to filter out potential PCR-generated spurious sequences.</p>
+<p>This new version of <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> adds two additional filters:</p>
+<ul>
+<li>A filter to set a threshold for the minimum number of samples (PCRs) a sequence must be present to be retained (default: 1, can be changed using the <code>--min-sample-count</code> option).</li>
+<li>A naive chimera detection algorithm. This is an experimental feature. It is not run by default. It can be enabled with the <code>--dectect-chimera</code> option.</li>
+</ul>
+<p><a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> can run in two modes:</p>
+<ul>
+<li>A tagging mode where no sequences are actually removed from the data set, they are just tagged. It is your responsibility to remove the sequences you do not want based on these tags and your filter rules, using <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a>.</li>
+<li>A filter mode in which sequences that are considered to be artifactual sequences by <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> are removed from the data set.</li>
+</ul>
+<p><a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> relies on per-sample (PCR) sequence abundance information to apply its algorithms. Therefore, the input data set must first be dereplicated using the <a href="http://metabar:8888/obidoc/obitools/obiuniq/">
+    <abbr title="obiuniq: dereplicate a sequence file"><code>obiuniq</code></abbr>
+    </a> command with the <code>-m sample</code> option.</p>
+
+
+<script src="/obidoc/mermaid.min.js"></script>
+
+  <script>mermaid.initialize({
+  "flowchart": {
+    "useMaxWidth":true
+  },
+  "theme": "default"
+}
+)</script>
+
+
+
+
+<pre class="mermaid workflow">
+graph TD
+  A@{ shape: doc, label: "my_sequences_uniq.fasta" }
+  C[obiclean]
+  D@{ shape: doc, label: "my_sequences_clean.fasta" }
+  A --> C:::obitools
+  C --> D
+  classDef obitools fill:#99d57c
+</pre>
+
+<h2 id="the-clustering-algorithm">
+  The clustering algorithm
+  <a class="anchor" href="#the-clustering-algorithm">#</a>
+</h2>
+<p>The algorithm implemented in <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> aims to remove punctual PCR errors (nucleotide substitutions, insertions or deletions). Therefore, it is not applied to the whole data set at once, but to each sample (PCR) independently.</p>
+<p>Two pieces of information are used:</p>
+<ul>
+<li>The <strong>count</strong> attributes of the sequence set.</li>
+<li>The pairwise sequence similarities calculated in each set of sequences belonging to a sample.</li>
+</ul>
+<p>The result of the <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> algorithm is the classification of each sequence set into one of three classes: <code>head</code>, <code>internal</code> or <code>singleton</code>.</p>
+<p>Consider two sequences <em>S1</em> and <em>S2</em> that occur in the same sample (PCR). <em>S1</em> is a sequence variant of <em>S2</em> if and only if</p>
+<ul>
+<li>
+<p>The ratio of the number of occurrences of <em>S1</em> and <em>S2</em> is less than the parameter <em>R</em>.
+
+<link rel="stylesheet" href="/obidoc/katex/katex.min.css" />
+<script defer src="/obidoc/katex/katex.min.js"></script>
+<script defer src="/obidoc/katex/auto-render.min.js" onload="renderMathInElement(document.body);"></script><span>
+  \[
+\frac{Count_{S1}}{Count_{S2}} < R
+\]
+</span>
+
+The default value of <em>R</em> is 1 and can be set between 0 and 1 using the <code>-r</code> option.</p>
+</li>
+<li>
+<p>The number of differences between <em>S1</em> and <em>S2</em> when aligning these sequences is less than a maximum number of differences that can be specified with the <code>-d</code> option (default = 1 error).
+<span>
+  \[
+dist(S1,S2) < d
+\]
+</span>
+</p>
+</li>
+</ul>
+<p>This relation, <em>is a sequence variant of</em>, defines a 
+  <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">Directed Acyclic Graph (DAG)</a> on the sequences belonging to a sample.
+<a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> gives access to this graph using the <code>--save-graph</code> option. The following is an example of a command to run <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> and create the graph files:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiclean -r 0.1 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         -Z <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         --save-graph sample-graph  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         wolf_uniq.fasta.gz &gt; wolf_clean.fasta.gz
+</span></span></code></pre></div><ul>
+<li>The <code>-r</code> option is used to set the ratio threshold between the sequence abundances.</li>
+<li>The <code>--save-graph</code> option tells <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> to save the graph defined by the <em>&ldquo;is a sequence variant of&rdquo;</em> relation in a file per sample, using the 
+  <a href="https://en.wikipedia.org/wiki/Graph_Modelling_Language">GML</a> format, in the directory named <code>sample-graph</code>.</li>
+</ul>
+<pre>
+  . 📂 sample-graph
+  ├── 📄 <a href="sample-graph/13a_F730603.gml" dowload="13a_F730603.gml">13a_F730603.gml</a>
+  ├── 📄 <a href="sample-graph/15a_F730814.gml" dowload="15a_F730814.gml">15a_F730814.gml</a>
+  ├── 📄 <a href="sample-graph/26a_F040644.gml" dowload="26a_F040644.gml">26a_F040644.gml</a>
+  └── 📄 <a href="sample-graph/29a_F260619.gml" dowload="29a_F260619.gml">29a_F260619.gml</a>
+</pre>
+<ul>
+<li>The <code>-Z</code> option is used to compress the output file.</li>
+</ul>
+<p>The program [yEd] (
+  <a href="https://www.yworks.com/products/yed">https://www.yworks.com/products/yed</a>) allows you to visualize the graph described for each sample.</p>
+<figure style="border: solid; border-radius: 30px; box-shadow: 0 0 0 10px #f3f5f6 inset;   padding: 1em;"
+  ><img src="/obidoc/obitools/obiclean/13a_F730603.svg"
+    style="display: block; margin: 0 auto"
+    alt="Each dot represents one sequence. The area of the dot is proportional to the abundance of the sequence in the sample. The arrows represent the relationship is a sequence variant of, starting from the derived sequence to its presumed original version. The number on each arrow indicates the distance between the two sequences, here 1 everywhere. This sample corresponds to the dietary analysis of a wolf. Therefore, one true sequence (the prey) is expected. It corresponds to the big blue circle."><figcaption style="width: 90%; display: block; margin: 0 auto">
+      <h4>obiclean graph for the sample 13a_F730603</h4><p>Each dot represents one sequence. The area of the dot is proportional to the abundance of the sequence in the sample. The arrows represent the relationship <em>is a sequence variant of</em>, starting from the derived sequence to its presumed original version. The number on each arrow indicates the distance between the two sequences, here 1 everywhere. This sample corresponds to the dietary analysis of a wolf. Therefore, one true sequence (the prey) is expected. It corresponds to the big blue circle.</p>
+    </figcaption>
+</figure>
+<p>From the graph topology, each sequence <em>S</em> is classified into one of the following three classes</p>
+<ul>
+<li>
+<p><code>head</code></p>
+<ul>
+<li>There is <strong>at least one</strong> sequence in the sample that is a variant of <em>S</em>.</li>
+<li>There is <strong>no</strong> sequence in the sample such that <em>S</em> is a variant of that sequence.</li>
+</ul>
+</li>
+<li>
+<p><code>internal</code></p>
+<ul>
+<li>There is <strong>at least one</strong> sequence in the sample such that <em>S</em> is a variant of this sequence.</li>
+</ul>
+</li>
+<li>
+<p><code>singleton</code></p>
+<ul>
+<li>There is <strong>no</strong> sequence in the sample that is a variant of <em>S</em>.</li>
+<li>There is <strong>no</strong> sequence in the sample that is a variant of this sequence.</li>
+</ul>
+</li>
+</ul>
+<p>This class is sample dependent, as a graph is built per sample and recorded in the <code>obiclean_status</code> tag, as shown below for one of the sequences extracted from the result file 
+      
+  <a href="wolf_clean.fasta.gz"><code>wolf_clean.fasta.gz</code></a>.</p>
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;HELIUM_000100422_612GNAAXX:7:91:7524:17193#0/1_sub[28..127] {&#34;ali_dir&#34;:&#34;left&#34;,&#34;ali_length&#34;:62,&#34;count&#34;:8,&#34;direction&#34;:&#34;reverse&#34;,&#34;experiment&#34;:&#34;wolf_diet&#34;,&#34;forward_match&#34;:&#34;ttagataccccactatgc&#34;,&#34;forward_mismatches&#34;:0,&#34;forward_primer&#34;:&#34;ttagataccccactatgc&#34;,&#34;merged_sample&#34;:{&#34;15a_F730814&#34;:5,&#34;29a_F260619&#34;:3},&#34;mode&#34;:&#34;alignment&#34;,&#34;obiclean_head&#34;:false,&#34;obiclean_headcount&#34;:0,&#34;obiclean_internalcount&#34;:2,&#34;obiclean_mutation&#34;:{&#34;HELIUM_000100422_612GNAAXX:7:22:2603:18023#0/1_sub[28..127]&#34;:&#34;(a)-&gt;(g)@26&#34;},&#34;obiclean_samplecount&#34;:2,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;15a_F730814&#34;:&#34;i&#34;,&#34;29a_F260619&#34;:&#34;i&#34;},&#34;obiclean_weight&#34;:{&#34;15a_F730814&#34;:5,&#34;29a_F260619&#34;:3},&#34;reverse_match&#34;:&#34;tagaacaggctcctctag&#34;,&#34;reverse_mismatches&#34;:0,&#34;reverse_primer&#34;:&#34;tagaacaggctcctctag&#34;,&#34;seq_a_single&#34;:46,&#34;seq_b_single&#34;:46}
+ttagccctaaacacaagtaattaatgtaacaaaattattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+</code></pre><h3 id="tags-added-to-each-sequence-by-the-clustering-algorithm">
+  Tags added to each sequence by the clustering algorithm
+  <a class="anchor" href="#tags-added-to-each-sequence-by-the-clustering-algorithm">#</a>
+</h3>
+<ul>
+<li>
+<p><code>obiclean_head</code>: <code>true</code> if the sequence is a <em>head</em> or <em>singleton</em> in at least one sample, <code>false</code> otherwise.</p>
+</li>
+<li>
+<p>obiclean_samplecount: the number of samples the sequence occurs in the data set (here 2).</p>
+</li>
+<li>
+<p>obiclean_headcount: the number of samples where the sequence is classified as <em>head</em> (here 0).</p>
+</li>
+<li>
+<p>obiclean_internalcount: the number of samples where the sequence is classified as <em>internal</em> (here 2).</p>
+</li>
+<li>
+<p>obiclean_singletoncount: the number of samples where the sequence is classified as <em>singleton</em> (here 0).</p>
+</li>
+<li>
+<p><code>obiclean_status</code>: a JSON map indexed by the name of the sample in which the sequence was found. The value indicates the classification of the sequence in this sample: <code>i</code> for <em>internal</em>, <code>s</code> for <em>singleton</em> or <code>h</code> for <em>head</em>.</p>
+</li>
+<li>
+<p><code>obiclean_weight</code>: a JSON map indexed by the name of the sample in which the sequence was found. The value indicates the number of times the sequence and its derivatives were found in this sample (here 5 for sample <em>15a_F73081</em>).</p>
+</li>
+<li>
+<p><code>obiclean_mutation</code>: a JSON map indexed by sequence <code>id</code>s. Each entry of the map contains the sequence <code>id</code> of the parent sequence and the position of the mutation between the parent sequence and the sequence in the variant. Only sequences belonging to the class <em>internal</em> in at least one sample are annotated with this tag.</p>
+<p>Here: <code>(a)-&gt;(g)@26</code> indicates that the <code>a</code> in the parent sequence <code>HELIUM_000100422_612GNAAXX:7:22:2603:18023#0/1_sub[28..127]</code> in this variant has been replaced by a <code>g</code> at position 26.</p>
+</li>
+</ul>
+<h2 id="the-chimera-detection-algorithm">
+  The Chimera Detection Algorithm
+  <a class="anchor" href="#the-chimera-detection-algorithm">#</a>
+</h2>
+<p>This new version of <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> implements a naive chimera detection algorithm.
+It is an experimental feature. The algorithm is only run when the <code>--dectect-chimera</code> option is used.
+It is applied to sequences that have already been classified by the clustering algorithm presented above.</p>
+<p>The algorithm defines a chimeric sequence <em>S</em> as a sequence classified as <code>head</code> or <code>singleton</code> by the clustering algorithm, for which there exists in the sample a pair of sequences <span>
+  \(\{S_{Pre} ; S_{Suf}\}\)
+</span>
+ that are more frequent than <em>S</em>, and such that the concatenation of the shared prefix between <em>S</em> and <span>
+  \(S_{Pre}\)
+</span>
+ and the shared suffix between <em>S</em> and <span>
+  \(S_{Suf}\)
+</span>
+ is equal to <em>S</em>.</p>
+<span>
+  \[
+S = Common\_prefix(S,S_{Pre}) + Common\_suffix(S,S_{Suf})
+\]
+</span>
+
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiclean -r 0.1 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         -Z <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         --detect-chimera  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         wolf_uniq.fasta.gz &gt; wolf_clean_chimera.fasta.gz
+</span></span></code></pre></div><p>Extracted from the result file 
+      
+  <a href="wolf_clean_chimera.fasta.gz"><code>wolf_clean_chimera.fasta.gz</code></a>, the sequence shown below illustrates how a chimeric sequence is annotated.</p>
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;HELIUM_000100422_612GNAAXX:7:21:6999:18567#0/1_sub[28..127] {&#34;ali_dir&#34;:&#34;left&#34;,&#34;ali_length&#34;:62,&#34;chimera&#34;:{&#34;29a_F260619&#34;:&#34;{HELIUM_000100422_612GNAAXX:7:26:10054:16185#0/1_sub[28..127]}/{HELIUM_000100422_612GNAAXX:7:102:9724:19316#0/1_sub[28..127]}@(24)&#34;},&#34;count&#34;:1,&#34;direction&#34;:&#34;reverse&#34;,&#34;experiment&#34;:&#34;wolf_diet&#34;,&#34;forward_match&#34;:&#34;ttagataccccactatgc&#34;,&#34;forward_mismatches&#34;:0,&#34;forward_primer&#34;:&#34;ttagataccccactatgc&#34;,&#34;forward_tag&#34;:&#34;gcctcct&#34;,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:1},&#34;mode&#34;:&#34;alignment&#34;,&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:0,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:1,&#34;obiclean_singletoncount&#34;:1,&#34;obiclean_status&#34;:{&#34;29a_F260619&#34;:&#34;s&#34;},&#34;obiclean_weight&#34;:{&#34;29a_F260619&#34;:1},&#34;pairing_mismatches&#34;:{&#34;(A:21)-&gt;(G:02)&#34;:67,&#34;(A:34)-&gt;(C:02)&#34;:31,&#34;(A:34)-&gt;(G:02)&#34;:29,&#34;(C:28)-&gt;(G:02)&#34;:42,&#34;(C:34)-&gt;(A:02)&#34;:30,&#34;(G:32)-&gt;(T:02)&#34;:55,&#34;(T:33)-&gt;(G:02)&#34;:35},&#34;reverse_match&#34;:&#34;tagaacaggctcctctag&#34;,&#34;reverse_mismatches&#34;:0,&#34;reverse_primer&#34;:&#34;tagaacaggctcctctag&#34;,&#34;reverse_tag&#34;:&#34;gcctcct&#34;,&#34;score&#34;:306,&#34;score_norm&#34;:0.806,&#34;seq_a_single&#34;:46,&#34;seq_ab_match&#34;:50,&#34;seq_b_single&#34;:46}
+ttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctgtatacccgt
+</code></pre><h3 id="tags-added-to-each-chimeric-sequence-by-the-chimera-detection-algorithm">
+  Tags added to each chimeric sequence by the chimera detection algorithm
+  <a class="anchor" href="#tags-added-to-each-chimeric-sequence-by-the-chimera-detection-algorithm">#</a>
+</h3>
+<p>A <code>chimera</code> tag is added to the sequence. The tag contains a JSON map indexed by the names of the samples in which the chimeric sequence was detected. The value indicates the two parental sequences and the position of the transition between the two sequences in the chimera:</p>
+<pre tabindex="0"><code>{&#34;29a_F260619&#34;:&#34;{HELIUM_000100422_612GNAAXX:7:26:10054:16185#0/1_sub[28..127]}/{HELIUM_000100422_612GNAAXX:7:102:9724:19316#0/1_sub[28..127]}@(24)&#34;}
+</code></pre><p>Which reads as</p>
+<ul>
+<li>Sequence: <code>HELIUM_000100422_612GNAAXX:7:21:6999:18567#0/1_sub[28..127]</code>
+<ul>
+<li>was detected as chimera in sample: 29a_F260619</li>
+<li>between the sequences:
+<ul>
+<li><code>HELIUM_000100422_612GNAAXX:7:26:10054:16185#0/1_sub[28..127]</code> as prefix</li>
+<li><code>HELIUM_000100422_612GNAAXX:7:102:9724:19316#0/1_sub[28..127]</code> as suffix</li>
+<li>The junction is at position 24 on the chimeric sequence <code>HELIUM_000100422_612GNAAXX:7:21:6999:18567#0/1_sub[28..127]</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="filtering-the-output">
+  Filtering the output
+  <a class="anchor" href="#filtering-the-output">#</a>
+</h2>
+<h3 id="removal-of-sequences-annotated-as-artifacts">
+  Removal of sequences annotated as artifacts.
+  <a class="anchor" href="#removal-of-sequences-annotated-as-artifacts">#</a>
+</h3>
+<p>By default, <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> only annotates each sequence with different tags describing its classification in the different samples. Therefore, there are as many sequences in the result file as in the input file. This can be verified using the <a href="http://metabar:8888/obidoc/obitools/obicount/">
+    <abbr title="obicount: counting sequence records"><code>obicount</code></abbr>
+    </a> command on the previous input and result files, 
+      
+  <a href="wolf_uniq.fasta.gz"><code>wolf_uniq.fasta.gz</code></a> and 
+      
+  <a href="wolf_clean_chimera.fasta.gz"><code>wolf_clean_chimera.fasta.gz</code></a> respectively.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount wolf_uniq.fasta.gz | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| entities |       n |
+| -------- | ------- |
+| variants |   4 313 |
+| reads    |  42 452 |
+| symbols  | 428 403 |
+</code></pre><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount wolf_uniq_chimera.fasta.gz | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| entities |       n |
+| -------- | ------- |
+| variants |   4 313 |
+| reads    |  42 452 |
+| symbols  | 428 403 |
+</code></pre><p><a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> can be run in filter mode, allowing a sequence to be removed from the resulting sequence set if it is considered artifactual in all samples where it appears. Artifactual sequences are those classified as <em>internal</em> or <em>chimeric</em>.</p>
+<p>This filtering is done by setting the <code>-H</code> option.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiclean -r 0.1 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         -Z <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         --detect-chimera  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         -H <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         wolf_uniq.fasta.gz &gt; wolf_clean_chimera_head.fasta.gz
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount wolf_clean_chimera_head.fasta.gz | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| entities |       n |
+| -------- | ------- |
+| variants |   2 322 |
+| reads    |  35 623 |
+| symbols  | 230 953 |
+</code></pre><h3 id="remove-sequences-occurring-in-less-than-k-samples-pcrs">
+  Remove sequences occurring in less than <em>k</em> samples (PCRs)
+  <a class="anchor" href="#remove-sequences-occurring-in-less-than-k-samples-pcrs">#</a>
+</h3>
+<p>It may be considered reasonable to eliminate a sequence present in fewer than k samples, particularly if technical PCR replicates have been performed and several samples in the dataset actually correspond to these technical replicates of a single biological sample. By default, the minimum number of samples is set to 1, meaning that no sequences are rejected by this filter. The <code>-min-sample-count</code> option can be used to set this threshold to a higher value.
+A value of <em>2</em> already has a significant effect:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiclean -r 0.1 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         --detect-chimera  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         -H <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         --min-sample-count <span style="color:#ae81ff">2</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         wolf_uniq.fasta.gz <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    | obicount | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| entities |      n |
+| -------- | ------ |
+| variants |     12 |
+| reads    | 12 695 |
+| symbols  |  1 197 |
+</code></pre><p>This is equivalent to post-filtering the result of the <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> command using the following <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiclean -r 0.1 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         --detect-chimera  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         -H <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         wolf_uniq.fasta.gz <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    | obigrep -p <span style="color:#e6db74">&#39;annotations.obiclean_samplecount&gt;=2&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    | obicount | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| entities |      n |
+| -------- | ------ |
+| variants |     12 |
+| reads    | 12 695 |
+| symbols  |  1 197 |
+</code></pre><h2 id="synopsis">
+  Synopsis
+  <a class="anchor" href="#synopsis">#</a>
+</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiclean <span style="color:#f92672">[</span>--batch-size &lt;int&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--compressed|-Z<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--debug<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">[</span>--distance|-d &lt;int&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--ecopcr<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--embl<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--fasta<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--fasta-output<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">[</span>--fastq<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--fastq-output<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--force-one-cpu<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--genbank<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--head|-H<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">[</span>--help|-h|-?<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--input-OBI-header<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--input-json-header<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">[</span>--json-output<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--max-cpu &lt;int&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--min-eval-rate &lt;int&gt;<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">[</span>--min-sample-count &lt;int&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--no-order<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--no-progressbar<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">[</span>--out|-o &lt;FILENAME&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--output-OBI-header|-O<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">[</span>--output-json-header<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--pprof<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--pprof-goroutine &lt;int&gt;<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">[</span>--pprof-mutex &lt;int&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--ratio|-r &lt;float64&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--sample|-s &lt;string&gt;<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">[</span>--save-graph &lt;string&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--save-ratio &lt;string&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--skip-empty<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">[</span>--solexa<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--version<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>&lt;args&gt;<span style="color:#f92672">]</span>
+</span></span></code></pre></div><h2 id="options">
+  Options
+  <a class="anchor" href="#options">#</a>
+</h2>
+<h3 id="obiclean-specific-options">
+  <em>obiclean</em> specific options
+  <a class="anchor" href="#obiclean-specific-options">#</a>
+</h3>
+<h4 id="clustering-algorithm-options">
+  Clustering algorithm options
+  <a class="anchor" href="#clustering-algorithm-options">#</a>
+</h4>
+<ul>
+<li><b><code class="language-bash">--distance</code></b>
+| <b><code class="language-bash">-d</code></b>
+ &lt;INTEGER>: maximum numbers of differences between two variant sequences. (default: 1)
+</li>
+<li><b><code class="language-bash">--ratio</code></b>
+| <b><code class="language-bash">-r</code></b>
+ &lt;FLOAT>: threshold ratio between counts (rare/abundant counts) of two sequence records so that the less abundant one is a variant of the more abundant (default: 1.00).
+</li>
+<li><b><code class="language-bash">--sample</code></b>
+| <b><code class="language-bash">-s</code></b>
+ &lt;STRING>: name of the attribute containing sample descriptions (default: &ldquo;sample&rdquo;).
+</li>
+</ul>
+<h4 id="chimera-detection-options">
+  Chimera detection options
+  <a class="anchor" href="#chimera-detection-options">#</a>
+</h4>
+<ul>
+<li><b><code class="language-bash">--detect-chimera</code></b>: enable chimera detection. (default: false)
+</li>
+</ul>
+<h4 id="filtering-options">
+  Filtering options
+  <a class="anchor" href="#filtering-options">#</a>
+</h4>
+<ul>
+<li><b><code class="language-bash">--head</code></b>
+| <b><code class="language-bash">-H</code></b>
+: remove from the result data set, the sequences annotated as spurious in all the samples (default: false).
+</li>
+<li><b><code class="language-bash">--min-sample-count</code></b> &lt;INTEGER>: minimum number of samples a sequence must be present in to be considered in the analysis. (default: 1)
+</li>
+</ul>
+<h4 id="dumping-internal-clustering-data">
+  Dumping internal clustering data
+  <a class="anchor" href="#dumping-internal-clustering-data">#</a>
+</h4>
+<ul>
+<li><b><code class="language-bash">--save-graph</code></b> &lt;DIRNAME>: save the clustering graph for each sample (PCR) in a GML file in the directory precised as parameter of the option (default: false).
+</li>
+<li><b><code class="language-bash">--save-ratio</code></b> &lt;FILENAME>: create a CSV file containing abundance ratio statistics for the edges of the clustering graphs above the <code>--min-eval-rate</code> threshold.
+If the option <code>-Z</code> is used conjointly with the option <code>--save-graph</code>, in addition to the result file, the ratio CSV file is also compressed using GZIP.
+</li>
+<li><b><code class="language-bash">--min-eval-rate</code></b> &lt;INTEGER>: the minimum abundance of the destination sequence of an edge to be stored in the CSV file produced by the <code>--save-ratio</code> option (default: 1000).
+</li>
+</ul>
+<h3 id="shared-options">
+  shared options
+  <a class="anchor" href="#shared-options">#</a>
+</h3>
+<h4 id="controlling-the-input-data">
+  Controlling the input data
+  <a class="anchor" href="#controlling-the-input-data">#</a>
+</h4>
+
+
+<I>OBITools4</I> generally recognizes the input file format. It also recognizes
+whether the input file is compressed using GZIP. But some rare files can be
+misidentified, so the following options allow the user to force the format, thus
+bypassing the format identification step. 
+
+<h5 id="the-file-format-options">
+  The file format options
+  <a class="anchor" href="#the-file-format-options">#</a>
+</h5>
+
+
+<ul>
+    <li>
+<b><code class="language-bash">--fasta</code></b>: indicates that sequence data is in <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a> format.</li>
+    <li>
+<b><code class="language-bash">--fastq</code></b>: indicates that sequence data is in <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a> format.</li>
+    <li>
+<b><code class="language-bash">--embl</code></b>: indicates that sequence data is in <a href="http://metabar:8888/obidoc/formats/embl/">EMBL-ENA flatfile</a> format.</li>
+    <li>
+<b><code class="language-bash">--csv</code></b>: indicates that sequence data is in <a href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">CSV</a> format.</li>
+    <li>
+<b><code class="language-bash">--genbank</code></b>: indicates that sequence data is in <a href="http://metabar:8888/obidoc/formats/genbank/">GenBank flatfile</a> format.</li>
+    <li><b><code class="language-bash">--ecopcr</code></b>: indicates that sequence data is in the old ecoPCR tabulated format.</li>
+</ul>
+
+<h5 id="controlling-the-way-obitools4-are-formatting-annotations">
+  Controlling the way <em>OBITools4</em> are formatting annotations
+  <a class="anchor" href="#controlling-the-way-obitools4-are-formatting-annotations">#</a>
+</h5>
+
+
+These options only apply to the  <a href="http://metabar:8888/obidoc/formats/fasta/">FASTA</a> and  <a href="http://metabar:8888/obidoc/formats/fastq/">FASTQ</a> formats
+
+<ul>
+    <li><b><code class="language-bash">--input-OBI-header</code></b>: FASTA/FASTQ title line annotations follow the old OBI format.</li>
+    <li><b><code class="language-bash">--input-json-header</code></b>: FASTA/FASTQ title line annotations follow the JSON format.</li>
+</ul>
+
+<h5 id="controlling-quality-score-decoding">
+  Controlling quality score decoding
+  <a class="anchor" href="#controlling-quality-score-decoding">#</a>
+</h5>
+
+
+This option only applies to the <a href="http://metabar:8888/obidoc/formats/fastq/">FASTQ</a> formats
+
+<ul>
+    <li><b><code class="language-bash">--solexa</code></b>: decodes quality string according to the old Solexa specification. (default: the standard Sanger encoding is used, env: <strong>OBISSOLEXA</strong>)</li>
+</ul>
+
+<h4 id="controlling-the-output-data">
+  Controlling the output data
+  <a class="anchor" href="#controlling-the-output-data">#</a>
+</h4>
+
+
+<ul>
+    <li><b><code class="language-bash">--compress</code></b>
+| <b><code class="language-bash">-Z</code></b>
+: output is compressed using gzip. (default: false)</li>
+    <li><b><code class="language-bash">--no-order</code></b>: the <em>OBITools</em> ensure that the order between the input file and
+the output file does not change. When multiple files are processed,
+they are processed one at a time.
+If the <strong>&ndash;no-order</strong> option is added to a command, multiple input
+files can be opened at the same time and their contents processed
+in parallel. This usually increases processing speed, but does not
+guarantee the order of the sequences in the output file.
+Also, processing multiple files in parallel may require more memory
+to perform the computation.</li>
+    <li>
+<b><code class="language-bash">--fasta-output</code></b>: writes sequence data in <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>  format (default if quality data is not available).</li>
+    <li>
+      <b><code class="language-bash">--fastq-output</code></b>: writes sequence data in <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a>  format (default if quality data is available).</li>
+    <li><b><code class="language-bash">--json-output</code></b>: writes sequence data in JSON format.</li>
+    <li><b><code class="language-bash">--out</code></b>
+| <b><code class="language-bash">-o</code></b>
+ &lt;FILENAME>: filename used for saving the output (default: &ldquo;-&rdquo;, the standard output)</li>
+    <li><b><code class="language-bash">--output-OBI-header</code></b>
+| <b><code class="language-bash">-O</code></b>
+: writes output FASTA/FASTQ title line annotations in OBI format (default: JSON).</li>
+    <li><b><code class="language-bash">--output-json-header</code></b>: writew output FASTA/FASTQ title line annotations in JSON format (the default format).</li>
+    <li><b><code class="language-bash">--skip-empty</code></b>: sequences of length equal to zero are removed from the output (default: false).</li>
+    <li><b><code class="language-bash">--no-progressbar</code></b>: deactivates progress bar display (default: false).</li>
+</ul>
+<h4 id="general-options">
+  General options
+  <a class="anchor" href="#general-options">#</a>
+</h4>
+
+
+<ul>
+    <li><b><code class="language-bash">--help</code></b>
+| <b><code class="language-bash">-h|-?</code></b>
+: shows this help.</li>
+    <li><b><code class="language-bash">--version</code></b>: prints the version and exits.</li>
+    <li><b><code class="language-bash">--silent-warning</code></b>: This option tells obitools to stop displaying warnings.
+This behaviour can be controlled by setting the <strong>OBIWARNINGS</strong> environment variable.</li>
+</ul>
+
+
+
+<h4 id="computation-related-options">
+  Computation related options
+  <a class="anchor" href="#computation-related-options">#</a>
+</h4>
+
+
+<ul>
+    <li><b><code class="language-bash">--max-cpu</code></b> &lt;INTEGER>: <em>OBITools</em> can take advantage of your computer&rsquo;s multi-core
+architecture by parallelizing the computation across all available CPUs.
+Computing on more CPUs usually requires more memory to perform the
+computation. Reducing the number of CPUs used to perform a calculation
+is also a way to indirectly control the amount of memory used by the
+process. The number of CPUs used by <em>OBITools</em> can also be controlled
+by setting the <strong>OBIMAXCPU</strong> environment variable.</li>
+    <li><b><code class="language-bash">--force-one-cpu</code></b>: forces the use of a single CPU core for parallel processing (default: false).</li>
+    <li><b><code class="language-bash">--batch-size</code></b> &lt;INTEGER>: number of sequence per batch for parallel processing (default: 1000, env: <strong>OBIBATCHSIZE</strong>)</li>
+</ul>
+
+<h4 id="debug-related-options">
+  Debug related options
+  <a class="anchor" href="#debug-related-options">#</a>
+</h4>
+
+
+<ul>
+    <li><b><code class="language-bash">--debug</code></b>: enables debug mode, by setting log level to debug (default: false, env: <strong>OBIDEBUG</strong>)</li>
+    <li><b><code class="language-bash">--pprof</code></b>: enables pprof server. Look at the log for details. (default: false).</li>
+    <li><b><code class="language-bash">--pprof-mutex</code></b> &lt;INTEGER>: enables profiling of mutex lock. (default: 10, env: <strong>OBIPPROFMUTEX</strong>)</li>
+    <li><b><code class="language-bash">--pprof-goroutine</code></b> &lt;INTEGER>: enables profiling of goroutine blocking profile. (default: 6060, env: <strong>OBIPPROFGOROUTINE</strong>)</li>
+</ul>
+<h2 id="examples">
+  Examples
+  <a class="anchor" href="#examples">#</a>
+</h2>
+<h3 id="determining-the-ratio-parameter">
+  Determining the ratio parameter
+  <a class="anchor" href="#determining-the-ratio-parameter">#</a>
+</h3>
+<p>The ratio parameter (option <code>-r</code>) defines the ratio threshold between the frequency of the variant of a sequence and its original sequence. It can be used to distinguish between two closely related true sequences and a true sequence with its variant. To get an idea of the ratio threshold to use, the <code>obiclean</code> command with the <code>--save-ratio</code> option can be used. This option creates a CSV file containing the abundance ratio statistics from the edges of the clustering graphs. Only a subset of the edges are kept in the CSV file:</p>
+<ul>
+<li>Those corresponding to a single mutation (distance between the original and the mutated sequence is 1).</li>
+<li>Those where the original sequence has a weight greater than the threshold (determined by the <code>--min-eval-rate</code> option).</li>
+</ul>
+<p>The last condition is used to avoid estimating the ratio from edges with too few sequences, in order to limit the stochastic effect on ratio estimation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiclean -Z <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         --save-ratio wolf_ratio_R1.csv.gz  <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         wolf_uniq.fasta.gz &gt; wolf_clean_R1.fasta.gz
+</span></span></code></pre></div><p>The <code>--save-ratio</code> requires a parameter <code>FILENAME</code> that is the name of the CSV file to create. The file is compressed using GZIP if the option <code>-Z</code> is used.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gzcat wolf_ratio_R1.csv.gz | head | csvlook -I
+</span></span></code></pre></div><pre tabindex="0"><code>| Sample      | Origin_id                                                  | Origin_status | Origin | Mutant | Origin_Weight | Mutant_Weight | Origin_Count | Mutant_Count | Position | Origin_length | A  | C  | G  | T  |
+| ----------- | ---------------------------------------------------------- | ------------- | ------ | ------ | ------------- | ------------- | ------------ | ------------ | -------- | ------------- | -- | -- | -- | -- |
+| 26a_F040644 | HELIUM_000100422_612GNAAXX:7:5:15939:5437#0/1_sub[28..126] | h             | a      | -      | 12830         | 1             | 10385        | 1            | 44       | 99            | 35 | 25 | 16 | 23 |
+| 26a_F040644 | HELIUM_000100422_612GNAAXX:7:5:15939:5437#0/1_sub[28..126] | h             | a      | -      | 12830         | 1             | 10385        | 1            | 72       | 99            | 35 | 25 | 16 | 23 |
+| 26a_F040644 | HELIUM_000100422_612GNAAXX:7:5:15939:5437#0/1_sub[28..126] | h             | a      | -      | 12830         | 1             | 10385        | 1            | 42       | 99            | 35 | 25 | 16 | 23 |
+| 26a_F040644 | HELIUM_000100422_612GNAAXX:7:5:15939:5437#0/1_sub[28..126] | h             | a      | -      | 12830         | 1             | 10385        | 1            | 57       | 99            | 35 | 25 | 16 | 23 |
+| 26a_F040644 | HELIUM_000100422_612GNAAXX:7:5:15939:5437#0/1_sub[28..126] | h             | a      | -      | 12830         | 1             | 10385        | 1            | 76       | 99            | 35 | 25 | 16 | 23 |
+| 26a_F040644 | HELIUM_000100422_612GNAAXX:7:5:15939:5437#0/1_sub[28..126] | h             | a      | -      | 12830         | 1             | 10385        | 1            | 73       | 99            | 35 | 25 | 16 | 23 |
+| 26a_F040644 | HELIUM_000100422_612GNAAXX:7:5:15939:5437#0/1_sub[28..126] | h             | a      | -      | 12830         | 1             | 10385        | 1            | 16       | 99            | 35 | 25 | 16 | 23 |
+| 26a_F040644 | HELIUM_000100422_612GNAAXX:7:5:15939:5437#0/1_sub[28..126] | h             | a      | -      | 12830         | 1             | 10385        | 1            | 32       | 99            | 35 | 25 | 16 | 23 |
+| 26a_F040644 | HELIUM_000100422_612GNAAXX:7:5:15939:5437#0/1_sub[28..126] | h             | a      | -      | 12830         | 1             | 10385        | 1            | 73       | 99            | 35 | 25 | 16 | 23 |
+</code></pre><p>The ratio CSV file 
+      
+  <a href="wolf_ratio_R1.csv.gz"><code>wolf_ratio_R1.csv.gz</code></a> contains the following columns:</p>
+<ul>
+<li><code>Sample</code>: The name of the sample where the observation is done.</li>
+<li><code>Origin_id</code>: The ID of the original sequence corresponding to described mutant.</li>
+<li><code>Origin_status</code>: The status of the original sequence in the sample.</li>
+<li><code>Origin</code>: Original sequence at the mutation site.</li>
+<li><code>Mutant</code>: Mutant sequence at the mutation site.</li>
+<li><code>Origin_Weight</code>: Observed weight of the original sequence in the sample.</li>
+<li><code>Mutant_Weight</code>: Observed weight of the mutant sequence in the sample.</li>
+<li><code>Origin_Count</code>: Observed count of the original sequence in the sample.</li>
+<li><code>Mutant_Count</code>: Observed count of the mutant sequence in the sample.</li>
+<li><code>Position</code>: Position of the mutation in the original sequence.</li>
+<li><code>Origin_length</code>: Length of the original sequence.</li>
+<li><code>A</code>: Count of <em>A</em> nucleotides in the original sequence.</li>
+<li><code>C</code>: Count of <em>C</em> nucleotides in the original sequence.</li>
+<li><code>G</code>: Count of <em>G</em> nucleotides in the original sequence.</li>
+<li><code>T</code>: Count of <em>T</em> nucleotides in the original sequence.</li>
+</ul>
+<p>From the file 
+      
+  <a href="wolf_ratio_R1.csv.gz"><code>wolf_ratio_R1.csv.gz</code></a>, a histogram of the ratio of the weight of the mutant to the weight of the original can be plotted using the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gzcat wolf_ratio_R1.csv.gz <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    | octosql -o csv <span style="color:#e6db74">&#34;select log10(float(Mutant_Weight) / float(Origin_Weight)) as ratio 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                        from stdin.csv&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    | uplot -H hist -n <span style="color:#ae81ff">25</span>
+</span></span></code></pre></div><pre tabindex="0"><code>                                  ratio
+                ┌                                        ┐ 
+   [-4.2, -4.0) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 107                    
+   [-4.0, -3.8) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 200    
+   [-3.8, -3.6) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 208   
+   [-3.6, -3.4) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 119                  
+   [-3.4, -3.2) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 145              
+   [-3.2, -3.0) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 146             
+   [-3.0, -2.8) ┤▇▇▇▇▇▇▇▇▇▇▇▇ 71                           
+   [-2.8, -2.6) ┤▇▇▇▇▇▇▇▇ 45                               
+   [-2.6, -2.4) ┤▇▇▇▇ 26                                   
+   [-2.4, -2.2) ┤▇ 6                                       
+   [-2.2, -2.0) ┤▇ 7                                       
+   [-2.0, -1.8) ┤ 2                                        
+   [-1.8, -1.6) ┤ 0                                        
+   [-1.6, -1.4) ┤ 0                                        
+   [-1.4, -1.2) ┤ 2                                        
+</code></pre><p>The file 
+      
+  <a href="wolf_ratio_R1.csv.gz"><code>wolf_ratio_R1.csv.gz</code></a> describes the following number of edges (look the number of rows in the CSV file):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gzcat wolf_ratio_R1.csv.gz <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  | csvtk dim
+</span></span></code></pre></div><pre tabindex="0"><code>file  num_cols  num_rows
+-           15     1,084
+</code></pre><p>Most edges in the graph connect a PCR variant sequence to its parent sequence. Only a few edges correspond to a connection between two closely related true sequences that differ only by a single mutation; they are not frequent enough to distort the shape of the distribution. Therefore, this histogram can be considered as the distribution of the ratio between a variant sequence and its parent sequence. We can observe that no ratio in this histogram is greater than <span>
+  \(10^{-1}\)
+</span>
+, and only 4 out of 1084 edges have a ratio greater than <span>
+  \(10^{-2}\)
+</span>
+. Using the <code>--ratio 0.1</code> option will not split any edges, using the <code>--ratio 0.01</code> option will split 4 edges over the edges used for the statistics. Because of all the edges discarded from the ratio table (involving too few original sequences), the effect on the number of MOTUs produced may be greater.</p>
+<p>Below we run the <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> command with several different values for the <code>--ratio</code> option, ranging from 1 to 0.01. For each run, the number of MOTUs produced is printed by piping the output of <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a> to the <a href="http://metabar:8888/obidoc/obitools/obicount/">
+    <abbr title="obicount: counting sequence records"><code>obicount</code></abbr>
+    </a> and <code>csvlook</code> commands.</p>
+<ul>
+<li>Run with a ratio of 1</li>
+</ul>
+<pre tabindex="0"><code>obiclean -r 1 -H wolf_uniq.fasta.gz \
+  | obicount | csvlook
+</code></pre><pre tabindex="0"><code>| entities |       n |
+| -------- | ------- |
+| variants |   2 046 |
+| reads    |  35 111 |
+| symbols  | 203 349 |
+</code></pre><ul>
+<li>Run with a ratio of 1/2</li>
+</ul>
+<pre tabindex="0"><code>obiclean -r 0.5 -H wolf_uniq.fasta.gz \
+  | obicount | csvlook
+</code></pre><pre tabindex="0"><code>| entities |       n |
+| -------- | ------- |
+| variants |   2 046 |
+| reads    |  35 111 |
+| symbols  | 203 349 |
+</code></pre><ul>
+<li>Run with a ratio of 1/10</li>
+</ul>
+<pre tabindex="0"><code>obiclean -r 0.1 -H wolf_uniq.fasta.gz \
+  | obicount | csvlook
+</code></pre><pre tabindex="0"><code>| entities |       n |
+| -------- | ------- |
+| variants |   2 449 |
+| reads    |  35 757 |
+| symbols  | 243 515 |
+</code></pre><ul>
+<li>Run with a ratio of 1/100</li>
+</ul>
+<pre tabindex="0"><code>obiclean -r 0.01 -H wolf_uniq.fasta.gz \
+  | obicount | csvlook
+</code></pre><pre tabindex="0"><code>| entities |       n |
+| -------- | ------- |
+| variants |   3 215 |
+| reads    |  37 546 |
+| symbols  | 319 820 |
+</code></pre><p>As you can see, the number of MOTUs produced increases as the <code>-ratio</code> option decreases, but the ratio of 0.5 has no effect on the number of MOTUs produced compared to the default ratio of 1.0.</p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#obiclean-a-pcr-aware-denoising-algorithm"><code>obiclean</code>: a PCR aware denoising algorithm</a>
+      <ul>
+        <li><a href="#description">Description</a></li>
+        <li><a href="#the-clustering-algorithm">The clustering algorithm</a>
+          <ul>
+            <li><a href="#tags-added-to-each-sequence-by-the-clustering-algorithm">Tags added to each sequence by the clustering algorithm</a></li>
+          </ul>
+        </li>
+        <li><a href="#the-chimera-detection-algorithm">The Chimera Detection Algorithm</a>
+          <ul>
+            <li><a href="#tags-added-to-each-chimeric-sequence-by-the-chimera-detection-algorithm">Tags added to each chimeric sequence by the chimera detection algorithm</a></li>
+          </ul>
+        </li>
+        <li><a href="#filtering-the-output">Filtering the output</a>
+          <ul>
+            <li><a href="#removal-of-sequences-annotated-as-artifacts">Removal of sequences annotated as artifacts.</a></li>
+            <li><a href="#remove-sequences-occurring-in-less-than-k-samples-pcrs">Remove sequences occurring in less than <em>k</em> samples (PCRs)</a></li>
+          </ul>
+        </li>
+        <li><a href="#synopsis">Synopsis</a></li>
+        <li><a href="#options">Options</a>
+          <ul>
+            <li><a href="#obiclean-specific-options"><em>obiclean</em> specific options</a></li>
+            <li><a href="#shared-options">shared options</a></li>
+          </ul>
+        </li>
+        <li><a href="#examples">Examples</a>
+          <ul>
+            <li><a href="#determining-the-ratio-parameter">Determining the ratio parameter</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

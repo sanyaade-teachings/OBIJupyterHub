@@ -1,0 +1,2815 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
+  obigrep: filter a sequence file
+  #
+
+
+  Description
+  #
+
+
+    obigrep
+     is a tool for selecting a subset of sequences based on a set of criteria. Sequences from the input dataset that match all the criteria are retained and printed in the result, while other sequences are discarded.
+Selection criteria can be based on different aspects of the sequence data, such as
+
+The sequence identifier (ID)
+The sequence annotations
+The sequence itself
+
+
+  Selection based on sequence identifier (ID)
+  #
+
+There are two ways of selecting sequences according to their identifier:">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://metabar:8888/obidoc/obitools/obigrep/">
+  <meta property="og:site_name" content="OBITools4 documentation">
+  <meta property="og:title" content="obigrep">
+  <meta property="og:description" content="obigrep: filter a sequence file # Description # obigrep is a tool for selecting a subset of sequences based on a set of criteria. Sequences from the input dataset that match all the criteria are retained and printed in the result, while other sequences are discarded.
+Selection criteria can be based on different aspects of the sequence data, such as
+The sequence identifier (ID) The sequence annotations The sequence itself Selection based on sequence identifier (ID) # There are two ways of selecting sequences according to their identifier:">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+<title>obigrep | OBITools4 documentation</title>
+<link rel="icon" href="/obidoc/favicon.png" >
+<link rel="manifest" href="/obidoc/manifest.json">
+<link rel="canonical" href="http://metabar:8888/obidoc/obitools/obigrep/">
+<link rel="stylesheet" href="/obidoc/book.min.5fd7b8e2d1c0ae15da279c52ff32731130386f71b58f011468f20d0056fe6b78.css" integrity="sha256-X9e44tHArhXaJ5xS/zJzETA4b3G1jwEUaPINAFb&#43;a3g=" crossorigin="anonymous">
+  <script defer src="/obidoc/fuse.min.js"></script>
+  <script defer src="/obidoc/en.search.min.4da51bdd2d833922fdbc0e19df517221387fc625ffb68ee140d605b3c5b68058.js" integrity="sha256-TaUb3S2DOSL9vA4Z31FyITh/xiX/to7hQNYFs8W2gFg=" crossorigin="anonymous"></script>
+
+  <script defer src="/obidoc/sw.min.32af8eafce4180aa1c5dea66d99fb26ba9043ea7c7a4c706138c91d9051b285e.js" integrity="sha256-Mq&#43;Or85BgKocXepm2Z&#43;ya6kEPqfHpMcGE4yR2QUbKF4=" crossorigin="anonymous"></script>
+<link rel="alternate" type="application/rss+xml" href="http://metabar:8888/obidoc/obitools/obigrep/index.xml" title="OBITools4 documentation" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  <link rel="stylesheet" type="text/css" href="http://metabar:8888/obidoc/hugo-cite.css" />
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/obidoc/"><img src="/obidoc/obitools_logo.jpg" alt="Logo" class="book-icon" /><span>OBITools4 documentation</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Docs</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/about/" class="">About</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/installation/" class="">Installation</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/principles/" class="">General operating principles</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-08756b4c1f14be6ee584ece005b9f621" class="toggle"  />
+    <label for="section-08756b4c1f14be6ee584ece005b9f621" class="flex justify-between">
+      <a role="button" class="">File formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-933c2e64b905b84e22aa5273cea2d0bd" class="toggle"  />
+    <label for="section-933c2e64b905b84e22aa5273cea2d0bd" class="flex justify-between">
+      <a role="button" class="">Sequence file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fasta/" class="">FASTA file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fastq/" class="">FASTQ file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/genbank/" class="">GenBank Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/embl/" class="">EMBL Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/csv/" class="">CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/json/" class="">JSON format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/annotations/" class="">Annotation of sequences</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-0258ae1c222f9a38cc1b75254c93b0f4" class="toggle"  />
+    <label for="section-0258ae1c222f9a38cc1b75254c93b0f4" class="flex justify-between">
+      <a role="button" class="">Taxonomy file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/csv_taxdump/" class="">CSV formatted taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/ncbi_taxdump/" class="">NCBI taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/csv/" class="">The CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-70b1e6e5ec7f3ccab643155fa50659b6" class="toggle"  />
+    <label for="section-70b1e6e5ec7f3ccab643155fa50659b6" class="flex justify-between">
+      <a role="button" class="">Patterns</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/regular/" class="">Regular Expressions</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/dnagrep/" class="">DNA Patterns</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8223f464911a1fe6c655972143684e93" class="toggle" checked />
+    <label for="section-8223f464911a1fe6c655972143684e93" class="flex justify-between">
+      <a role="button" class="">The OBITools4 commands</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/options/" class="">Shared command options</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8921ea65523c266b128dd4263232b0fc" class="toggle" checked />
+    <label for="section-8921ea65523c266b128dd4263232b0fc" class="flex justify-between">
+      <a role="button" class="">Basics</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiannotate/" class="">obiannotate</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicomplement/" class="">obicomplement</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconvert/" class="">obiconvert</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicount/" class="">obicount</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicsv/" class="">obicsv</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidemerge/" class="">obidemerge</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidistribute/" class="">obidistribute</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obigrep/" class="active">obigrep</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obijoin/" class="">obijoin</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimatrix/" class="">obimatrix</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisplit/" class="">obisplit</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisummary/" class="">obisummary</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiuniq/" class="">obiuniq</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-dbdf1bb5377572439394e60e08c30f50" class="toggle"  />
+    <label for="section-dbdf1bb5377572439394e60e08c30f50" class="flex justify-between">
+      <a role="button" class="">Demultiplexing samples</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimultiplex/" class="">obimultiplex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitagpcr/" class="">obitagpcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-aa98fedd067b51150db59691a8ea8edd" class="toggle"  />
+    <label for="section-aa98fedd067b51150db59691a8ea8edd" class="flex justify-between">
+      <a role="button" class="">Sequence alignments</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiclean/" class="">obiclean</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7433746525d8c2b29b033f765c869acd" class="toggle"  />
+    <label for="section-7433746525d8c2b29b033f765c869acd" class="flex justify-between">
+      <a href="/obidoc/obitools/obipairing/" class="">obipairing</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/fasta-like/" class="">The FASTA-like alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/exact-alignment/" class="">Exact alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obipcr/" class="">obipcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obirefidx/" class="">obirefidx</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitag/" class="">obitag</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-5746f699d10490780dec8e30ab2dd3ce" class="toggle"  />
+    <label for="section-5746f699d10490780dec8e30ab2dd3ce" class="flex justify-between">
+      <a role="button" class="">Taxonomy</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitaxonomy/" class="">obitaxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-3f50c4fe7ab436a56ae92897d5444956" class="toggle"  />
+    <label for="section-3f50c4fe7ab436a56ae92897d5444956" class="flex justify-between">
+      <a role="button" class="">Advanced tools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiscript/" class="">obiscript</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-549be3934679fcb82a232f6bd5435563" class="toggle"  />
+    <label for="section-549be3934679fcb82a232f6bd5435563" class="flex justify-between">
+      <a role="button" class="">Others</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimicrosat/" class="">obimicrosat</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-ceca4455173761e30cbc0a6dc2327167" class="toggle"  />
+    <label for="section-ceca4455173761e30cbc0a6dc2327167" class="flex justify-between">
+      <a role="button" class="">Experimentals</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicleandb/" class="">obicleandb</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconsensus/" class="">obiconsensus</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obilandmark/" class="">obilandmark</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/tags/" class="">Glossary of tags</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9b1bcd52530c59dc4819b1f61c128f54" class="toggle"  />
+    <label for="section-9b1bcd52530c59dc4819b1f61c128f54" class="flex justify-between">
+      <a role="button" class="">Cookbook</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/illumina/" class="">Analysing an Illumina data set</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/ecoprimers/" class="">Designing new barcodes</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/local_genbank/" class="">Prepare a local copy of Genbank</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/reference_db/" class="">Build a reference database</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/minion/" class="">Oxford Nanopore data analysis</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Programming OBITools</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/expression/" class="">Expression language</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-6d580829a667b5cca790b286d99a10fe" class="toggle"  />
+    <label for="section-6d580829a667b5cca790b286d99a10fe" class="flex justify-between">
+      <a href="/obidoc/docs/programming/lua/" class="">Lua: for scripting OBITools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-2fb081dac812d624eea5f4268fca9e26" class="toggle"  />
+    <label for="section-2fb081dac812d624eea5f4268fca9e26" class="flex justify-between">
+      <a role="button" class="">Obitools Classes</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequence/" class="">BioSequence</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequenceslice/" class="">BioSequenceSlice</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxonomy/" class="">Taxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxon/" class="">Taxon</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/mutex/" class="">Mutex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/obidoc/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>obigrep</h3>
+
+  <label for="toc-control">
+    
+    <img src="/obidoc/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#obigrep-filter-a-sequence-file"><code>obigrep</code>: filter a sequence file</a>
+      <ul>
+        <li><a href="#description">Description</a>
+          <ul>
+            <li><a href="#selection-based-on-sequence-identifier-id">Selection based on sequence identifier (ID)</a></li>
+            <li><a href="#selection-based-on-sequence-definition">Selection based on sequence definition</a></li>
+            <li><a href="#selection-based-on-the-annotations">Selection based on the annotations</a></li>
+            <li><a href="#selection-based-on-the-sequence">Selection based on the sequence</a></li>
+            <li><a href="#defining-you-own-predicate">Defining you own predicate</a></li>
+          </ul>
+        </li>
+        <li><a href="#working-with-paired-sequence-files">Working with paired sequence files:</a></li>
+        <li><a href="#synopsis">Synopsis</a></li>
+        <li><a href="#options">Options</a>
+          <ul>
+            <li><a href="#matching-the-sequence-annotations">Matching the sequence annotations</a></li>
+            <li><a href="#taxonomy-based-filtering">Taxonomy based filtering</a></li>
+          </ul>
+        </li>
+        <li><a href="#examples">Examples</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="obigrep-filter-a-sequence-file">
+  <code>obigrep</code>: filter a sequence file
+  <a class="anchor" href="#obigrep-filter-a-sequence-file">#</a>
+</h1>
+<h2 id="description">
+  Description
+  <a class="anchor" href="#description">#</a>
+</h2>
+<p><a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> is a tool for selecting a subset of sequences based on a set of criteria. Sequences from the input dataset that match all the criteria are retained and printed in the result, while other sequences are discarded.</p>
+<p>Selection criteria can be based on different aspects of the sequence data, such as</p>
+<ul>
+<li>The sequence identifier (ID)</li>
+<li>The sequence annotations</li>
+<li>The sequence itself</li>
+</ul>
+<h3 id="selection-based-on-sequence-identifier-id">
+  Selection based on sequence identifier (ID)
+  <a class="anchor" href="#selection-based-on-sequence-identifier-id">#</a>
+</h3>
+<p>There are two ways of selecting sequences according to their identifier:</p>
+<ul>
+<li>Using a 
+  <a href="http://metabar:8888/obidoc/docs/patterns/regular/">regular pattern</a> with option <code>-I</code></li>
+<li>Using a list of identifiers (IDs) provided in a file with option <code>--id-list</code></li>
+</ul>
+<p>On the following five-sequences sample file:</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="five_ids.fasta" download="five_ids.fasta">📄 five_ids.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">&gt;seqA1
+cgatgctgcatgctagtgctagtcgat
+&gt;seqB1
+tagctagctagctagctagctagctagcta
+&gt;seqA2
+gtagctagctagctagctagctagctaga
+&gt;seqC1
+cgatgctgcatgctagtgctagtcgatga
+&gt;seqB2
+tagctagctagctagctagctagctagcta
+</code></pre></td>
+    
+</DIV>
+
+<p>To select sequences with IDs &ldquo;seqA1&rdquo; and &ldquo;seqB1&rdquo;, you can use the command</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -I <span style="color:#e6db74">&#39;^seq[AB]1$&#39;</span> five_ids.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 
+cgatgctgcatgctagtgctagtcgat
+&gt;seqB1 
+tagctagctagctagctagctagctagcta
+</code></pre><p>The explanations for the regular pattern <code>^seq[AB]1$</code> are</p>
+<ul>
+<li>the <code>^</code> at the beginning means that the string must start with that pattern</li>
+<li><code>seq</code> is an exact match for that string</li>
+<li><code>[AB]</code> means any character in the set {A, B}</li>
+<li><code>1</code> is an exact match for that character</li>
+<li><code>$</code> at the end of the pattern means that the string must end with that pattern.</li>
+</ul>
+<p>If the starting <code>^</code> had been omitted, the pattern would have matched any sequence ID containing &ldquo;seq&rdquo; followed by a character from the set {A, B} and ending with &ldquo;1&rdquo;, for example the IDs <code>my_seqA1</code> or <code>my_seqB1</code> would have been selected.</p>
+<p>If the ending &lsquo;$&rsquo; had been omitted, the pattern would have matched any sequence ID starting with &lsquo;seq&rsquo; followed by a character in the set {A, B} and containing &lsquo;1&rsquo;, e.g. the ids <code>seqA102</code> or <code>seqB1023456789</code> would have been selected.</p>
+<p>Another solution to extract these sequence IDs would be to use a text file containing them, one per line, as follows</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="seqAB.txt" download="seqAB.txt">📄 seqAB.txt</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-txt" data-lang="txt"><span style="display:flex;"><span>seqA1
+</span></span><span style="display:flex;"><span>seqB1
+</span></span></code></pre></td></tr></table>
+</div>
+</div></td>
+    
+</DIV>
+
+<p>This <code>seqAB.txt</code> can then be used as an index file by  <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep --id-list seqAB.txt five_ids.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 
+cgatgctgcatgctagtgctagtcgat
+&gt;seqB1 
+tagctagctagctagctagctagctagcta
+</code></pre><h3 id="selection-based-on-sequence-definition">
+  Selection based on sequence definition
+  <a class="anchor" href="#selection-based-on-sequence-definition">#</a>
+</h3>
+<p>Each sequence record can have a sequence definition describing the sequence. In 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+or 
+  <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a>
+format, this definition is found in the header of each sequence record after the second word (the first being the sequence id), or after the annotations between braces in the <em>OBITools4</em> extended version of these formats.</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="three_def.fasta" download="three_def.fasta">📄 three_def.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;seqA1
+cgatgctgcatgctagtgctagtcgat
+&gt;seqB1 my beautiful sequence
+tagctagctagctagctagctagctagcta
+&gt;seqA2 {&#34;count&#34;:10} my pretty sequence
+gtagctagctagctagctagctagctaga
+</code></pre></td>
+    
+</DIV>
+
+<p>In the <code>three_def.fasta</code> example file:</p>
+<ul>
+<li><code>seqA1</code> has no definition</li>
+<li><code>seqB1</code> definition is <code>my beautiful sequence</code></li>
+<li><code>seqA2</code> definition is <code>my pretty sequence</code></li>
+</ul>
+<p>The <code>-D</code> or <code>--definition</code> option lets you specify a 
+  <a href="http://metabar:8888/obidoc/docs/patterns/regular/">regular pattern</a> to select only those sequences whose definition matches the pattern. The example below selects sequences whose definition contains the word <code>pretty</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -D pretty three_def.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA2 {&#34;count&#34;:10,&#34;definition&#34;:&#34;my pretty sequence&#34;}
+gtagctagctagctagctagctagctaga
+</code></pre><p>As you can see in the results, all the <em>OBITools4</em> include the definition present in the original file as a new annotation tag called <code>definition</code>. So it is actually this tag that is tested by the <code>-D</code> option.</p>
+<h3 id="selection-based-on-the-annotations">
+  Selection based on the annotations
+  <a class="anchor" href="#selection-based-on-the-annotations">#</a>
+</h3>
+<h4 id="selection-based-on-any-annotation">
+  Selection based on any annotation
+  <a class="anchor" href="#selection-based-on-any-annotation">#</a>
+</h4>
+<p>The <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> tool can also be used to select sequences based on their annotations. Annotation are constituted by all the tags and values added to each sequence header in the 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+/
+  <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a>
+file. For instance, if you have a sequence file with the following headers:</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="five_tags.fasta" download="five_tags.fasta">📄 five_tags.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+&gt;seqB1 {&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:63221 [Homo sapiens neanderthalensis]@subspecies&#34;,&#34;toto&#34;:&#34;tata&#34;}
+tagctagctagctagctagctagctagcta
+&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+&gt;seqC1 {&#34;count&#34;:15,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9604 [Hominidae]@family&#34;,&#34;toto&#34;:&#34;foo&#34;}
+cgatgctccatgctagtgctagtcgatga
+&gt;seqB2 {&#34;count&#34;:25,&#34;tata&#34;:&#34;bar&#34;}
+cgatggctccatgctagtgctagtcgatga
+</code></pre></td>
+    
+</DIV>
+
+<h5 id="selecting-sequences-having-a-tag-whatever-its-value">
+  Selecting sequences having a tag whatever its value
+  <a class="anchor" href="#selecting-sequences-having-a-tag-whatever-its-value">#</a>
+</h5>
+<p>The <code>-A</code> option allows for selecting sequences having the given attribute whatever its value. In the following example, all the sequences having the <code>count</code> attribute are selected.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -A <span style="color:#e6db74">&#34;count&#34;</span> five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+&gt;seqC1 {&#34;count&#34;:15,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9604 [Hominidae]@family&#34;,&#34;toto&#34;:&#34;foo&#34;}
+cgatgctgcatgctagtgctagtcgatga
+&gt;seqB2 {&#34;count&#34;:25,&#34;tata&#34;:&#34;bar&#34;}
+tagctagctagctagctagctagctagcta
+</code></pre><p>Only four sequences are retained, the sequence <code>seqB1</code> is excluded because it does not have the tag <code>count</code>.</p>
+<h5 id="selecting-sequences-having-a-tag-with-a-specific-value">
+  Selecting sequences having a tag with a specific value
+  <a class="anchor" href="#selecting-sequences-having-a-tag-with-a-specific-value">#</a>
+</h5>
+<p>The <code>-a</code> option allows for selecting sequences having the given attribute affected to a value matching the provided 
+  <a href="http://metabar:8888/obidoc/docs/patterns/regular/">regular pattern</a>. In the following example, only the sequence <em>seqA1</em> having the <code>toto</code> attribute containing the value <code>titi</code> is selected.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -a toto<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;titi&#34;</span> five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+</code></pre><p>As the value is a 
+  <a href="http://metabar:8888/obidoc/docs/patterns/regular/">regular pattern</a>, it is possible to be less strict, and for example,
+the following command will select all sequences with the <code>toto</code> attribute containing a value beginning (<code>^</code> at the start of the expression) with <code>t</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -a toto<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;^t&#34;</span> five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+&gt;seqB1 {&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:63221 [Homo sapiens neanderthalensis]@subspecies&#34;,&#34;toto&#34;:&#34;tata&#34;}
+tagctagctagctagctagctagctagcta
+&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+</code></pre><p>The sequence <code>seqC1</code> is excluded because its <code>toto</code> attribute contains the value <code>foo</code>, which does not begin with <code>t</code>, while <code>seqB2</code> is excluded because it does not have a <code>toto</code> attribute.</p>
+<h4 id="selection-based-on-the-sequence-abundances">
+  Selection based on the sequence abundances
+  <a class="anchor" href="#selection-based-on-the-sequence-abundances">#</a>
+</h4>
+<p>In amplicon sequencing experiments, a sequence may be observed many times. The <a href="http://metabar:8888/obidoc/obitools/obiuniq/">
+    <abbr title="obiuniq: dereplicate a sequence file"><code>obiuniq</code></abbr>
+    </a> command can be used to dereplicate strictly identical sequences. The number of strictly identical sequence reads merged into a single sequence record is stored in the <code>count</code> annotation tag of that sequence record. It is common to filter out sequences that are too rare or too abundant, depending on the purpose of the experiment. There are two ways to select sequence records based on this <code>count</code> tag.</p>
+<ul>
+<li>the <code>--min-count</code> or <code>-c</code> options, followed by a numeric argument, select sequence records with a <code>count</code> greater than or equal to that argument.</li>
+<li>The <code>--max-count</code> or <code>-C</code> options, followed by a numeric argument, select sequence records with a <code>count</code> less than or equal to that argument.</li>
+</ul>
+
+            <link rel="stylesheet" href="/obidoc/css/vendors/admonitions.5c73bad2903e7d2d44ad118370ebd8c2cf5f239d4d93c283e55c00f2f8d30746.css" integrity="sha256-XHO60pA&#43;fS1ErRGDcOvYws9fI51Nk8KD5VwA8vjTB0Y=" crossorigin="anonymous">
+    <div class="admonition note">
+      <div class="admonition-header"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M0 64C0 28.7 28.7 0 64 0L224 0l0 128c0 17.7 14.3 32 32 32l128 0 0 125.7-86.8 86.8c-10.3 10.3-17.5 23.1-21 37.2l-18.7 74.9c-2.3 9.2-1.8 18.8 1.3 27.5L64 512c-35.3 0-64-28.7-64-64L0 64zm384 64l-128 0L256 0 384 128zM549.8 235.7l14.4 14.4c15.6 15.6 15.6 40.9 0 56.6l-29.4 29.4-71-71 29.4-29.4c15.6-15.6 40.9-15.6 56.6 0zM311.9 417L441.1 287.8l71 71L382.9 487.9c-4.1 4.1-9.2 7-14.9 8.4l-60.1 15c-5.5 1.4-11.2-.2-15.2-4.2s-5.6-9.7-4.2-15.2l15-60.1c1.4-5.6 4.3-10.8 8.4-14.9z"/></svg>
+        <span>Note</span>
+      </div>
+      <div class="admonition-content">
+        <p>If the <code>count</code> tag is missing from a data set, it is assumed to be equal to <em>1</em>.</p>
+      </div>
+    </div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -c <span style="color:#ae81ff">2</span> five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+&gt;seqC1 {&#34;count&#34;:15,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9604 [Hominidae]@family&#34;,&#34;toto&#34;:&#34;foo&#34;}
+cgatgctccatgctagtgctagtcgatga
+&gt;seqB2 {&#34;count&#34;:25,&#34;tata&#34;:&#34;bar&#34;}
+cgatggctccatgctagtgctagtcgatga
+</code></pre><p>Remove singleton sequences (sequences observed only once), here the sequences <code>seqA1</code> having a <code>count</code> tag equal to <em>1</em>, and <code>seqB1</code> having no <code>count</code> tag defined.</p>
+<p>The next command excludes from its results all the sequences occurring at least ten times.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -C <span style="color:#ae81ff">10</span> five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+&gt;seqB1 {&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:63221 [Homo sapiens neanderthalensis]@subspecies&#34;,&#34;toto&#34;:&#34;tata&#34;}
+tagctagctagctagctagctagctagcta
+&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+</code></pre><p>As usual, both options can be combined</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -c <span style="color:#ae81ff">2</span> -C <span style="color:#ae81ff">10</span> five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+</code></pre><h4 id="selection-based-on-taxonomic-annotation">
+  Selection based on taxonomic annotation.
+  <a class="anchor" href="#selection-based-on-taxonomic-annotation">#</a>
+</h4>
+<p>Taxonomy-based selection is always performed on the <code>taxid</code> attribute of a sequence, even if it contains other taxonomic information stored in other attribute such as <code>scientific_name</code> or <code>family_taxid</code>. To use  taxonomy-based selection with <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a>, it is mandatory to load a taxonomy using the <code>-t</code> or <code>--taxonomy</code> option.</p>
+<h5 id="selecting-sequences-belonging-a-clade">
+  Selecting sequences belonging a clade
+  <a class="anchor" href="#selecting-sequences-belonging-a-clade">#</a>
+</h5>
+<p>If you do not have a taxonomy dump already downloaded, you must first download one using the following <a href="http://metabar:8888/obidoc/obitools/obitaxonomy/">
+    <abbr title="obitaxonomy: manage and search in the taxonomic database"><code>obitaxonomy</code></abbr>
+    </a> command.
+The taxonomy will be stored in a file named <code>ncbitaxo.tgz</code>. This compressed archive can be supplied to other <em>OBITools4</em> at a later date.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obitaxonomy --download-ncbi --out ncbitaxo.tgz
+</span></span></code></pre></div><p>To select the sequences belonging to the <em>Homo sapiens</em> species, the first step is to extract the taxid corresponding to the species of interest from the downloaded taxonomy using the <a href="http://metabar:8888/obidoc/obitools/obitaxonomy/">
+    <abbr title="obitaxonomy: manage and search in the taxonomic database"><code>obitaxonomy</code></abbr>
+    </a> command.</p>
+<ul>
+<li>The <code>-t</code> option indicates the taxonomy to load</li>
+<li>The <code>--fixed</code> option indicates to consider the query string as the exact name of the species, not as a 
+  <a href="http://metabar:8888/obidoc/docs/patterns/regular/">regular pattern</a>.</li>
+<li>The <code>--rank species</code> indicates that our interest is only on taxa having the <strong>species</strong> taxonomic rank.</li>
+<li><code>&quot;Homo sapiens&quot;</code> is the query string used to match the taxonomy names.</li>
+</ul>
+<p>The <code>csvlook</code> command aims to present nicely the 
+  <a href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">CSV</a>
+output of <a href="http://metabar:8888/obidoc/obitools/obitaxonomy/">
+    <abbr title="obitaxonomy: manage and search in the taxonomic database"><code>obitaxonomy</code></abbr>
+    </a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obitaxonomy -t ncbitaxo.tgz --fixed --rank species <span style="color:#e6db74">&#34;Homo sapiens&#34;</span> | csvlook -I
+</span></span></code></pre></div><pre tabindex="0"><code>| taxid                             | parent                  | taxonomic_rank | scientific_name |
+| --------------------------------- | ----------------------- | -------------- | --------------- |
+| taxon:9606 [Homo sapiens]@species | taxon:9605 [Homo]@genus | species        | Homo sapiens    |
+</code></pre><p>The <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> option to select sequences belonging a taxon is <code>-r</code> or <code>--restrict-to-taxon</code>. The option requires as argument the taxid of the clade of interest, here <code>9606</code> for <em>Homo sapiens</em>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -t ncbitaxo.tgz -r taxon:9606 five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+&gt;seqB1 {&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:63221 [Homo sapiens neanderthalensis]@subspecies&#34;,&#34;toto&#34;:&#34;tata&#34;}
+tagctagctagctagctagctagctagcta
+</code></pre><p>Only sequences <em>seqA1</em> and <em>seqB1</em> annotated as belonging to the target clade <em>Homo sapiens</em> or one of its subspecies <em>Homo sapiens neanderthalensis</em> are retained. Sequence <em>seqA2</em> is not retained as it is annotated at genus level as <em>Homo</em> and therefore does not belong to the <em>Homo sapiens</em> clade, nor is sequence <em>seqC1</em> annotated at family level as <em>Hominidae</em>. The last sequence <em>seqB2</em> has no taxonomic annotation and is therefore considered to be annotated at the root of the taxonomy and no part of the <em>Homo sapiens</em> species clade.</p>
+<h5 id="excluding-sequences-belonging-a-clade">
+  Excluding sequences belonging a clade
+  <a class="anchor" href="#excluding-sequences-belonging-a-clade">#</a>
+</h5>
+<p>The <code>-i</code> or <code>--ignore-taxon</code> in its long form, performs the reverse selection of the <code>-r</code> option presented above. It only retains sequences that do not belong to the taxid target clade passed as an argument.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -t ncbitaxo.tgz -i taxon:9606 five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+&gt;seqC1 {&#34;count&#34;:15,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9604 [Hominidae]@family&#34;,&#34;toto&#34;:&#34;foo&#34;}
+cgatgctccatgctagtgctagtcgatga
+&gt;seqB2 {&#34;count&#34;:25,&#34;tata&#34;:&#34;bar&#34;}
+cgatggctccatgctagtgctagtcgatga
+</code></pre><p>Here, only the sequence <em>seqA2</em>, <em>seqC1</em> and <em>seqB2</em> are retained as none of them belongs to the <em>Homo sapiens</em> species.</p>
+<h5 id="keep-only-sequence-with-taxonomic-information-at-a-given-rank">
+  Keep only sequence with taxonomic information at a given rank
+  <a class="anchor" href="#keep-only-sequence-with-taxonomic-information-at-a-given-rank">#</a>
+</h5>
+<p>A taxid, when associated with a taxonomy, not only provides information at its taxonomic rank, but also makes it possible to retrieve information at any higher rank. For example, from a species taxid, it is expected that by querying the taxonomy, it will be possible to retrieve the corresponding genus or family taxid. <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> allows you to select sequences annotated by a taxid capable of providing information at a given taxonomic rank using the <code>--require-rank</code> option.</p>
+<p>To retrieve all ranks defined by a taxonomy, it is possible to use the <a href="http://metabar:8888/obidoc/obitools/obitaxonomy/">
+    <abbr title="obitaxonomy: manage and search in the taxonomic database"><code>obitaxonomy</code></abbr>
+    </a> command with the <code>-l</code> option.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obitaxonomy -t ncbitaxo.tgz -l | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| rank             |
+| ---------------- |
+| domain           |
+| phylum           |
+| class            |
+| suborder         |
+| subcohort        |
+| superphylum      |
+| subspecies       |
+| varietas         |
+| subgenus         |
+| parvorder        |
+| acellular root   |
+| genotype         |
+| subtribe         |
+| subkingdom       |
+| subfamily        |
+| kingdom          |
+| isolate          |
+| superorder       |
+| section          |
+| subvariety       |
+| genus            |
+| serogroup        |
+| tribe            |
+| forma            |
+| infraclass       |
+| superclass       |
+| serotype         |
+| no rank          |
+| family           |
+| species group    |
+| subclass         |
+| infraorder       |
+| pathogroup       |
+| realm            |
+| order            |
+| biotype          |
+| species subgroup |
+| species          |
+| strain           |
+| clade            |
+| cohort           |
+| series           |
+| cellular root    |
+| morph            |
+| subphylum        |
+| forma specialis  |
+| superfamily      |
+| subsection       |
+</code></pre><p>This allows us to check that the <strong>species</strong> rank is defined and to filter the <code>five_tags.fasta</code> test file to retain only sequences with information available at the <strong>species</strong> level.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -t ncbitaxo.tgz --require-rank species five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+&gt;seqB1 {&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:63221 [Homo sapiens neanderthalensis]@subspecies&#34;,&#34;toto&#34;:&#34;tata&#34;}
+tagctagctagctagctagctagctagcta
+</code></pre><p>Only two sequences are selected by this command, because <code>seqA1</code> is annotated at the <strong>species</strong> level, and <code>seqB1</code> is annotated at the <strong>subspecies</strong> taxonomic rank, which allows for retrieving <strong>species</strong> level information.</p>
+<p><code>seqA2</code> and <code>seqC1</code> are discarded as they are annotated at genus and family levels, respectively. <code>seqB2</code> is discarded as it is not taxonomically annotated and is therefore considered to be annotated at the root of the taxonomy.</p>
+<h5 id="keep-only-sequences-annotated-with-valid-taxids">
+  Keep only sequences annotated with valid taxids
+  <a class="anchor" href="#keep-only-sequences-annotated-with-valid-taxids">#</a>
+</h5>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="six_invalid.fasta" download="six_invalid.fasta">📄 six_invalid.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+&gt;seqB1 {&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:63221 [Homo sapiens neanderthalensis]@subspecies&#34;,&#34;toto&#34;:&#34;tata&#34;}
+tagctagctagctagctagctagctagcta
+&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+&gt;seqC1 {&#34;count&#34;:15,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9604 [Hominidae]@family&#34;,&#34;toto&#34;:&#34;foo&#34;}
+cgatgctgcatgctagtgctagtcgatga
+&gt;seqB2 {&#34;count&#34;:25,&#34;tata&#34;:&#34;bar&#34;}
+tagctagctagctagctagctagctagcta
+&gt;seqD1 {&#34;taxid&#34;:&#34;taxon:9607&#34;}
+gctagctagctgacgatgcatgcgtaggtgcagttgcgta</code></pre></td>
+    
+</DIV>
+
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -t ncbitaxo.tgz --valid-taxid six_invalid.fasta
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>WARN<span style="color:#f92672">[</span>0005<span style="color:#f92672">]</span> seqD1: Taxid: taxon:9607 is unknown from taxonomy <span style="color:#f92672">(</span>Taxid taxon:9607 is not part of the taxonomy NCBI Taxonomy<span style="color:#f92672">)</span> 
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+&gt;seqB1 {&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:63221 [Homo sapiens neanderthalensis]@subspecies&#34;,&#34;toto&#34;:&#34;tata&#34;}
+tagctagctagctagctagctagctagcta
+&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+&gt;seqC1 {&#34;count&#34;:15,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9604 [Hominidae]@family&#34;,&#34;toto&#34;:&#34;foo&#34;}
+cgatgctgcatgctagtgctagtcgatga
+</code></pre><h3 id="selection-based-on-the-sequence">
+  Selection based on the sequence
+  <a class="anchor" href="#selection-based-on-the-sequence">#</a>
+</h3>
+<h4 id="selection-based-on-the-sequence-length">
+  Selection based on the sequence length
+  <a class="anchor" href="#selection-based-on-the-sequence-length">#</a>
+</h4>
+<p>Two options <code>-l</code> (<code>--min-length</code>) and <code>-L</code> (<code>--max-length</code>) allow to select sequences based on their length. A sequence is selected if its length is greater or equal to the <code>--min-length</code> and less or equal to the <code>--max-length</code>. If only one of these options is used, only the specified limit is applied.</p>
+<p>In the 
+      
+  <a href="five_tags.fasta"><code>five_tags.fasta</code></a>, one sequence is 27 base pairs (bp) long, two are 29 bp and the two last 30 bp long.</p>
+<p>To select only sequences with a minimum length of 29 bp, the following command can be executed</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -l <span style="color:#ae81ff">29</span> five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqB1 {&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:63221 [Homo sapiens neanderthalensis]@subspecies&#34;,&#34;toto&#34;:&#34;tata&#34;}
+tagctagctagctagctagctagctagcta
+&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+&gt;seqC1 {&#34;count&#34;:15,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9604 [Hominidae]@family&#34;,&#34;toto&#34;:&#34;foo&#34;}
+cgatgctccatgctagtgctagtcgatga
+&gt;seqB2 {&#34;count&#34;:25,&#34;tata&#34;:&#34;bar&#34;}
+cgatggctccatgctagtgctagtcgatga
+</code></pre><p>To select only sequences with a maximum length of 29 bp, the following command can be executed</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -L <span style="color:#ae81ff">29</span> five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+&gt;seqC1 {&#34;count&#34;:15,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9604 [Hominidae]@family&#34;,&#34;toto&#34;:&#34;foo&#34;}
+cgatgctccatgctagtgctagtcgatga
+</code></pre><p>Interestingly, in both cases, both 29-bp sequences were selected.</p>
+<h4 id="selection-based-on-the-sequence-1">
+  Selection based on the sequence
+  <a class="anchor" href="#selection-based-on-the-sequence-1">#</a>
+</h4>
+<p>Sequence records can be selected on the sequence itself. There are two pattern matching algorithms available, depending on the options used:</p>
+<ul>
+<li><code>--sequence</code> or <code>-s</code> : The pattern is a 
+  <a href="http://metabar:8888/obidoc/docs/patterns/regular/">regular pattern</a> used to match the sequence records. The pattern is not case-sensitive.</li>
+<li><code>--approx-pattern</code> : This option uses the same algorithm as <a href="http://metabar:8888/obidoc/obitools/obipcr/">
+    <abbr title="obipcr: the electronic PCR tool"><code>obipcr</code></abbr>
+    </a> and <a href="http://metabar:8888/obidoc/obitools/obimultiplex/">
+    <abbr title="obimultiplex: "><code>obimultiplex</code></abbr>
+    </a> to locate primers. The description of the pattern follows the 
+  <a href="http://metabar:8888/obidoc/docs/patterns/dnagrep/">same grammar</a>.</li>
+</ul>
+<p>While 
+  <a href="http://metabar:8888/obidoc/docs/patterns/regular/">regular pattern</a> allows for more complex expression in describing the look-up sequence, the 
+  <a href="http://metabar:8888/obidoc/docs/patterns/dnagrep/">DNA Patterns</a> have the advantage of offering discrepancy between the pattern and the actual sequence (mismatches and indels). To set the number and the type of allowed errors use the <code>--pattern-error</code> and the <code>--allows-indels</code> options.</p>
+<p>In the next example, sequences containing the pattern <code>tgc</code> present twice at least in the sequence eventually separated by any number of bases (<code>.*</code>) are searched. This can be expressed as the 
+  <a href="http://metabar:8888/obidoc/docs/patterns/regular/">regular pattern</a> : <code>tgc.*tgc</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -s <span style="color:#e6db74">&#39;tgc.*tgc&#39;</span> five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+&gt;seqC1 {&#34;count&#34;:15,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9604 [Hominidae]@family&#34;,&#34;toto&#34;:&#34;foo&#34;}
+cgatgctccatgctagtgctagtcgatga
+&gt;seqB2 {&#34;count&#34;:25,&#34;tata&#34;:&#34;bar&#34;}
+cgatggctccatgctagtgctagtcgatga
+</code></pre><p>If we are interested in sequence matching this pattern <code>gatgctgcat</code>, but want to allow a certain number of errors, we can use the <code>--approx-pattern</code> option. Despite its name, this option does not allow any errors by default, so for simple patterns like the one we have here, both the <code>--approx-pattern</code> and the <code>-s</code> options are equivalent.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep --approx-pattern gatgctgcat <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+</code></pre><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -s gatgctgcat <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+</code></pre><p>However, <code>--approx-pattern</code> can be parameterized using the <code>--pattern-error</code> option. The following example allows two errors (differences) between the pattern and the matched sequence. Without a further option, these errors can only be substitutions. Thus, the value defined by <code>--pattern-error</code> is the maximum 
+  <a href="https://en.wikipedia.org/wiki/Hamming_distance">Hamming distance</a> between the pattern and the matched sequence.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep --approx-pattern gatgctgcat <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --pattern-error <span style="color:#ae81ff">2</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+&gt;seqC1 {&#34;count&#34;:15,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9604 [Hominidae]@family&#34;,&#34;toto&#34;:&#34;foo&#34;}
+cgatgctccatgctagtgctagtcgatga
+</code></pre><p>By adding the <code>--allows-indels</code> option, obigrep will allow indels in the pattern. This means that it can match sequences where the differences between the pattern and the matched sequence are insertions or deletions. Insertion or deletion of a symbol is considered one error. Therefore, with <code>--pattern-error 2</code> and <code>--allows-indels</code> you can allow two mismatches, two insertions or deletions, or one mismatch and one indel. In this case, the `&ndash;pattern-error&rsquo; defines the maximum 
+  <a href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein distance</a> allowed between the pattern and the matched sequence.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep --approx-pattern gatgctgcat <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --pattern-error <span style="color:#ae81ff">2</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --allows-indels <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA1 {&#34;count&#34;:1,&#34;tata&#34;:&#34;bar&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;toto&#34;:&#34;titi&#34;}
+cgatgctgcatgctagtgctagtcgat
+&gt;seqC1 {&#34;count&#34;:15,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9604 [Hominidae]@family&#34;,&#34;toto&#34;:&#34;foo&#34;}
+cgatgctccatgctagtgctagtcgatga
+&gt;seqB2 {&#34;count&#34;:25,&#34;tata&#34;:&#34;bar&#34;}
+cgatggctccatgctagtgctagtcgatga
+</code></pre><h3 id="defining-you-own-predicate">
+  Defining you own predicate
+  <a class="anchor" href="#defining-you-own-predicate">#</a>
+</h3>
+<p>You can create your own predicate to filter your dataset. A predicate is an expression that returns a logical value of true or false when evaluated. It is defined using the <code>--predicate</code> (<code>-p</code>) option and the 
+  <a href="http://metabar:8888/obidoc/docs/programming/expression/"><em>OBITools4</em> expression language</a>. The predicate is evaluated on each sequence in the dataset. Sequences that result in a <code>true</code> value are retained in the result, while those that result in a <code>false</code> value are discarded.</p>
+<p>The following command, for example, filters out all sequences with a <em>count</em> annotation of less than 2 and greater than 10.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -c <span style="color:#ae81ff">2</span> -C <span style="color:#ae81ff">10</span> five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+</code></pre><p>The following predicate can be used to substitute for it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -p <span style="color:#e6db74">&#39;sequence.Count() &gt;= 2 &amp;&amp; sequence.Count() &lt;= 10&#39;</span> five_tags.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;seqA2 {&#34;count&#34;:5,&#34;tata&#34;:&#34;foo&#34;,&#34;taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;toto&#34;:&#34;tutu&#34;}
+gtagctagctagctagctagctagctaga
+</code></pre><p>The 
+  <a href="http://metabar:8888/obidoc/docs/programming/expression/"><em>OBITools4</em> expression language</a> provides <code>min</code> and <code>max</code> functions. These functions extract the minimum and maximum values from a map or vector, respectively.</p>
+<p>In the file  
+      
+  <a href="some_uniq_seq.fasta"><code>some_uniq_seq.fasta</code></a>, the &lsquo;merged_sample` tag on each sequence indicates how the corresponding reads are distributed among samples.</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="some_uniq_seq.fasta" download="some_uniq_seq.fasta">📄 some_uniq_seq.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;Seq_1 {&#34;count&#34;:2,&#34;merged_sample&#34;:{&#34;15a_F730814&#34;:1,&#34;29a_F260619&#34;:1}}
+ttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcaat
+agctyaaaactcaaaggacttggcggtgctttataccctt
+&gt;Seq_2 {&#34;count&#34;:22,&#34;merged_sample&#34;:{&#34;15a_F730814&#34;:12,&#34;29a_F260619&#34;:10}}
+ttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcaat
+atcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;Seq_3 {&#34;count&#34;:22,&#34;merged_sample&#34;:{&#34;15a_F730814&#34;:15,&#34;29a_F260619&#34;:7}}
+ttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcgat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+</code></pre></td>
+    
+</DIV>
+
+<p>It is possible to extract the contingency table from this file using the <a href="http://metabar:8888/obidoc/obitools/obimatrix/">
+    <abbr title="obimatrix: convert a sequence file into a data matrix file"><code>obimatrix</code></abbr>
+    </a> command. The <code>--transpose</code> option transposes the matrix so that sequences are in rows and samples are in columns.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obimatrix --transpose some_uniq_seq.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  | csvtomd
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>id     |  15a_F730814  |  29a_F260619
+</span></span><span style="display:flex;"><span>-------|---------------|-------------
+</span></span><span style="display:flex;"><span>Seq_1  |  1            |  1
+</span></span><span style="display:flex;"><span>Seq_2  |  12           |  10
+</span></span><span style="display:flex;"><span>Seq_3  |  15           |  7
+</span></span></code></pre></div><p>To select sequences that occur at least ten times in a sample, you have to determine the maximum value of the <code>merged_sample</code> tag and compare it to the value ten.</p>
+<p>This can be done using a predicate expression:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -p <span style="color:#e6db74">&#39;max(annotations.merged_sample) &gt;= 10&#39;</span> some_uniq_seq.fasta 
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;Seq_2 {&#34;count&#34;:22,&#34;merged_sample&#34;:{&#34;15a_F730814&#34;:12,&#34;29a_F260619&#34;:10}}
+ttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcaat
+atcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;Seq_3 {&#34;count&#34;:22,&#34;merged_sample&#34;:{&#34;15a_F730814&#34;:15,&#34;29a_F260619&#34;:7}}
+ttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcgat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+</code></pre><p>As you can see from the results, <code>seq_1</code> is discarded because it does not appear in any of the samples.
+It does not occur more than ten times. The maximum number of occurrences of <code>seq_1</code> is <em>1</em>.</p>
+<h2 id="working-with-paired-sequence-files">
+  Working with paired sequence files:
+  <a class="anchor" href="#working-with-paired-sequence-files">#</a>
+</h2>
+<p><em>OBITools4</em> can handle paired sequence files. This means that it processes the paired sequences in the two files together. In particular, for <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a>, it will apply the same filtering to both files. This ensures that each sequence in the result files is paired with its correct counterpart.</p>
+<p>The most important option for manipulating paired sequence files is the <code>--paired-with</code> option. This allows you to specify the name of a file containing sequences to be paired with those in the main sequence file. Since an obitools4 command that processes paired sequences produces two paired result files, the standard output cannot be used to store the results. Instead, you must use the <code>--out</code> option to specify where the results should be written.</p>
+<p>Considering the two paired input files:</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="forward.fastq" download="forward.fastq">📄 forward.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:14968:1570 1:N:0:CTCACCAA+CTAGGCAA
+TGTTCCACGGGCAATCCTGAGCCAAATCTTTCATTTTGAAAAAATGAGAGATATAATGTATCTCTTATTTATTATAAGAAATAAAATATTTCTTATCTAATATTAAAGTTAGGTGCAGAGACTCAATGGGTGGAACTAGATCGGATGTGCA
++
+11&gt;A&gt;@3@A11&gt;ACFFEG110BFB00BAFGHE2DFGG201110/B11111/D1D2222D2FDFDFGDGHHBGG2F222110D11@1D1FGHFHGFF@GE1F2FG22112B220F1@111/0&gt;BF11B210B&gt;//11B1&lt;1BB&lt;///&lt;1122
+@M01334:147:000000000-LBRVD:1:1101:15946:1586 1:N:0:CTCACCAA+CTAGGCAA
+TCCTAACCCCATTGAGTCTCTGCACCTATCTTTAATATTAGATAAGAAATATTTTATTTCTTATAATAAATAAGAGATATTTTATATCTCTCATTTTTTCAAAATGAAAGATTTGGCTCAGGATTGCCCACGTAACGGAGATCGGAAGAGC
++
+1&gt;&gt;A111&gt;&gt;&gt;AFGGB1FFGFGFF3BBF1GGHHH33D2GH2B1D211110D1DGHHBFGGGGG2FA2F221F21A1F0D1DGHH2FAFFGFHFFGHHHHGG22@1BD111@0FFHE11GC1001BGF1B1B/EF00??////BF////&lt;000
+@M01334:147:000000000-LBRVD:1:1101:15399:1590 1:N:0:CTCACCAA+CTAGGCAA
+TGTTCCACCCATTGAGTCTCTGCACCTATCTTTAATATTAGATAAGAAATATTTTACTTCTTATAATAAATAAGAGTTATTTTATATCTCTCATTTTTTCAAAATGAAAGATTTGGCTCAGGATTGCCCGTGGAACTAGATCGGAAGAGCA
++
+11&gt;A&gt;@3B&gt;&gt;1CF111BBFAG3A3AAF1FFGHHF3FBGH221F211110D1DGHH2BBGBFF2F22D221D211111A2DDGG2F2FFFEGD1FFHHHGFD221B111110BFGD11F@1001BF0@@1/EA//1&gt;F1B1FD/////00&lt;1
+@M01334:147:000000000-LBRVD:1:1101:13773:1687 1:N:0:CTCACCAA+CTAGGCAA
+CTCGGATCACCATTGAGTCTCTGCACCTATCTTTAATATTAGATAAGAAAAAATATTATTTCTTATCTGAAATAAGAAATATTTTATATATTTCTTTTTCTCAAAATGAAAGATTTGGCTCAGGATTGCCCTGATCCGAGGGATAGCACCA
++
+3AAAAAADFFFFGGGGFGGGGGHHHHHHFHHHHHHHHGHHHHGHGGHFFHHHCGFHHHHHHHHHHHHHGHHGGFHFFHHHGHHHHBHHHGHHHHHHHHHHHHHFFHHFBDFBCGHHF4BGHFGFFHHBDGFHHEHHFAAEECEGF3FDGFC
+</code></pre></td>
+    
+</DIV>
+
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="reverse.fastq" download="reverse.fastq">📄 reverse.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:14968:1570 2:N:0:CTCACCAA+CTAGGCAA
+TTTTCCTCCCTTTTTTTCTCTGCACCTTTCTTTTTTATTAGTTTTTTATTATTTTTTTTCTTTTTTTATTTTATTGATACTTTATATCTCTCTTTTTTTCTTTTTTATTGATTTTTCTCTGGTTTTCCCTTGTTACTTGTTCTTTTTTGCT
++
+11&gt;&gt;1131111BB111A0B3B313A0B1BAFGG11E/DG222B22///1D2DDGG1AE&gt;&gt;FG1D1/&gt;/12B221212@21BFD2B2B2B2F11BFGHEEC1111B//1212BBF110@22111@@/2111?01111@111?111111--11
+@M01334:147:000000000-LBRVD:1:1101:15946:1586 2:N:0:CTCACCAA+CTAGGCAA
+CCGTTACGTGGGCAATCCTGAGCCAATTCTTTCTTTTTGAAAAAATGAGAGATATAAAATATCTCTTATTTATTATAAGAAATAAAATATTTCTTATCTAATATTAATGATAGGTGCAGTGACTCTATGGGGTTAGGTAGTTCGGATGAGC
++
+111&gt;&gt;111B111111BA0B1101B001BAGGH22DGGH?01110/B11111/D1D2221D1DBEDGH1GHH2GG2F222110D@111D1DFGEGFBG@GB1B2FG22222B220B11111111B@11B210/?E/00B211B2/////111
+@M01334:147:000000000-LBRVD:1:1101:15399:1590 2:N:0:CTCACCAA+CTAGGCAA
+TTTTCCTCGGGCTATCCTGAGCCAAATCTTTCCTTTTGAAAAATTTAGAGATATAAAATATCTCTTATTTATTTTATGTAGTATTATATTTCTTATCTAATATTAAATTTAGTTGCTTTTTCTCATTTTGTTTTACTTTTTCTTTTTTGCT
++
+11&gt;&gt;1131111111B11B1101A000B1DFF21DDFG1011100B122111D1D2221D1DADAFG1DGH2FG2D212222D2222D2DAF2FG2D@F21B2DE22122B221@11111110B222B222B00021B221B011111//11
+@M01334:147:000000000-LBRVD:1:1101:13773:1687 2:N:0:CTCACCAA+CTAGGCAA
+TGATAGCAGGGCTATCCTGAGCCAAATCCGTGTTTTGAGAAAACAAGGGGGTTCTCGAACTAGAATACAAAAGAAAAGGATAGGTGCAGAGACTCAATGGTGCTATCCCTCGGATCAGGGCAATCCTTAGCCAAATCTTTCATTTTTTGAA
++
+111&gt;13@1111&gt;11B1AF11BABC00B110BAFGGH0000DFAB//0///EEECGFA10AG1111D@@11100/0000/0F110B11@11/0&gt;FC@1B&gt;1B11FEFEC&gt;E&gt;///?&lt;0110/?/FF&lt;G22111@00@&lt;GHHB&gt;FHHH1///1
+</code></pre></td>
+    
+</DIV>
+
+<p>To conserve only sequences starting with a <strong>t</strong>, use the following command:</p>
+<!-- Should it be **t** or **T** ? or it is equivalent? -->
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -s <span style="color:#e6db74">&#39;^t&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --paired-with reverse.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --out start_t.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        forward.fastq
+</span></span></code></pre></div><p>After running the <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> command, if you check the directory contents, you will obtain two new files named 
+      
+  <a href="start_t_R1.fastq"><code>start_t_R1.fastq</code></a> and 
+      
+  <a href="start_t_R2.fastq"><code>start_t_R2.fastq</code></a>, in addition to the two input files, 
+  <a href="foward.fastq"><code>forward.fastq</code></a> and 
+      
+  <a href="reverse.fastq"><code>reverse.fastq</code></a>.  These file names are created by adding the suffixes <code>_R1</code> and <code>_R2</code> to the <code>start_t.fastq</code> file name specified in the <code>--out</code> option. The <code>start_t_R1.fastq</code> file (suffix <code>_R1</code>) contains the reads from the main file (
+  <a href="foward.fastq"><code>forward.fastq</code></a>), while <code>start_t_R2.fastq</code> (suffix <code>_R2</code>) contains the reads from the file specified by the &lsquo;&ndash;paired-with&rsquo; option (
+      
+  <a href="reverse.fastq"><code>reverse.fastq</code></a>).</p>
+<pre tabindex="0"><code>% ls -l
+total 135568
+-rw-r--r--@ 1 coissac  staff      1504 13 mai 18:09 forward.fastq
+-rw-r--r--@ 1 coissac  staff      1504 13 mai 18:09 reverse.fastq
+-rw-r-----@ 1 coissac  staff      1179 13 mai 18:14 start_t_R1.fastq
+-rw-r-----@ 1 coissac  staff      1179 13 mai 18:14 start_t_R2.fastq
+</code></pre><p>Inspecting the file  
+      
+  <a href="start_t_R1.fastq"><code>start_t_R1.fastq</code></a> makes the effect of  <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> clear. Every sequence starts with <strong>t</strong>.</p>
+<p>    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="start_t_R1.fastq" download="start_t_R1.fastq">📄 start_t_R1.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:14968:1570 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+tgttccacgggcaatcctgagccaaatctttcattttgaaaaaatgagagatataatgtatctcttatttattataagaaataaaatatttcttatctaatattaaagttaggtgcagagactcaatgggtggaactagatcggatgtgca
++
+11&gt;A&gt;@3@A11&gt;ACFFEG110BFB00BAFGHE2DFGG201110/B11111/D1D2222D2FDFDFGDGHHBGG2F222110D11@1D1FGHFHGFF@GE1F2FG22112B220F1@111/0&gt;BF11B210B&gt;//11B1&lt;1BB&lt;///&lt;1122
+@M01334:147:000000000-LBRVD:1:1101:15946:1586 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+tcctaaccccattgagtctctgcacctatctttaatattagataagaaatattttatttcttataataaataagagatattttatatctctcattttttcaaaatgaaagatttggctcaggattgcccacgtaacggagatcggaagagc
++
+1&gt;&gt;A111&gt;&gt;&gt;AFGGB1FFGFGFF3BBF1GGHHH33D2GH2B1D211110D1DGHHBFGGGGG2FA2F221F21A1F0D1DGHH2FAFFGFHFFGHHHHGG22@1BD111@0FFHE11GC1001BGF1B1B/EF00??////BF////&lt;000
+@M01334:147:000000000-LBRVD:1:1101:15399:1590 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+tgttccacccattgagtctctgcacctatctttaatattagataagaaatattttacttcttataataaataagagttattttatatctctcattttttcaaaatgaaagatttggctcaggattgcccgtggaactagatcggaagagca
++
+11&gt;A&gt;@3B&gt;&gt;1CF111BBFAG3A3AAF1FFGHHF3FBGH221F211110D1DGHH2BBGBFF2F22D221D211111A2DDGG2F2FFFEGD1FFHHHGFD221B111110BFGD11F@1001BF0@@1/EA//1&gt;F1B1FD/////00&lt;1
+</code></pre></td>
+    
+</DIV>
+
+However, when we look at the file  
+      
+  <a href="start_t_R2.fastq"><code>start_t_R2.fastq</code></a>, the second sequence starts with a <strong>c</strong>. In fact, the <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> constraint was only applied to the 
+  <a href="foward.fastq"><code>forward.fastq</code></a> file. The sequences were selected from the 
+      
+  <a href="reverse.fastq"><code>reverse.fastq</code></a> file because they are paired with one of the sequences selected from the 
+  <a href="foward.fastq"><code>forward.fastq</code></a> file.</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="start_t_R2.fastq" download="start_t_R2.fastq">📄 start_t_R2.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:14968:1570 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+ttttcctccctttttttctctgcacctttcttttttattagttttttattattttttttctttttttattttattgatactttatatctctctttttttcttttttattgatttttctctggttttcccttgttacttgttcttttttgct
++
+11&gt;&gt;1131111BB111A0B3B313A0B1BAFGG11E/DG222B22///1D2DDGG1AE&gt;&gt;FG1D1/&gt;/12B221212@21BFD2B2B2B2F11BFGHEEC1111B//1212BBF110@22111@@/2111?01111@111?111111--11
+@M01334:147:000000000-LBRVD:1:1101:15946:1586 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+ccgttacgtgggcaatcctgagccaattctttctttttgaaaaaatgagagatataaaatatctcttatttattataagaaataaaatatttcttatctaatattaatgataggtgcagtgactctatggggttaggtagttcggatgagc
++
+111&gt;&gt;111B111111BA0B1101B001BAGGH22DGGH?01110/B11111/D1D2221D1DBEDGH1GHH2GG2F222110D@111D1DFGEGFBG@GB1B2FG22222B220B11111111B@11B210/?E/00B211B2/////111
+@M01334:147:000000000-LBRVD:1:1101:15399:1590 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+ttttcctcgggctatcctgagccaaatctttccttttgaaaaatttagagatataaaatatctcttatttattttatgtagtattatatttcttatctaatattaaatttagttgctttttctcattttgttttactttttcttttttgct
++
+11&gt;&gt;1131111111B11B1101A000B1DFF21DDFG1011100B122111D1D2221D1DADAFG1DGH2FG2D212222D2222D2DAF2FG2D@F21B2DE22122B221@11111110B222B222B00021B221B011111//11
+</code></pre></td>
+    
+</DIV>
+
+<p>The <code>--paired-mode</code> option can be used to specify how the <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> filtering constraints are applied to both files. The option requires an argument that can take four different values:</p>
+<ul>
+<li><code>forward</code>: the selection rules apply only to the forward reads; the reverse reads are selected because they are paired with a selected forward read. This is the default behaviour presented above.</li>
+<li><code>reverse</code>: the selection rules apply only to the reverse reads; the forward reads are selected because they are paired with a selected reverse read.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -s <span style="color:#e6db74">&#39;^t&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --paired-with reverse.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --paired-mode reverse <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --out start_t_rev.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        forward.fastq
+</span></span></code></pre></div>    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="start_t_rev_R1.fastq" download="start_t_rev_R1.fastq">📄 start_t_rev_R1.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:14968:1570 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+tgttccacgggcaatcctgagccaaatctttcattttgaaaaaatgagagatataatgtatctcttatttattataagaaataaaatatttcttatctaatattaaagttaggtgcagagactcaatgggtggaactagatcggatgtgca
++
+11&gt;A&gt;@3@A11&gt;ACFFEG110BFB00BAFGHE2DFGG201110/B11111/D1D2222D2FDFDFGDGHHBGG2F222110D11@1D1FGHFHGFF@GE1F2FG22112B220F1@111/0&gt;BF11B210B&gt;//11B1&lt;1BB&lt;///&lt;1122
+@M01334:147:000000000-LBRVD:1:1101:15399:1590 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+tgttccacccattgagtctctgcacctatctttaatattagataagaaatattttacttcttataataaataagagttattttatatctctcattttttcaaaatgaaagatttggctcaggattgcccgtggaactagatcggaagagca
++
+11&gt;A&gt;@3B&gt;&gt;1CF111BBFAG3A3AAF1FFGHHF3FBGH221F211110D1DGHH2BBGBFF2F22D221D211111A2DDGG2F2FFFEGD1FFHHHGFD221B111110BFGD11F@1001BF0@@1/EA//1&gt;F1B1FD/////00&lt;1
+@M01334:147:000000000-LBRVD:1:1101:13773:1687 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+ctcggatcaccattgagtctctgcacctatctttaatattagataagaaaaaatattatttcttatctgaaataagaaatattttatatatttctttttctcaaaatgaaagatttggctcaggattgccctgatccgagggatagcacca
++
+3AAAAAADFFFFGGGGFGGGGGHHHHHHFHHHHHHHHGHHHHGHGGHFFHHHCGFHHHHHHHHHHHHHGHHGGFHFFHHHGHHHHBHHHGHHHHHHHHHHHHHFFHHFBDFBCGHHF4BGHFGFFHHBDGFHHEHHFAAEECEGF3FDGFC
+</code></pre></td>
+    
+</DIV>
+
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="start_t_rev_R2.fastq" download="start_t_rev_R2.fastq">📄 start_t_rev_R2.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:14968:1570 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+ttttcctccctttttttctctgcacctttcttttttattagttttttattattttttttctttttttattttattgatactttatatctctctttttttcttttttattgatttttctctggttttcccttgttacttgttcttttttgct
++
+11&gt;&gt;1131111BB111A0B3B313A0B1BAFGG11E/DG222B22///1D2DDGG1AE&gt;&gt;FG1D1/&gt;/12B221212@21BFD2B2B2B2F11BFGHEEC1111B//1212BBF110@22111@@/2111?01111@111?111111--11
+@M01334:147:000000000-LBRVD:1:1101:15399:1590 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+ttttcctcgggctatcctgagccaaatctttccttttgaaaaatttagagatataaaatatctcttatttattttatgtagtattatatttcttatctaatattaaatttagttgctttttctcattttgttttactttttcttttttgct
++
+11&gt;&gt;1131111111B11B1101A000B1DFF21DDFG1011100B122111D1D2221D1DADAFG1DGH2FG2D212222D2222D2DAF2FG2D@F21B2DE22122B221@11111110B222B222B00021B221B011111//11
+@M01334:147:000000000-LBRVD:1:1101:13773:1687 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+tgatagcagggctatcctgagccaaatccgtgttttgagaaaacaagggggttctcgaactagaatacaaaagaaaaggataggtgcagagactcaatggtgctatccctcggatcagggcaatccttagccaaatctttcattttttgaa
++
+111&gt;13@1111&gt;11B1AF11BABC00B110BAFGGH0000DFAB//0///EEECGFA10AG1111D@@11100/0000/0F110B11@11/0&gt;FC@1B&gt;1B11FEFEC&gt;E&gt;///?&lt;0110/?/FF&lt;G22111@00@&lt;GHHB&gt;FHHH1///1
+</code></pre></td>
+    
+</DIV>
+
+<ul>
+<li><code>and</code>: the selection rules must be true for both reads of the pair</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -s <span style="color:#e6db74">&#39;^t&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --paired-with reverse.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --paired-mode and <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --out start_t_and.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        forward.fastq
+</span></span></code></pre></div>    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="start_t_and_R1.fastq" download="start_t_and_R1.fastq">📄 start_t_and_R1.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:14968:1570 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+tgttccacgggcaatcctgagccaaatctttcattttgaaaaaatgagagatataatgtatctcttatttattataagaaataaaatatttcttatctaatattaaagttaggtgcagagactcaatgggtggaactagatcggatgtgca
++
+11&gt;A&gt;@3@A11&gt;ACFFEG110BFB00BAFGHE2DFGG201110/B11111/D1D2222D2FDFDFGDGHHBGG2F222110D11@1D1FGHFHGFF@GE1F2FG22112B220F1@111/0&gt;BF11B210B&gt;//11B1&lt;1BB&lt;///&lt;1122
+@M01334:147:000000000-LBRVD:1:1101:15399:1590 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+tgttccacccattgagtctctgcacctatctttaatattagataagaaatattttacttcttataataaataagagttattttatatctctcattttttcaaaatgaaagatttggctcaggattgcccgtggaactagatcggaagagca
++
+11&gt;A&gt;@3B&gt;&gt;1CF111BBFAG3A3AAF1FFGHHF3FBGH221F211110D1DGHH2BBGBFF2F22D221D211111A2DDGG2F2FFFEGD1FFHHHGFD221B111110BFGD11F@1001BF0@@1/EA//1&gt;F1B1FD/////00&lt;1
+</code></pre></td>
+    
+</DIV>
+
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="start_t_and_R2.fastq" download="start_t_and_R2.fastq">📄 start_t_and_R2.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:14968:1570 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+ttttcctccctttttttctctgcacctttcttttttattagttttttattattttttttctttttttattttattgatactttatatctctctttttttcttttttattgatttttctctggttttcccttgttacttgttcttttttgct
++
+11&gt;&gt;1131111BB111A0B3B313A0B1BAFGG11E/DG222B22///1D2DDGG1AE&gt;&gt;FG1D1/&gt;/12B221212@21BFD2B2B2B2F11BFGHEEC1111B//1212BBF110@22111@@/2111?01111@111?111111--11
+@M01334:147:000000000-LBRVD:1:1101:15399:1590 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+ttttcctcgggctatcctgagccaaatctttccttttgaaaaatttagagatataaaatatctcttatttattttatgtagtattatatttcttatctaatattaaatttagttgctttttctcattttgttttactttttcttttttgct
++
+11&gt;&gt;1131111111B11B1101A000B1DFF21DDFG1011100B122111D1D2221D1DADAFG1DGH2FG2D212222D2222D2DAF2FG2D@F21B2DE22122B221@11111110B222B222B00021B221B011111//11
+</code></pre></td>
+    
+</DIV>
+
+<ul>
+<li><code>or</code>:  the selection rules must be true for at least one read of the pair. The second read is selected because its counterpart has been selected by the <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> rules.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -s <span style="color:#e6db74">&#39;^t&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --paired-with reverse.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --paired-mode or <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --out start_t_or.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        forward.fastq
+</span></span></code></pre></div>    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="start_t_or_R1.fastq" download="start_t_or_R1.fastq">📄 start_t_or_R1.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:14968:1570 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+tgttccacgggcaatcctgagccaaatctttcattttgaaaaaatgagagatataatgtatctcttatttattataagaaataaaatatttcttatctaatattaaagttaggtgcagagactcaatgggtggaactagatcggatgtgca
++
+11&gt;A&gt;@3@A11&gt;ACFFEG110BFB00BAFGHE2DFGG201110/B11111/D1D2222D2FDFDFGDGHHBGG2F222110D11@1D1FGHFHGFF@GE1F2FG22112B220F1@111/0&gt;BF11B210B&gt;//11B1&lt;1BB&lt;///&lt;1122
+@M01334:147:000000000-LBRVD:1:1101:15946:1586 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+tcctaaccccattgagtctctgcacctatctttaatattagataagaaatattttatttcttataataaataagagatattttatatctctcattttttcaaaatgaaagatttggctcaggattgcccacgtaacggagatcggaagagc
++
+1&gt;&gt;A111&gt;&gt;&gt;AFGGB1FFGFGFF3BBF1GGHHH33D2GH2B1D211110D1DGHHBFGGGGG2FA2F221F21A1F0D1DGHH2FAFFGFHFFGHHHHGG22@1BD111@0FFHE11GC1001BGF1B1B/EF00??////BF////&lt;000
+@M01334:147:000000000-LBRVD:1:1101:15399:1590 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+tgttccacccattgagtctctgcacctatctttaatattagataagaaatattttacttcttataataaataagagttattttatatctctcattttttcaaaatgaaagatttggctcaggattgcccgtggaactagatcggaagagca
++
+11&gt;A&gt;@3B&gt;&gt;1CF111BBFAG3A3AAF1FFGHHF3FBGH221F211110D1DGHH2BBGBFF2F22D221D211111A2DDGG2F2FFFEGD1FFHHHGFD221B111110BFGD11F@1001BF0@@1/EA//1&gt;F1B1FD/////00&lt;1
+@M01334:147:000000000-LBRVD:1:1101:13773:1687 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+ctcggatcaccattgagtctctgcacctatctttaatattagataagaaaaaatattatttcttatctgaaataagaaatattttatatatttctttttctcaaaatgaaagatttggctcaggattgccctgatccgagggatagcacca
++
+3AAAAAADFFFFGGGGFGGGGGHHHHHHFHHHHHHHHGHHHHGHGGHFFHHHCGFHHHHHHHHHHHHHGHHGGFHFFHHHGHHHHBHHHGHHHHHHHHHHHHHFFHHFBDFBCGHHF4BGHFGFFHHBDGFHHEHHFAAEECEGF3FDGFC
+</code></pre></td>
+    
+</DIV>
+
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="start_t_or_R2.fastq" download="start_t_or_R2.fastq">📄 start_t_or_R2.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:14968:1570 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+ttttcctccctttttttctctgcacctttcttttttattagttttttattattttttttctttttttattttattgatactttatatctctctttttttcttttttattgatttttctctggttttcccttgttacttgttcttttttgct
++
+11&gt;&gt;1131111BB111A0B3B313A0B1BAFGG11E/DG222B22///1D2DDGG1AE&gt;&gt;FG1D1/&gt;/12B221212@21BFD2B2B2B2F11BFGHEEC1111B//1212BBF110@22111@@/2111?01111@111?111111--11
+@M01334:147:000000000-LBRVD:1:1101:15946:1586 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+ccgttacgtgggcaatcctgagccaattctttctttttgaaaaaatgagagatataaaatatctcttatttattataagaaataaaatatttcttatctaatattaatgataggtgcagtgactctatggggttaggtagttcggatgagc
++
+111&gt;&gt;111B111111BA0B1101B001BAGGH22DGGH?01110/B11111/D1D2221D1DBEDGH1GHH2GG2F222110D@111D1DFGEGFBG@GB1B2FG22222B220B11111111B@11B210/?E/00B211B2/////111
+@M01334:147:000000000-LBRVD:1:1101:15399:1590 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+ttttcctcgggctatcctgagccaaatctttccttttgaaaaatttagagatataaaatatctcttatttattttatgtagtattatatttcttatctaatattaaatttagttgctttttctcattttgttttactttttcttttttgct
++
+11&gt;&gt;1131111111B11B1101A000B1DFF21DDFG1011100B122111D1D2221D1DADAFG1DGH2FG2D212222D2222D2DAF2FG2D@F21B2DE22122B221@11111110B222B222B00021B221B011111//11
+@M01334:147:000000000-LBRVD:1:1101:13773:1687 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+tgatagcagggctatcctgagccaaatccgtgttttgagaaaacaagggggttctcgaactagaatacaaaagaaaaggataggtgcagagactcaatggtgctatccctcggatcagggcaatccttagccaaatctttcattttttgaa
++
+111&gt;13@1111&gt;11B1AF11BABC00B110BAFGGH0000DFAB//0///EEECGFA10AG1111D@@11100/0000/0F110B11@11/0&gt;FC@1B&gt;1B11FEFEC&gt;E&gt;///?&lt;0110/?/FF&lt;G22111@00@&lt;GHHB&gt;FHHH1///1
+</code></pre></td>
+    
+</DIV>
+
+<ul>
+<li><code>andnot</code>: the selection rules must be true on the forward sequence but not on the reverse one.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -s <span style="color:#e6db74">&#39;^t&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --paired-with reverse.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --paired-mode andnot <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --out start_t_andnot.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        forward.fastq
+</span></span></code></pre></div>    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="start_t_andnot_R1.fastq" download="start_t_andnot_R1.fastq">📄 start_t_andnot_R1.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:15946:1586 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+tcctaaccccattgagtctctgcacctatctttaatattagataagaaatattttatttcttataataaataagagatattttatatctctcattttttcaaaatgaaagatttggctcaggattgcccacgtaacggagatcggaagagc
++
+1&gt;&gt;A111&gt;&gt;&gt;AFGGB1FFGFGFF3BBF1GGHHH33D2GH2B1D211110D1DGHHBFGGGGG2FA2F221F21A1F0D1DGHH2FAFFGFHFFGHHHHGG22@1BD111@0FFHE11GC1001BGF1B1B/EF00??////BF////&lt;000
+</code></pre></td>
+    
+</DIV>
+
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="start_t_andnot_R2.fastq" download="start_t_andnot_R2.fastq">📄 start_t_andnot_R2.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:15946:1586 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+ccgttacgtgggcaatcctgagccaattctttctttttgaaaaaatgagagatataaaatatctcttatttattataagaaataaaatatttcttatctaatattaatgataggtgcagtgactctatggggttaggtagttcggatgagc
++
+111&gt;&gt;111B111111BA0B1101B001BAGGH22DGGH?01110/B11111/D1D2221D1DBEDGH1GHH2GG2F222110D@111D1DFGEGFBG@GB1B2FG22222B220B11111111B@11B210/?E/00B211B2/////111
+</code></pre></td>
+    
+</DIV>
+
+<ul>
+<li><code>xor</code>: the selection rules must be true on only one read of the pair, not on both.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -s <span style="color:#e6db74">&#39;^t&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --paired-with reverse.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --paired-mode xor <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --out start_t_xor.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        forward.fastq
+</span></span></code></pre></div>    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="start_t_xor_R1.fastq" download="start_t_xor_R1.fastq">📄 start_t_xor_R1.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:15946:1586 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+tcctaaccccattgagtctctgcacctatctttaatattagataagaaatattttatttcttataataaataagagatattttatatctctcattttttcaaaatgaaagatttggctcaggattgcccacgtaacggagatcggaagagc
++
+1&gt;&gt;A111&gt;&gt;&gt;AFGGB1FFGFGFF3BBF1GGHHH33D2GH2B1D211110D1DGHHBFGGGGG2FA2F221F21A1F0D1DGHH2FAFFGFHFFGHHHHGG22@1BD111@0FFHE11GC1001BGF1B1B/EF00??////BF////&lt;000
+@M01334:147:000000000-LBRVD:1:1101:13773:1687 {&#34;definition&#34;:&#34;1:N:0:CTCACCAA+CTAGGCAA&#34;}
+ctcggatcaccattgagtctctgcacctatctttaatattagataagaaaaaatattatttcttatctgaaataagaaatattttatatatttctttttctcaaaatgaaagatttggctcaggattgccctgatccgagggatagcacca
++
+3AAAAAADFFFFGGGGFGGGGGHHHHHHFHHHHHHHHGHHHHGHGGHFFHHHCGFHHHHHHHHHHHHHGHHGGFHFFHHHGHHHHBHHHGHHHHHHHHHHHHHFFHHFBDFBCGHHF4BGHFGFFHHBDGFHHEHHFAAEECEGF3FDGFC
+</code></pre></td>
+    
+</DIV>
+
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="start_t_xor_R2.fastq" download="start_t_xor_R2.fastq">📄 start_t_xor_R2.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:15946:1586 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+ccgttacgtgggcaatcctgagccaattctttctttttgaaaaaatgagagatataaaatatctcttatttattataagaaataaaatatttcttatctaatattaatgataggtgcagtgactctatggggttaggtagttcggatgagc
++
+111&gt;&gt;111B111111BA0B1101B001BAGGH22DGGH?01110/B11111/D1D2221D1DBEDGH1GHH2GG2F222110D@111D1DFGEGFBG@GB1B2FG22222B220B11111111B@11B210/?E/00B211B2/////111
+@M01334:147:000000000-LBRVD:1:1101:13773:1687 {&#34;definition&#34;:&#34;2:N:0:CTCACCAA+CTAGGCAA&#34;}
+tgatagcagggctatcctgagccaaatccgtgttttgagaaaacaagggggttctcgaactagaatacaaaagaaaaggataggtgcagagactcaatggtgctatccctcggatcagggcaatccttagccaaatctttcattttttgaa
++
+111&gt;13@1111&gt;11B1AF11BABC00B110BAFGGH0000DFAB//0///EEECGFA10AG1111D@@11100/0000/0F110B11@11/0&gt;FC@1B&gt;1B11FEFEC&gt;E&gt;///?&lt;0110/?/FF&lt;G22111@00@&lt;GHHB&gt;FHHH1///1
+</code></pre></td>
+    
+</DIV>
+
+<h2 id="synopsis">
+  Synopsis
+  <a class="anchor" href="#synopsis">#</a>
+</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep <span style="color:#f92672">[</span>--allows-indels<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--approx-pattern &lt;PATTERN&gt;<span style="color:#f92672">]</span>...
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--attribute|-a &lt;KEY<span style="color:#f92672">=</span>VALUE&gt;<span style="color:#f92672">]</span>... <span style="color:#f92672">[</span>--batch-size &lt;int&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--compress|-Z<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--csv<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--debug<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--definition|-D &lt;PATTERN&gt;<span style="color:#f92672">]</span>... <span style="color:#f92672">[</span>--ecopcr<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--embl<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--fail-on-taxonomy<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--fasta<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--fasta-output<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--fastq<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--fastq-output<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--force-one-cpu<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--genbank<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--has-attribute|-A &lt;KEY&gt;<span style="color:#f92672">]</span>... <span style="color:#f92672">[</span>--help|-h|-?<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--id-list &lt;FILENAME&gt;<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--identifier|-I &lt;PATTERN&gt;<span style="color:#f92672">]</span>... <span style="color:#f92672">[</span>--ignore-taxon|-i &lt;TAXID&gt;<span style="color:#f92672">]</span>...
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--input-OBI-header<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--input-json-header<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--inverse-match|-v<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--json-output<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--max-count|-C &lt;COUNT&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--max-cpu &lt;int&gt;<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--max-length|-L &lt;LENGTH&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--min-count|-c &lt;COUNT&gt;<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--min-length|-l &lt;LENGTH&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--no-order<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--no-progressbar<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--only-forward<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--out|-o &lt;FILENAME&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--output-OBI-header|-O<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--output-json-header<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--paired-mode &lt;forward|reverse|and|or|andnot|xor&gt;<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--paired-with &lt;FILENAME&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--pattern-error &lt;int&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--pprof<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--pprof-goroutine &lt;int&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--pprof-mutex &lt;int&gt;<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--predicate|-p &lt;EXPRESSION&gt;<span style="color:#f92672">]</span>... <span style="color:#f92672">[</span>--raw-taxid<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--require-rank &lt;RANK_NAME&gt;<span style="color:#f92672">]</span>... <span style="color:#f92672">[</span>--restrict-to-taxon|-r &lt;TAXID&gt;<span style="color:#f92672">]</span>...
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--save-discarded &lt;FILENAME&gt;<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--sequence|-s &lt;PATTERN&gt;<span style="color:#f92672">]</span>...
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--silent-warning<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--skip-empty<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--solexa<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--taxonomy|-t &lt;string&gt;<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--u-to-t<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--update-taxid<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--valid-taxid<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--version<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">[</span>--with-leaves<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>&lt;args&gt;<span style="color:#f92672">]</span>
+</span></span></code></pre></div><h2 id="options">
+  Options
+  <a class="anchor" href="#options">#</a>
+</h2>
+<h4 id="selecting-sequence-records">
+  Selecting sequence records
+  <a class="anchor" href="#selecting-sequence-records">#</a>
+</h4>
+
+
+<h5 id="selection-based-on-the-sequence">
+  Selection based on the sequence
+  <a class="anchor" href="#selection-based-on-the-sequence">#</a>
+</h5>
+
+
+<h6 id="strict-matching">
+  Strict matching
+  <a class="anchor" href="#strict-matching">#</a>
+</h6>
+
+
+<ul>
+    <li><b><code class="language-bash">--sequence</code></b>
+| <b><code class="language-bash">-s</code></b>
+ &lt;PATTERN>: A <a href="/obidoc/docs/patterns/regular">Regular expression pattern</a> used to match the sequence.
+Only the entries whose sequence matches the pattern are kept.
+Regular expression patterns are case-insensitive.</li>
+</ul>
+
+<h6 id="approximate-matching">
+  Approximate matching
+  <a class="anchor" href="#approximate-matching">#</a>
+</h6>
+
+
+<ul>
+    <li><b><code class="language-bash">--approx-pattern</code></b> &lt;PATTERN>: A <a href="/obidoc/docs/patterns/dnagrep">DNA pattern</a> used to match the sequence.
+Only the entries whose sequence matches the pattern are kept.
+DNA patterns are case-insensitive. They can be matched allowing
+for errors: mismatches or insertions or deletions.</li>
+    <li><b><code class="language-bash">--allows-indels</code></b>: allows for indels during pattern DNA pattern matching (see <code>--approx-pattern</code> option).
+</li>
+    <li><b><code class="language-bash">--pattern-error</code></b> &lt;INTEGER>: maximum number of errors allowed when searching for patterns in DNA (default 0, see <code>--approx-pattern</code> option).
+</ul>
+
+<h5 id="selection-based-on-the-sequence-identifier">
+  Selection based on the sequence identifier
+  <a class="anchor" href="#selection-based-on-the-sequence-identifier">#</a>
+</h5>
+
+
+<ul>
+    <li><b><code class="language-bash">--identifier</code></b>
+| <b><code class="language-bash">-I</code></b>
+ &lt;REGEX>: <a href="/obidoc/docs/patterns/regular">Regular expression pattern</a> to be
+tested against the sequence identifier.
+The pattern is case-insensitive.</li>
+    <li><b><code class="language-bash">--id-list</code></b> &lt;FILENAME>: <FILENAME> points to a text file containing the list of sequence record identifiers to be selected.
+The file format consists in a single identifier per line.</li>
+</ul>
+
+<h5 id="selection-based-on-the-sequence-definition">
+  Selection based on the sequence definition
+  <a class="anchor" href="#selection-based-on-the-sequence-definition">#</a>
+</h5>
+
+
+<ul>
+    <li><b><code class="language-bash">--definition</code></b>
+| <b><code class="language-bash">-D</code></b>
+ &lt;REGEX>: <a href="/obidoc/docs/patterns/regular">Regular expression pattern</a> to be tested against the sequence definition.
+The pattern is case-insensitive.</li>
+</ul>
+
+<h5 id="selection-based-on-the-sequence-properties">
+  Selection based on the sequence properties
+  <a class="anchor" href="#selection-based-on-the-sequence-properties">#</a>
+</h5>
+
+
+<ul>
+    <li><b><code class="language-bash">--min-count</code></b>
+| <b><code class="language-bash">-c</code></b>
+ &lt;COUNT>: selects the sequence records for which the number of occurrences (<em>i.e</em> the <em>count</em> attribute) is equal to or greater than the defined minimum count.</li>
+    <li><b><code class="language-bash">--max-count</code></b>
+| <b><code class="language-bash">-C</code></b>
+ &lt;COUNT>: Select the sequence records for which the occurrence count (<em>i.e</em> the <em>count</em> attribute) is equal to or smaller than the defined maximum count.</li>
+    <li><b><code class="language-bash">--min-length</code></b>
+| <b><code class="language-bash">-l</code></b>
+ &lt;LENGTH>: selects the sequence records for which the sequence length is equal to or
+greater than the defined minimum sequence length.</li>
+    <li><b><code class="language-bash">--max-length</code></b>
+| <b><code class="language-bash">-L</code></b>
+ &lt;LENGTH>: selects sequence records for which the sequence length is equal to or less than the defined maximum sequence length.</li>
+</ul>
+
+<h3 id="matching-the-sequence-annotations">
+  Matching the sequence annotations
+  <a class="anchor" href="#matching-the-sequence-annotations">#</a>
+</h3>
+<h3 id="taxonomy-based-filtering">
+  Taxonomy based filtering
+  <a class="anchor" href="#taxonomy-based-filtering">#</a>
+</h3>
+<p>If the user specifies a taxonomy when calling *OBITools* (see <code>--taxonomy</code> option), it is possible to filter the sequences based on taxonomic properties. Each of the following options can be used multiple times if needed to specify multiple taxids or ranks.</p>
+<ul>
+<li>
+<b><code class="language-bash">--restrict-to-taxon</code></b>
+| <b><code class="language-bash">-r</code></b>
+ &lt;TAXID>: Only sequences having a taxid belonging the provided taxid are conserved.
+
+</li>
+<li>
+<b><code class="language-bash">--ignore-taxon</code></b>
+| <b><code class="language-bash">-i</code></b>
+ &lt;TAXID>: Sequences having a taxid belonging the provided taxid are discarded.
+
+</li>
+<li>
+<b><code class="language-bash">--require-rank</code></b> &lt;RANK_NAME>: Only sequences having a taxid able to provide information at the &lt;RANK_NAME&gt; level are conserved.
+As an example, the NCBI taxid 74635 corresponding to <em>Rosa canina</em> is able to provide information at the <em>species</em>, <em>genus</em> or <em>family</em> level. But, taxid 3764 (<em>Rosa</em> genus) is not able to provide information at the <em>species</em> level. Many of the taxid related to environmental samples have partial classification and a taxon at the <em>species</em> level is not always connected to a taxon at the <em>genus</em> level as parent. They can sometimes be connected to a taxon at higher level.
+
+</li>
+</ul>
+<h4 id="controlling-the-input-data">
+  Controlling the input data
+  <a class="anchor" href="#controlling-the-input-data">#</a>
+</h4>
+
+
+<I>OBITools4</I> generally recognizes the input file format. It also recognizes
+whether the input file is compressed using GZIP. But some rare files can be
+misidentified, so the following options allow the user to force the format, thus
+bypassing the format identification step. 
+
+<h5 id="the-file-format-options">
+  The file format options
+  <a class="anchor" href="#the-file-format-options">#</a>
+</h5>
+
+
+<ul>
+    <li>
+<b><code class="language-bash">--fasta</code></b>: indicates that sequence data is in <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a> format.</li>
+    <li>
+<b><code class="language-bash">--fastq</code></b>: indicates that sequence data is in <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a> format.</li>
+    <li>
+<b><code class="language-bash">--embl</code></b>: indicates that sequence data is in <a href="http://metabar:8888/obidoc/formats/embl/">EMBL-ENA flatfile</a> format.</li>
+    <li>
+<b><code class="language-bash">--csv</code></b>: indicates that sequence data is in <a href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">CSV</a> format.</li>
+    <li>
+<b><code class="language-bash">--genbank</code></b>: indicates that sequence data is in <a href="http://metabar:8888/obidoc/formats/genbank/">GenBank flatfile</a> format.</li>
+    <li><b><code class="language-bash">--ecopcr</code></b>: indicates that sequence data is in the old ecoPCR tabulated format.</li>
+</ul>
+
+<h5 id="controlling-the-way-obitools4-are-formatting-annotations">
+  Controlling the way <em>OBITools4</em> are formatting annotations
+  <a class="anchor" href="#controlling-the-way-obitools4-are-formatting-annotations">#</a>
+</h5>
+
+
+These options only apply to the  <a href="http://metabar:8888/obidoc/formats/fasta/">FASTA</a> and  <a href="http://metabar:8888/obidoc/formats/fastq/">FASTQ</a> formats
+
+<ul>
+    <li><b><code class="language-bash">--input-OBI-header</code></b>: FASTA/FASTQ title line annotations follow the old OBI format.</li>
+    <li><b><code class="language-bash">--input-json-header</code></b>: FASTA/FASTQ title line annotations follow the JSON format.</li>
+</ul>
+
+<h5 id="controlling-quality-score-decoding">
+  Controlling quality score decoding
+  <a class="anchor" href="#controlling-quality-score-decoding">#</a>
+</h5>
+
+
+This option only applies to the <a href="http://metabar:8888/obidoc/formats/fastq/">FASTQ</a> formats
+
+<ul>
+    <li><b><code class="language-bash">--solexa</code></b>: decodes quality string according to the old Solexa specification. (default: the standard Sanger encoding is used, env: <strong>OBISSOLEXA</strong>)</li>
+</ul>
+
+<h4 id="controlling-the-output-data">
+  Controlling the output data
+  <a class="anchor" href="#controlling-the-output-data">#</a>
+</h4>
+
+
+<ul>
+    <li><b><code class="language-bash">--compress</code></b>
+| <b><code class="language-bash">-Z</code></b>
+: output is compressed using gzip. (default: false)</li>
+    <li><b><code class="language-bash">--no-order</code></b>: the <em>OBITools</em> ensure that the order between the input file and
+the output file does not change. When multiple files are processed,
+they are processed one at a time.
+If the <strong>&ndash;no-order</strong> option is added to a command, multiple input
+files can be opened at the same time and their contents processed
+in parallel. This usually increases processing speed, but does not
+guarantee the order of the sequences in the output file.
+Also, processing multiple files in parallel may require more memory
+to perform the computation.</li>
+    <li>
+<b><code class="language-bash">--fasta-output</code></b>: writes sequence data in <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>  format (default if quality data is not available).</li>
+    <li>
+      <b><code class="language-bash">--fastq-output</code></b>: writes sequence data in <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a>  format (default if quality data is available).</li>
+    <li><b><code class="language-bash">--json-output</code></b>: writes sequence data in JSON format.</li>
+    <li><b><code class="language-bash">--out</code></b>
+| <b><code class="language-bash">-o</code></b>
+ &lt;FILENAME>: filename used for saving the output (default: &ldquo;-&rdquo;, the standard output)</li>
+    <li><b><code class="language-bash">--output-OBI-header</code></b>
+| <b><code class="language-bash">-O</code></b>
+: writes output FASTA/FASTQ title line annotations in OBI format (default: JSON).</li>
+    <li><b><code class="language-bash">--output-json-header</code></b>: writew output FASTA/FASTQ title line annotations in JSON format (the default format).</li>
+    <li><b><code class="language-bash">--skip-empty</code></b>: sequences of length equal to zero are removed from the output (default: false).</li>
+    <li><b><code class="language-bash">--no-progressbar</code></b>: deactivates progress bar display (default: false).</li>
+</ul>
+<h4 id="general-options">
+  General options
+  <a class="anchor" href="#general-options">#</a>
+</h4>
+
+
+<ul>
+    <li><b><code class="language-bash">--help</code></b>
+| <b><code class="language-bash">-h|-?</code></b>
+: shows this help.</li>
+    <li><b><code class="language-bash">--version</code></b>: prints the version and exits.</li>
+    <li><b><code class="language-bash">--silent-warning</code></b>: This option tells obitools to stop displaying warnings.
+This behaviour can be controlled by setting the <strong>OBIWARNINGS</strong> environment variable.</li>
+</ul>
+
+
+
+<h4 id="computation-related-options">
+  Computation related options
+  <a class="anchor" href="#computation-related-options">#</a>
+</h4>
+
+
+<ul>
+    <li><b><code class="language-bash">--max-cpu</code></b> &lt;INTEGER>: <em>OBITools</em> can take advantage of your computer&rsquo;s multi-core
+architecture by parallelizing the computation across all available CPUs.
+Computing on more CPUs usually requires more memory to perform the
+computation. Reducing the number of CPUs used to perform a calculation
+is also a way to indirectly control the amount of memory used by the
+process. The number of CPUs used by <em>OBITools</em> can also be controlled
+by setting the <strong>OBIMAXCPU</strong> environment variable.</li>
+    <li><b><code class="language-bash">--force-one-cpu</code></b>: forces the use of a single CPU core for parallel processing (default: false).</li>
+    <li><b><code class="language-bash">--batch-size</code></b> &lt;INTEGER>: number of sequence per batch for parallel processing (default: 1000, env: <strong>OBIBATCHSIZE</strong>)</li>
+</ul>
+
+<h4 id="debug-related-options">
+  Debug related options
+  <a class="anchor" href="#debug-related-options">#</a>
+</h4>
+
+
+<ul>
+    <li><b><code class="language-bash">--debug</code></b>: enables debug mode, by setting log level to debug (default: false, env: <strong>OBIDEBUG</strong>)</li>
+    <li><b><code class="language-bash">--pprof</code></b>: enables pprof server. Look at the log for details. (default: false).</li>
+    <li><b><code class="language-bash">--pprof-mutex</code></b> &lt;INTEGER>: enables profiling of mutex lock. (default: 10, env: <strong>OBIPPROFMUTEX</strong>)</li>
+    <li><b><code class="language-bash">--pprof-goroutine</code></b> &lt;INTEGER>: enables profiling of goroutine blocking profile. (default: 6060, env: <strong>OBIPPROFGOROUTINE</strong>)</li>
+</ul>
+<h2 id="examples">
+  Examples
+  <a class="anchor" href="#examples">#</a>
+</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep --help
+</span></span></code></pre></div></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#obigrep-filter-a-sequence-file"><code>obigrep</code>: filter a sequence file</a>
+      <ul>
+        <li><a href="#description">Description</a>
+          <ul>
+            <li><a href="#selection-based-on-sequence-identifier-id">Selection based on sequence identifier (ID)</a></li>
+            <li><a href="#selection-based-on-sequence-definition">Selection based on sequence definition</a></li>
+            <li><a href="#selection-based-on-the-annotations">Selection based on the annotations</a></li>
+            <li><a href="#selection-based-on-the-sequence">Selection based on the sequence</a></li>
+            <li><a href="#defining-you-own-predicate">Defining you own predicate</a></li>
+          </ul>
+        </li>
+        <li><a href="#working-with-paired-sequence-files">Working with paired sequence files:</a></li>
+        <li><a href="#synopsis">Synopsis</a></li>
+        <li><a href="#options">Options</a>
+          <ul>
+            <li><a href="#matching-the-sequence-annotations">Matching the sequence annotations</a></li>
+            <li><a href="#taxonomy-based-filtering">Taxonomy based filtering</a></li>
+          </ul>
+        </li>
+        <li><a href="#examples">Examples</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,8 @@
+@M01334:147:000000000-LBRVD:1:1101:15946:1586 {"ali_dir":"right","ali_length":138,"definition":"1:N:0:CTCACCAA+CTAGGCAA","mode":"alignment","pairing_mismatches":{"(T:16)->(A:33)":14,"(T:33)->(A:17)":118,"(T:37)->(A:16)":125,"(T:38)->(A:16)":32,"(T:39)->(A:17)":44},"paring_fast_count":114,"paring_fast_overlap":138,"paring_fast_score":0.844,"score":5446,"score_norm":0.957,"seq_a_single":13,"seq_ab_match":132,"seq_b_single":13}
+gctcatccgaactacctaaccccattgagtctctgcacctatctttaatattagataagaaatattttatttcttataataaataagagatattttatatctctcattttttcaaaatgaaagatttggctcaggattgcccacgtaacggagatcggaagagc
++
+111/////2B112CMMOUO?MNObVHfcAVVHVWVVTQSWRXXIYYYXUSWiXaWeWWUWVSTTTWXgeUWWXXXWWgXWYYWVYWdUgSTTTXYYUVdTVWVXVgUWXXXVeYXfTCUXWW`QGUWfA@WSR?PRRWVARAc?UVMMOO?///BF////<000
+@M01334:147:000000000-LBRVD:1:1101:13773:1687 {"ali_dir":"left","ali_length":54,"definition":"1:N:0:CTCACCAA+CTAGGCAA","mode":"alignment","pairing_mismatches":{"(C:39)->(A:16)":102,"(C:39)->(A:17)":121,"(T:39)->(A:14)":101},"paring_fast_count":42,"paring_fast_overlap":54,"paring_fast_score":0.824,"score":2888,"score_norm":0.944,"seq_a_single":97,"seq_ab_match":51,"seq_b_single":97}
+ctcggatcaccattgagtctctgcacctatctttaatattagataagaaaaaatattatttcttatctgaaataagaaatattttatatatttctttttctcaaaatgaaagatttggctcaggattgccctgatccgagggatagcaccattgagtctctgcacctatccttttcttttgtattctagttcgagaacccccttgttttctcaaaacacggatttggctcaggatagccctgctatca
++
+3AAAAAADFFFFGGGGFGGGGGHHHHHHFHHHHHHHHGHHHHGHGGHFFHHHCGFHHHHHHHHHHHHHGHHGGFHFFHHHGHHHHBHHHGHHHHHHHXVVJIommmegikl]bVWgVDRXIlbkkVfPSWVWccVVT^ebggjkkCVeWcd1@CF>0/11@11B011F0/0000/00111@@D1111GA01AFGCEEE///0//BAFD0000HGGFAB011B00CBAB11FA1B11>1111@31>111

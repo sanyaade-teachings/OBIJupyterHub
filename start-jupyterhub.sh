@@ -49,12 +49,12 @@ docker ps -aq --filter name=jupyter- | xargs -r docker rm -f 2>/dev/null || true
 # Build student image
 echo ""
 echo -e "${BLUE}🔨 Building student image...${NC}"
-#docker build -t jupyterhub-student:latest -f Dockerfile .
+docker build -t jupyterhub-student:latest -f Dockerfile .
 
 # Build hub image
 echo ""
 echo -e "${BLUE}🔨 Building JupyterHub image...${NC}"
-#docker build -t jupyterhub-hub:latest -f Dockerfile.hub .
+docker build -t jupyterhub-hub:latest -f Dockerfile.hub .
 
 # Compile the web site
 echo ""

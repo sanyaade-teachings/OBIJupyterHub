@@ -1,0 +1,15 @@
+{
+  "name": "OBITools4 documentation",
+  "short_name": "OBITools4 documentation",
+  "start_url": "/obidoc/",
+  "scope": "/obidoc/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/obidoc/favicon.svg",
+      "sizes": "512x512"
+    }
+  ]
+}

@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
+  General operating principles for OBITools
+  #
+
+OBIToolsare not a metabarcoding data analysis pipeline, but a set of tools for developing customized analyses, while avoiding the black-box effect of a ready-to-use pipeline. A particular effort in the development of OBITools4 has been to use data formats that can be easily interfaced with other software.
+OBITools correspond to a set of UNIX commands that are executed from a command line interface, also known as a terminal, to perform various tasks on DNA sequence files. A UNIX command can be considered as a process that takes a set of inputs and produces a set of outputs.">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://metabar:8888/obidoc/docs/principles/">
+  <meta property="og:site_name" content="OBITools4 documentation">
+  <meta property="og:title" content="General operating principles">
+  <meta property="og:description" content="General operating principles for OBITools # OBIToolsare not a metabarcoding data analysis pipeline, but a set of tools for developing customized analyses, while avoiding the black-box effect of a ready-to-use pipeline. A particular effort in the development of OBITools4 has been to use data formats that can be easily interfaced with other software.
+OBITools correspond to a set of UNIX commands that are executed from a command line interface, also known as a terminal, to perform various tasks on DNA sequence files. A UNIX command can be considered as a process that takes a set of inputs and produces a set of outputs.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+<title>General operating principles | OBITools4 documentation</title>
+<link rel="icon" href="/obidoc/favicon.png" >
+<link rel="manifest" href="/obidoc/manifest.json">
+<link rel="canonical" href="http://metabar:8888/obidoc/docs/principles/">
+<link rel="stylesheet" href="/obidoc/book.min.5fd7b8e2d1c0ae15da279c52ff32731130386f71b58f011468f20d0056fe6b78.css" integrity="sha256-X9e44tHArhXaJ5xS/zJzETA4b3G1jwEUaPINAFb&#43;a3g=" crossorigin="anonymous">
+  <script defer src="/obidoc/fuse.min.js"></script>
+  <script defer src="/obidoc/en.search.min.4da51bdd2d833922fdbc0e19df517221387fc625ffb68ee140d605b3c5b68058.js" integrity="sha256-TaUb3S2DOSL9vA4Z31FyITh/xiX/to7hQNYFs8W2gFg=" crossorigin="anonymous"></script>
+
+  <script defer src="/obidoc/sw.min.32af8eafce4180aa1c5dea66d99fb26ba9043ea7c7a4c706138c91d9051b285e.js" integrity="sha256-Mq&#43;Or85BgKocXepm2Z&#43;ya6kEPqfHpMcGE4yR2QUbKF4=" crossorigin="anonymous"></script>
+<link rel="alternate" type="application/rss+xml" href="http://metabar:8888/obidoc/docs/principles/index.xml" title="OBITools4 documentation" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  <link rel="stylesheet" type="text/css" href="http://metabar:8888/obidoc/hugo-cite.css" />
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/obidoc/"><img src="/obidoc/obitools_logo.jpg" alt="Logo" class="book-icon" /><span>OBITools4 documentation</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Docs</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/about/" class="">About</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/installation/" class="">Installation</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/principles/" class="active">General operating principles</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-08756b4c1f14be6ee584ece005b9f621" class="toggle"  />
+    <label for="section-08756b4c1f14be6ee584ece005b9f621" class="flex justify-between">
+      <a role="button" class="">File formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-933c2e64b905b84e22aa5273cea2d0bd" class="toggle"  />
+    <label for="section-933c2e64b905b84e22aa5273cea2d0bd" class="flex justify-between">
+      <a role="button" class="">Sequence file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fasta/" class="">FASTA file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fastq/" class="">FASTQ file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/genbank/" class="">GenBank Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/embl/" class="">EMBL Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/csv/" class="">CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/json/" class="">JSON format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/annotations/" class="">Annotation of sequences</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-0258ae1c222f9a38cc1b75254c93b0f4" class="toggle"  />
+    <label for="section-0258ae1c222f9a38cc1b75254c93b0f4" class="flex justify-between">
+      <a role="button" class="">Taxonomy file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/csv_taxdump/" class="">CSV formatted taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/ncbi_taxdump/" class="">NCBI taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/csv/" class="">The CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-70b1e6e5ec7f3ccab643155fa50659b6" class="toggle"  />
+    <label for="section-70b1e6e5ec7f3ccab643155fa50659b6" class="flex justify-between">
+      <a role="button" class="">Patterns</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/regular/" class="">Regular Expressions</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/dnagrep/" class="">DNA Patterns</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8223f464911a1fe6c655972143684e93" class="toggle"  />
+    <label for="section-8223f464911a1fe6c655972143684e93" class="flex justify-between">
+      <a role="button" class="">The OBITools4 commands</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/options/" class="">Shared command options</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8921ea65523c266b128dd4263232b0fc" class="toggle"  />
+    <label for="section-8921ea65523c266b128dd4263232b0fc" class="flex justify-between">
+      <a role="button" class="">Basics</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiannotate/" class="">obiannotate</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicomplement/" class="">obicomplement</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconvert/" class="">obiconvert</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicount/" class="">obicount</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicsv/" class="">obicsv</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidemerge/" class="">obidemerge</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidistribute/" class="">obidistribute</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obigrep/" class="">obigrep</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obijoin/" class="">obijoin</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimatrix/" class="">obimatrix</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisplit/" class="">obisplit</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisummary/" class="">obisummary</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiuniq/" class="">obiuniq</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-dbdf1bb5377572439394e60e08c30f50" class="toggle"  />
+    <label for="section-dbdf1bb5377572439394e60e08c30f50" class="flex justify-between">
+      <a role="button" class="">Demultiplexing samples</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimultiplex/" class="">obimultiplex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitagpcr/" class="">obitagpcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-aa98fedd067b51150db59691a8ea8edd" class="toggle"  />
+    <label for="section-aa98fedd067b51150db59691a8ea8edd" class="flex justify-between">
+      <a role="button" class="">Sequence alignments</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiclean/" class="">obiclean</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7433746525d8c2b29b033f765c869acd" class="toggle"  />
+    <label for="section-7433746525d8c2b29b033f765c869acd" class="flex justify-between">
+      <a href="/obidoc/obitools/obipairing/" class="">obipairing</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/fasta-like/" class="">The FASTA-like alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/exact-alignment/" class="">Exact alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obipcr/" class="">obipcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obirefidx/" class="">obirefidx</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitag/" class="">obitag</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-5746f699d10490780dec8e30ab2dd3ce" class="toggle"  />
+    <label for="section-5746f699d10490780dec8e30ab2dd3ce" class="flex justify-between">
+      <a role="button" class="">Taxonomy</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitaxonomy/" class="">obitaxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-3f50c4fe7ab436a56ae92897d5444956" class="toggle"  />
+    <label for="section-3f50c4fe7ab436a56ae92897d5444956" class="flex justify-between">
+      <a role="button" class="">Advanced tools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiscript/" class="">obiscript</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-549be3934679fcb82a232f6bd5435563" class="toggle"  />
+    <label for="section-549be3934679fcb82a232f6bd5435563" class="flex justify-between">
+      <a role="button" class="">Others</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimicrosat/" class="">obimicrosat</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-ceca4455173761e30cbc0a6dc2327167" class="toggle"  />
+    <label for="section-ceca4455173761e30cbc0a6dc2327167" class="flex justify-between">
+      <a role="button" class="">Experimentals</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicleandb/" class="">obicleandb</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconsensus/" class="">obiconsensus</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obilandmark/" class="">obilandmark</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/tags/" class="">Glossary of tags</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9b1bcd52530c59dc4819b1f61c128f54" class="toggle"  />
+    <label for="section-9b1bcd52530c59dc4819b1f61c128f54" class="flex justify-between">
+      <a role="button" class="">Cookbook</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/illumina/" class="">Analysing an Illumina data set</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/ecoprimers/" class="">Designing new barcodes</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/local_genbank/" class="">Prepare a local copy of Genbank</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/reference_db/" class="">Build a reference database</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/minion/" class="">Oxford Nanopore data analysis</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Programming OBITools</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/expression/" class="">Expression language</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-6d580829a667b5cca790b286d99a10fe" class="toggle"  />
+    <label for="section-6d580829a667b5cca790b286d99a10fe" class="flex justify-between">
+      <a href="/obidoc/docs/programming/lua/" class="">Lua: for scripting OBITools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-2fb081dac812d624eea5f4268fca9e26" class="toggle"  />
+    <label for="section-2fb081dac812d624eea5f4268fca9e26" class="flex justify-between">
+      <a role="button" class="">Obitools Classes</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequence/" class="">BioSequence</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequenceslice/" class="">BioSequenceSlice</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxonomy/" class="">Taxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxon/" class="">Taxon</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/mutex/" class="">Mutex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/obidoc/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>General operating principles</h3>
+
+  <label for="toc-control">
+    
+    <img src="/obidoc/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#general-operating-principles-for-obitools">General operating principles for <em>OBITools</em></a>
+      <ul>
+        <li><a href="#specifying-the-input-data">Specifying the input data</a></li>
+        <li><a href="#specifying-what-to-do-with-the-output">Specifying what to do with the output</a></li>
+        <li><a href="#combining-obitools-commands-using-pipes">Combining <em>OBITools</em> commands using pipes</a></li>
+        <li><a href="#the-tagging-system-of-obitools">The tagging system of <em>OBITools</em></a>
+          <ul>
+            <li><a href="#the-key-names">The key names</a></li>
+            <li><a href="#the-tag-values">The tag values</a></li>
+          </ul>
+        </li>
+        <li><a href="#obitools4-and-the-taxonomic-information"><em>OBITools4</em> and the taxonomic information</a></li>
+        <li><a href="#manipulating-paired-sequence-files-with-obitools4">Manipulating paired sequence files with <em>OBITools4</em></a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="general-operating-principles-for-obitools">
+  General operating principles for <em>OBITools</em>
+  <a class="anchor" href="#general-operating-principles-for-obitools">#</a>
+</h1>
+<p><em>OBITools</em>are not a metabarcoding data analysis pipeline, but a set of tools for developing customized analyses, while avoiding the black-box effect of a ready-to-use pipeline. A particular effort in the development of <em>OBITools4</em> has been to use data formats that can be easily interfaced with other software.</p>
+<p><em>OBITools</em> correspond to a set of UNIX commands that are executed from a command line interface, also known as a terminal, to perform various tasks on DNA sequence files. A UNIX command can be considered as a process that takes a set of inputs and produces a set of outputs.</p>
+
+
+<script src="/obidoc/mermaid.min.js"></script>
+
+  <script>mermaid.initialize({
+  "flowchart": {
+    "useMaxWidth":true
+  },
+  "theme": "default"
+}
+)</script>
+
+
+
+
+<pre class="mermaid workflow">
+graph LR
+  A@{ shape: doc, label: "input 1" }
+  B@{ shape: doc, label: "input 2" }
+  C[Unix command]
+  D@{ shape: doc, label: "output 1" }
+  E@{ shape: doc, label: "output 2" }
+  F@{ shape: doc, label: "output 3" }
+  A --> C
+  B --> C:::obitools
+  C --> D
+  C --> E
+  C --> F
+  classDef obitools fill:#99d57c
+</pre>
+
+<p>Most <em>OBITools</em> take a single file as input and produce a single file as output. Among the inputs, one has a special status: the standard input (<em>stdin</em>). Symmetrically, there is the standard output (<em>stdout</em>). By default, like any other UNIX command, the <em>OBITools</em> reads its data from <em>stdin</em> and write its results to <em>stdout</em>.</p>
+
+
+<pre class="mermaid workflow">
+graph LR
+  A@{ shape: doc, label: "stdin" }
+  C[Unix command]
+  D@{ shape: doc, label: "stdout" }
+  A --> C:::obitools
+  C --> D
+  classDef obitools fill:#99d57c
+</pre>
+
+<p>If nothing is specified, the UNIX system connects standard input to the terminal keyboard and standard output to the terminal screen. So, for example, if you enter the <a href="http://metabar:8888/obidoc/obitools/obiconvert/">
+    <abbr title="obiconvert: convert format of a sequence file"><code>obiconvert</code></abbr>
+    </a> command in your terminal without any arguments, it will appear to stop and do nothing, when in fact it is waiting for you to type something on the keyboard. To stop it, just press <em>Ctrl+D</em> or <em>Ctrl+C</em>. <em>Ctrl+D</em> ends typing and stops the program. <em>Ctrl+C</em> kills the program.</p>
+<h2 id="specifying-the-input-data">
+  Specifying the input data
+  <a class="anchor" href="#specifying-the-input-data">#</a>
+</h2>
+<p><em>OBITools</em> are designed to process DNA sequence files. Most of them therefore accept DNA sequence files as input. They can be formatted in the most common sequence file formats, 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+, 
+  <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a>
+, 
+  <a href="http://metabar:8888/obidoc/formats/embl/">EMBL-ENA</a>
+and 
+  <a href="http://metabar:8888/obidoc/formats/genbank/">GenBank</a>
+flat files. Data can also be supplied as CSV files. The <em>OBITools</em> generally recognize the file format of input data, but options are provided to force a specific format (<em>i.e.</em> <code>--fasta</code>, <code>--fastq</code>, <code>--genbank</code>, <code>--embl</code>).</p>
+<p>The most common way to specify the file containing the DNA sequences to be processed is to specify its name as an argument. Here is an example using <a href="http://metabar:8888/obidoc/obitools/obicount/">
+    <abbr title="obicount: counting sequence records"><code>obicount</code></abbr>
+    </a> to count the number of DNA sequences in a file named <code>my_file.fasta</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount my_file.fasta
+</span></span></code></pre></div><p>But it is also possible to pass data using the Unix redirection mechanism (<em>i.e.</em> <code>&gt;</code> and <code>&lt;</code>, 
+  <a href="https://en.wikipedia.org/wiki/Redirection_%28computing%29">more details</a>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount &lt; my_file.fasta
+</span></span></code></pre></div><p><em>OBITools</em> can also be used to process a set of files. In this case, <em>OBITools</em> will process the files in the order in which they appear on the command line.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount my_file1.fasta my_file2.fasta my_file3.fasta
+</span></span></code></pre></div><p>The wildcard character (<em>i.e.</em> <code>*</code>) can be used to specify a set of files to be processed.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount my_file*.fasta
+</span></span></code></pre></div><p>If the files are located in a subdirectory, the directory name can be specified, without the need to specify any file name. In that case, <em>OBITools</em> will process all the sequence files present in the subdirectory. Sequence files are searched recursively in the specified directory and all its sub-directories.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount my_sub_directory
+</span></span></code></pre></div><p>Files considered to be DNA sequence files are those with the extension <code>.fasta</code>, <code>.fastq</code>, <code>.genbank</code> or <code>.embl</code>, <code>.seq</code> or <code>.dat</code>. Files with the second extension <code>.gz</code> (<em>e.g.</em> <code>.fasta.gz</code>) are also considered to be DNA sequence files and are processed without the need for decompression.</p>
+<p>Imagine a folder called <code>Genbank</code> containing a complete copy of the Genbank database organized into subdirectories, one per division. Each division subdirectory contains a set of 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+compressed (<code>.gz</code>) files.</p>
+<pre tabindex="0"><code>. 📂 Genbank
+└── 📂 bct
+│   └── 📄 gbbct1.fasta.gz
+│   ├── 📄 gbbct2.fasta.gz
+│   ├── 📄 gbbct3.fasta.gz
+│   └── 📄 ...
+└── 📂 inv
+│   └── 📄 gbinv1.fasta.gz
+│   ├── 📄 gbinv2.fasta.gz
+│   ├── 📄 gbinv3.fasta.gz
+│   └── 📄...
+└── 📂 mam
+│   └── 📄 gbmam1.fasta.gz
+│   ├── 📄 gbmam2.fasta.gz
+│   ├── 📄 gbmam3.fasta.gz
+│   └── 📄...
+└── 📂...
+│
+</code></pre><p>It is possible to count entries in the <code>gbbct1.fasta.gz</code> file with the command</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount Genbank/bct/gbbct1.fasta.gz
+</span></span></code></pre></div><p>to count the entries in the <strong>bct</strong> (bacterial) division with the command</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount Genbank/bct
+</span></span></code></pre></div><p>or to count the entries in the complete Genbank copy with the command</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount Genbank
+</span></span></code></pre></div><h2 id="specifying-what-to-do-with-the-output">
+  Specifying what to do with the output
+  <a class="anchor" href="#specifying-what-to-do-with-the-output">#</a>
+</h2>
+<p>By default, <em>OBITools</em> write their output to standard output (<em>stdout</em>), which means that the results of a command are printed out on the terminal screen.</p>
+<p>Most <em>OBITools</em> produce sequence files as output. The output sequence file is in 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+or 
+  <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a>
+format, depending on whether it contains quality scores (
+  <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a>
+) or not (
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+). The output format of sequence files can be forced using the <code>--fasta-output</code> or <code>--fastq-output</code> options. If the <code>--fastq-output</code> option is used for a dataset without quality information, a default quality score of 40 will be assigned to each nucleotide. A third option is the <code>--json-output</code> option, which produces data in 
+  <a href="http://metabar:8888/obidoc/formats/json/">JSON</a>
+format.</p>
+<p>With the exception of the <a href="http://metabar:8888/obidoc/obitools/obisummary/">
+    <abbr title="obisummary: generate summary statistics"><code>obisummary</code></abbr>
+    </a> command, the <em>OBITools</em> which produce other
+types of data return them in CSV format. The <a href="http://metabar:8888/obidoc/obitools/obisummary/">
+    <abbr title="obisummary: generate summary statistics"><code>obisummary</code></abbr>
+    </a> command
+returns its results in 
+  <a href="https://en.wikipedia.org/wiki/JSON">JSON</a> or
+
+  <a href="https://en.wikipedia.org/wiki/YAML">YAML</a> formats.</p>
+<p>The <a href="http://metabar:8888/obidoc/obitools/obicomplement/">
+    <abbr title="obicomplement: reverse complement a sequence file"><code>obicomplement</code></abbr>
+    </a> command computes the reverse-complement of the DNA sequences provided as input.</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="two_sequences.fasta" download="two_sequences.fasta">📄 two_sequences.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;AB061527 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Sorex unguiculatus mitochondrial NA, complete genome.&#34;,&#34;family_name&#34;:&#34;Soricidae&#34;,&#34;family_taxid&#34;:9376,&#34;genus_name&#34;:&#34;Sorex&#34;,&#34;genus_taxid&#34;:9379,&#34;obicleandb_level&#34;:&#34;family&#34;,&#34;obicleandb_trusted&#34;:2.2137847111025621e-13,&#34;species_name&#34;:&#34;Sorex unguiculatus&#34;,&#34;species_taxid&#34;:62275,&#34;taxid&#34;:62275}
+ttagccctaaacttaggtatttaatctaacaaaaatacccgtcagagaactactagcaat
+agcttaaaactcaaaggacttggcggtgctttatatccct
+&gt;AL355887 {&#34;count&#34;:2,&#34;definition&#34;:&#34;Human chromosome 14 NA sequence BAC R-179O11 of library RPCI-11 from chromosome 14 of Homo sapiens (Human)XXKW HTG.; HTGS_ACTIVFIN.&#34;,&#34;family_name&#34;:&#34;Hominidae&#34;,&#34;family_taxid&#34;:9604,&#34;genus_name&#34;:&#34;Homo&#34;,&#34;genus_taxid&#34;:9605,&#34;obicleandb_level&#34;:&#34;genus&#34;,&#34;obicleandb_trusted&#34;:0,&#34;species_name&#34;:&#34;Homo sapiens&#34;,&#34;species_taxid&#34;:9606,&#34;taxid&#34;:9606}
+ttagccctaaactctagtagttacattaacaaaaccattcgtcagaatactacgagcaac
+agcttaaaactcaaaggacctggcagttctttatatccct
+</code></pre></td>
+    
+</DIV>
+
+<p>If the <code>two_sequences.fasta</code> file is processed with the <a href="http://metabar:8888/obidoc/obitools/obicomplement/">
+    <abbr title="obicomplement: reverse complement a sequence file"><code>obicomplement</code></abbr>
+    </a> command, without indicating the name of the output file, the result is written to the terminal screen.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicomplement two_sequences.fasta
+</span></span></code></pre></div>
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;AB061527 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Sorex unguiculatus mitochondrial NA, complete genome.&#34;,&#34;family_name&#34;:&#34;Soricidae&#34;,&#34;family_taxid&#34;:&#34;9376&#34;,&#34;genus_name&#34;:&#34;Sorex&#34;,&#34;genus_taxid&#34;:&#34;9379&#34;,&#34;obicleandb_level&#34;:&#34;family&#34;,&#34;obicleandb_trusted&#34;:2.2137847111025621e-13,&#34;species_name&#34;:&#34;Sorex unguiculatus&#34;,&#34;species_taxid&#34;:&#34;62275&#34;,&#34;taxid&#34;:&#34;62275&#34;}
+agggatataaagcaccgccaagtcctttgagttttaagctattgctagtagttctctgac
+gggtatttttgttagattaaatacctaagtttagggctaa
+&gt;AL355887 {&#34;count&#34;:2,&#34;definition&#34;:&#34;Human chromosome 14 NA sequence BAC R-179O11 of library RPCI-11 from chromosome 14 of Homo sapiens (Human)XXKW HTG.; HTGS_ACTIVFIN.&#34;,&#34;family_name&#34;:&#34;Hominidae&#34;,&#34;family_taxid&#34;:&#34;9604&#34;,&#34;genus_name&#34;:&#34;Homo&#34;,&#34;genus_taxid&#34;:&#34;9605&#34;,&#34;obicleandb_level&#34;:&#34;genus&#34;,&#34;obicleandb_trusted&#34;:0,&#34;species_name&#34;:&#34;Homo sapiens&#34;,&#34;species_taxid&#34;:&#34;9606&#34;,&#34;taxid&#34;:&#34;9606&#34;}
+agggatataaagaactgccaggtcctttgagttttaagctgttgctcgtagtattctgac
+gaatggttttgttaatgtaactactagagtttagggctaa
+</code></pre></td>
+
+<p>There are two options for saving the results to a file. The first is to redirect the output to a file, as in the following example.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicomplement two_sequences.fasta &gt; two_sequences_comp.fasta
+</span></span></code></pre></div><p>The second option is to use the <code>--out</code> option.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicomplement two_sequences.fasta --out two_sequences_comp.fasta
+</span></span></code></pre></div><p>Both methods will produce the same result, a file named <a href="two_sequences_comp.fasta" download="two_sequences_comp.fasta"><code>two_sequences_comp.fasta</code></a> containing the reverse-complement of the DNA sequences contained in <a href="two_sequences.fasta" download="two_sequences.fasta"><code>two_sequences.fasta</code></a>.</p>
+<h2 id="combining-obitools-commands-using-pipes">
+  Combining <em>OBITools</em> commands using pipes
+  <a class="anchor" href="#combining-obitools-commands-using-pipes">#</a>
+</h2>
+<p>Since <em>OBITools</em> are UNIX commands, and their default behaviour is to read their input from <em>stdin</em> and write their output to <em>stdout</em>, it is possible to combine them using the Unix pipe mechanism (<em>i.e.</em> <code>|</code>). For example, you can reverse-complement the file <code>two_sequences.fasta</code> with the command <a href="http://metabar:8888/obidoc/obitools/obicomplement/">
+<abbr title="obicomplement: reverse complement a sequence file"><code>obicomplement</code></abbr>
+</a>, and then count the number of DNA sequences in the resulting file with the command <a href="http://metabar:8888/obidoc/obitools/obicount/">
+<abbr title="obicount: counting sequence records"><code>obicount</code></abbr>
+</a>, without saving the intermediate results, by linking the <em>stdout</em> of <a href="http://metabar:8888/obidoc/obitools/obicomplement/">
+<abbr title="obicomplement: reverse complement a sequence file"><code>obicomplement</code></abbr>
+</a> to the <em>stdin</em> of <a href="http://metabar:8888/obidoc/obitools/obicount/">
+<abbr title="obicount: counting sequence records"><code>obicount</code></abbr>
+</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicomplement two_sequences.fasta | obicount 
+</span></span></code></pre></div><pre tabindex="0"><code>entities,n
+variants,2
+reads,3
+symbols,200
+</code></pre><p>The result of the <a href="http://metabar:8888/obidoc/obitools/obicount/">
+<abbr title="obicount: counting sequence records"><code>obicount</code></abbr>
+</a> command is a CSV file. Therefore, it can itself be piped to another command, like 
+  <a href="https://github.com/mplewis/csvtomd"><code>csvtomd</code></a> to reformat the result in a Markdown table.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicomplement two_sequences.fasta | obicount | csvtomd
+</span></span></code></pre></div><pre tabindex="0"><code>entities  |  n
+----------|-----
+variants  |  2
+reads     |  3
+symbols   |  200
+</code></pre><p>Or being plotted with the 
+  <a href="https://github.com/red-data-tools/YouPlot"><code>uplot</code></a> command.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicomplement two_sequences.fasta | obicount | uplot barplot -H -d,
+</span></span></code></pre></div><pre tabindex="0"><code>                               n
+            ┌                                        ┐ 
+   variants ┤ 2.0                                      
+      reads ┤ 3.0                                      
+    symbols ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 200.0   
+            └                                        ┘ 
+</code></pre><h2 id="the-tagging-system-of-obitools">
+  The tagging system of <em>OBITools</em>
+  <a class="anchor" href="#the-tagging-system-of-obitools">#</a>
+</h2>
+<p><em>OBITools</em> provide several tools for performing computations on the sequences. The result of such a computation may be the selection of a subset of the input sequences, a modification of the sequences themselves, or it may only lead to the estimation of some sequence properties. In the latter case, <em>OBITools</em> store the estimated properties of the relevant sequence in a 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+or 
+  <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a>
+file. To achieve this, <em>OBITools</em> add structured information in the form of a JSON map to the header of each sequence. The JSON map allows calculation results to be stored in key-value pairs. Each <em>OBITools</em> command adds one or more key-value pairs to the JSON map as required to annotate a sequence. Below is an example of a 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+formatted sequence with a JSON map added to its header containing three key-value pairs: <code>count</code> associated with the value <code>2</code>, <code>is_annotated</code> associated with the value <code>true</code> and <code>xxxx</code> associated with the value <code>yyyy</code>.</p>
+<pre tabindex="0"><code>&gt;sequence1 {&#34;count&#34;: 2, &#34;is_annotated&#34;: true, &#34;xxxx&#34;: &#34;yyy&#34;}
+cgacgtagctgtgatgcagtgcagttatattttacgtgctatgtttcagtttttttt
+fdcgacgcagcggag
+</code></pre><h3 id="the-key-names">
+  The key names
+  <a class="anchor" href="#the-key-names">#</a>
+</h3>
+<p>Keys can be any string of characters. Their names are case-sensitive. The keys <code>count</code>,
+<code>Count</code> and <code>COUNT</code> are all considered to be different keys. Some key names are
+reserved by <em>OBITools</em> and have special meanings (<em>e.g.</em> <code>count</code>
+contains, if present, an integer value indicating how many times this sequence has
+been observed, <code>taxid</code> contains a string corresponding to a taxonomic
+identifier from a taxonomy).</p>
+<h3 id="the-tag-values">
+  The tag values
+  <a class="anchor" href="#the-tag-values">#</a>
+</h3>
+<p>Values can be strings, integers, floats, or boolean values. Values can also
+be of composite types but with some limitations compared to the
+
+  <a href="https://en.wikipedia.org/wiki/JSON">JSON</a> format. In <em>OBITools4</em> annotations
+it is not possible to nest composite types. A list cannot contain a list or a map.</p>
+<p>A list is an ordered set of values, in this case a set of integer values:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">12</span>]
+</span></span></code></pre></div><p>A map is a set of values indexed by a key, which is a string. As an example, here is a
+map of integer values:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{<span style="color:#f92672">&#34;toto&#34;</span>:<span style="color:#ae81ff">4</span>,<span style="color:#f92672">&#34;titi&#34;</span>:<span style="color:#ae81ff">10</span>,<span style="color:#f92672">&#34;tutu&#34;</span>:<span style="color:#ae81ff">1</span>}
+</span></span></code></pre></div><p>Maps are notably used by <a href="http://metabar:8888/obidoc/obitools/obiuniq/">
+    <abbr title="obiuniq: dereplicate a sequence file"><code>obiuniq</code></abbr>
+    </a> to aggregate information collected
+from the merged sequence records.</p>
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;my_seq_O1 {&#34;merged_sample&#34;:{&#34;sample1&#34;:45,&#34;sample_2&#34;:33}}
+gctagctagctgtgatgtcgtagttgctgatgctagtgctagtcgtaaaaaat
+</code></pre><p>Using the <a href="http://metabar:8888/obidoc/obitools/obiannotate/">
+    <abbr title="obiannotate: edit sequence annotations"><code>obiannotate</code></abbr>
+    </a> command, it is possible to edit these annotations, adding new ones, deleting others, renaming keys or changing values.</p>
+
+            <link rel="stylesheet" href="/obidoc/css/vendors/admonitions.5c73bad2903e7d2d44ad118370ebd8c2cf5f239d4d93c283e55c00f2f8d30746.css" integrity="sha256-XHO60pA&#43;fS1ErRGDcOvYws9fI51Nk8KD5VwA8vjTB0Y=" crossorigin="anonymous">
+    <div class="admonition caution">
+      <div class="admonition-header"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>
+        <span>Caution</span>
+      </div>
+      <div class="admonition-content">
+        <p>You are free to add, edit and delete even the <em>OBITools4</em>
+reserved keys to mimic the results of an <em>OBITools4</em> commands. But beware
+of the impact of these manually modified values. It is best not to
+modified reserved annotation keys.</p>
+      </div>
+    </div><h2 id="obitools4-and-the-taxonomic-information">
+  <em>OBITools4</em> and the taxonomic information
+  <a class="anchor" href="#obitools4-and-the-taxonomic-information">#</a>
+</h2>
+<p>One of the advantages of <em>OBITools</em> is their ability to handle taxonomy annotations.
+Each sequence in a sequence file can be individually taxonomically annotated by adding a <code>taxid</code> tag. Although several annotation tags can be related to taxonomic information, only the <code>taxid</code> tag really matters.</p>
+<p>The tags associated with taxonomic annotations fall into three categories</p>
+<ul>
+<li><code>taxid</code> The main taxonomic annotation</li>
+<li>Any tag ending with the <code>_taxid</code> suffix contains secondary taxid annotations, such as <code>family_taxid</code> which contains the taxid at the family level.</li>
+<li>Text tags ending with <code>_name</code>, such as <code>scientific_name</code> or <code>family_name</code>, which contain the textual representation corresponding to the taxids.</li>
+</ul>
+<p>The last category is intended solely to facilitate the user&rsquo;s task, to make taxonomic information more comprehensible on a human level. The second category is also intended to help the user, bearing in mind that any taxonomy-based selection implemented by <em>OBITools4</em> is based solely on the <code>taxid</code> tag.</p>
+<p>Taxonomic identifiers, <em>taxid</em>, are short strings that uniquely identify a taxon within a taxonomy. It is important to rely on <em>taxid</em> rather than Latin names to identify taxa, as several taxa share the same Latin name (<em>e.g.</em> Vertebrata is also a genus of red algae).</p>
+<p>For example, in the 
+  <a href="https://www.ncbi.nlm.nih.gov/taxonomy">NCBI taxonomy</a>, the species <em>Homo sapiens</em> has the taxid <em>9606</em> and belongs to the genus <em>Homo</em>, which has the taxid <em>9605</em>. Although all NCBI taxids are numeric, the <em>OBITools4</em> treats them as strings: <code>&quot;9606&quot;</code> and <code>&quot;9605&quot;</code>.</p>
+<p>The one way to specify a taxid to obitools is to provide this short string: <code>&quot;9606&quot;</code> or <code>&quot;9605&quot;</code>.</p>
+<p>If the <code>--taxonomy</code> or <code>-t</code> option, which takes a filename as parameter, is used when calling a <em>OBITools</em> command, the corresponding taxonomy will be loaded and every taxid present in a file (<code>taxid</code> and <code>*_taxid</code> tags) will be checked against the taxonomy. To download a copy of the 
+  <a href="https://www.ncbi.nlm.nih.gov/taxonomy">NCBI taxonomy</a> you can use the <a href="http://metabar:8888/obidoc/obitools/obitaxonomy/">
+    <abbr title="obitaxonomy: manage and search in the taxonomic database"><code>obitaxonomy</code></abbr>
+    </a> command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obitaxonomy --download-ncbi --out ncbitaxo.tgz
+</span></span></code></pre></div><p>This will create a new <code>ncbitaxo.tgz</code> file containing a local copy of the complete taxonomy.</p>
+<p>The first consequence of this check is that all taxa are rewritten in their long form. <code>&quot;9606&quot;</code> becomes <code>&quot;taxon:9606 [Homo sapiens]@species&quot;</code>:</p>
+<ul>
+<li><code>taxon</code>: is the taxonomy code (<code>TAXOCOD</code> is <code>taxon</code> for the 
+  <a href="https://www.ncbi.nlm.nih.gov/taxonomy">NCBI taxonomy</a>).</li>
+<li><code>9606</code>: is the taxid</li>
+<li><code>Homo sapiens</code>: is the scientific name</li>
+<li><code>species</code>: is the taxonomic rank</li>
+</ul>
+<p>So the long form of a taxid can be written as <code>&quot;TAXOCOD:TAXID [SCIENTIFIC NAME]@RANK&quot;</code>.</p>
+<p>If you look at the following files, you can see that the <code>taxid</code> tag is set to <code>62275</code> and <code>9606</code> for the first and second sequences respectively:</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="two_sequences.fasta" download="two_sequences.fasta">📄 two_sequences.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;AB061527 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Sorex unguiculatus mitochondrial NA, complete genome.&#34;,&#34;family_name&#34;:&#34;Soricidae&#34;,&#34;family_taxid&#34;:9376,&#34;genus_name&#34;:&#34;Sorex&#34;,&#34;genus_taxid&#34;:9379,&#34;obicleandb_level&#34;:&#34;family&#34;,&#34;obicleandb_trusted&#34;:2.2137847111025621e-13,&#34;species_name&#34;:&#34;Sorex unguiculatus&#34;,&#34;species_taxid&#34;:62275,&#34;taxid&#34;:62275}
+ttagccctaaacttaggtatttaatctaacaaaaatacccgtcagagaactactagcaat
+agcttaaaactcaaaggacttggcggtgctttatatccct
+&gt;AL355887 {&#34;count&#34;:2,&#34;definition&#34;:&#34;Human chromosome 14 NA sequence BAC R-179O11 of library RPCI-11 from chromosome 14 of Homo sapiens (Human)XXKW HTG.; HTGS_ACTIVFIN.&#34;,&#34;family_name&#34;:&#34;Hominidae&#34;,&#34;family_taxid&#34;:9604,&#34;genus_name&#34;:&#34;Homo&#34;,&#34;genus_taxid&#34;:9605,&#34;obicleandb_level&#34;:&#34;genus&#34;,&#34;obicleandb_trusted&#34;:0,&#34;species_name&#34;:&#34;Homo sapiens&#34;,&#34;species_taxid&#34;:9606,&#34;taxid&#34;:9606}
+ttagccctaaactctagtagttacattaacaaaaccattcgtcagaatactacgagcaac
+agcttaaaactcaaaggacctggcagttctttatatccct
+</code></pre></td>
+    
+</DIV>
+
+<p>If you use <a href="http://metabar:8888/obidoc/obitools/obiconvert/">
+    <abbr title="obiconvert: convert format of a sequence file"><code>obiconvert</code></abbr>
+    </a> without specifying a taxonomy, its only action is to convert potential old numeric taxids (<code>62275</code> and <code>9606</code>) to their string equivalents (<code>&quot;62275&quot;</code> and <code>&quot;9606&quot;</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiconvert two_sequences.fasta
+</span></span></code></pre></div><pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;AB061527 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Sorex unguiculatus mitochondrial NA, complete genome.&#34;,&#34;family_name&#34;:&#34;Soricidae&#34;,&#34;family_taxid&#34;:&#34;9376&#34;,&#34;genus_name&#34;:&#34;Sorex&#34;,&#34;genus_taxid&#34;:&#34;9379&#34;,&#34;obicleandb_level&#34;:&#34;family&#34;,&#34;obicleandb_trusted&#34;:2.2137847111025621e-13,&#34;species_name&#34;:&#34;Sorex unguiculatus&#34;,&#34;species_taxid&#34;:&#34;62275&#34;,&#34;taxid&#34;:&#34;62275&#34;}
+ttagccctaaacttaggtatttaatctaacaaaaatacccgtcagagaactactagcaat
+agcttaaaactcaaaggacttggcggtgctttatatccct
+&gt;AL355887 {&#34;count&#34;:2,&#34;definition&#34;:&#34;Human chromosome 14 NA sequence BAC R-179O11 of library RPCI-11 from chromosome 14 of Homo sapiens (Human)XXKW HTG.; HTGS_ACTIVFIN.&#34;,&#34;family_name&#34;:&#34;Hominidae&#34;,&#34;family_taxid&#34;:&#34;9604&#34;,&#34;genus_name&#34;:&#34;Homo&#34;,&#34;genus_taxid&#34;:&#34;9605&#34;,&#34;obicleandb_level&#34;:&#34;genus&#34;,&#34;obicleandb_trusted&#34;:0,&#34;species_name&#34;:&#34;Homo sapiens&#34;,&#34;species_taxid&#34;:&#34;9606&#34;,&#34;taxid&#34;:&#34;9606&#34;}
+ttagccctaaactctagtagttacattaacaaaaccattcgtcagaatactacgagcaac
+agcttaaaactcaaaggacctggcagttctttatatccct
+</code></pre><p>If the previously downloaded 
+  <a href="https://www.ncbi.nlm.nih.gov/taxonomy">NCBI taxonomy</a> is specified to <a href="http://metabar:8888/obidoc/obitools/obiconvert/">
+    <abbr title="obiconvert: convert format of a sequence file"><code>obiconvert</code></abbr>
+    </a>, the output of the command will be as follows. You will notice that, this time, the taxa are given in their long form. The scientific name and taxonomic rank are also given.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiconvert -t ncbitaxo.tgz two_sequences.fasta
+</span></span></code></pre></div><pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;AB061527 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Sorex unguiculatus mitochondrial NA, complete genome.&#34;,&#34;family_name&#34;:&#34;Soricidae&#34;,&#34;family_taxid&#34;:&#34;taxon:9376 [Soricidae]@family&#34;,&#34;genus_name&#34;:&#34;Sorex&#34;,&#34;genus_taxid&#34;:&#34;taxon:9379 [Sorex]@genus&#34;,&#34;obicleandb_level&#34;:&#34;family&#34;,&#34;obicleandb_trusted&#34;:2.2137847111025621e-13,&#34;species_name&#34;:&#34;Sorex unguiculatus&#34;,&#34;species_taxid&#34;:&#34;taxon:62275 [Sorex unguiculatus]@species&#34;,&#34;taxid&#34;:&#34;taxon:62275 [Sorex unguiculatus]@species&#34;}
+ttagccctaaacttaggtatttaatctaacaaaaatacccgtcagagaactactagcaat
+agcttaaaactcaaaggacttggcggtgctttatatccct
+&gt;AL355887 {&#34;count&#34;:2,&#34;definition&#34;:&#34;Human chromosome 14 NA sequence BAC R-179O11 of library RPCI-11 from chromosome 14 of Homo sapiens (Human)XXKW HTG.; HTGS_ACTIVFIN.&#34;,&#34;family_name&#34;:&#34;Hominidae&#34;,&#34;family_taxid&#34;:&#34;taxon:9604 [Hominidae]@family&#34;,&#34;genus_name&#34;:&#34;Homo&#34;,&#34;genus_taxid&#34;:&#34;taxon:9605 [Homo]@genus&#34;,&#34;obicleandb_level&#34;:&#34;genus&#34;,&#34;obicleandb_trusted&#34;:0,&#34;species_name&#34;:&#34;Homo sapiens&#34;,&#34;species_taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;}
+ttagccctaaactctagtagttacattaacaaaaccattcgtcagaatactacgagcaac
+agcttaaaactcaaaggacctggcagttctttatatccct
+</code></pre><p>If the check reveals that taxid is not present in the taxonomy, a warning is issued by the <em>OBITools4</em>.
+As example, the <a href="http://metabar:8888/obidoc/obitools/obiconvert/">
+    <abbr title="obiconvert: convert format of a sequence file"><code>obiconvert</code></abbr>
+    </a> command applied to the following file:</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="four_sequences.fasta" download="four_sequences.fasta">📄 four_sequences.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;AY189646 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Homo sapiens clone arCan119 12S ribosomal RNA gene, partial sequence; mitochondrial gene for mitochondrial product.&#34;,&#34;species_name&#34;:&#34;Homo sapiens&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;}
+ttagccctaaacctcaacagttaaatcaacaaaactgctcgccagaacactacgrgccac
+agcttaaaactcaaaggacctggcggtgcttcatatccct
+&gt;AF023201 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Snyderichthys copei 12S ribosomal RNA gene, mitochondrial gene for mitochondrial RNA, complete sequence.&#34;,&#34;species_name&#34;:&#34;Snyderichthys copei&#34;,&#34;taxid&#34;:&#34;67561&#34;}
+tcagccataaacctagatgtccagctacagttagacatccgcccgggtactacgagcatt
+agcttgaaacccaaaggacctgacggtgccttagaccccc
+&gt;JN897380 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Nihonotrypaea thermophila mitochondrion, complete genome.&#34;,&#34;species_name&#34;:&#34;Nihonotrypaea thermophila&#34;,&#34;taxid&#34;:&#34;1114968&#34;}
+tagccttaacaaacatactaaaatattaaaagttatggtctctaaatttaaaggatttgg
+cggtaatttagtccag
+&gt;KC236422 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Nihonotrypaea japonica mitochondrion, complete genome.&#34;,&#34;species_name&#34;:&#34;Nihonotrypaea japonica&#34;,&#34;taxid&#34;:&#34;5799994&#34;}
+cagctttaacaaacatactaaaatattaaaagttatggtctctaaatttaaaggatttgg
+cggtaatttagtccag
+</code></pre></td>
+    
+</DIV>
+
+<p>displays the following warning:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiconvert -t ncbitaxo.tgz four_sequences.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>INFO[0000] Number of workers set 16                     
+INFO[0000] Found 1 files to process                     
+INFO[0000] four_sequences.fasta mime type: text/fasta   
+INFO[0000] On output use JSON headers                   
+INFO[0000] Output is done on stdout                     
+INFO[0000] Data is writen to stdout                     
+INFO[0000] NCBI Taxdump Tar Archive detected: ncbitaxo.tgz 
+INFO[0000] Loading Taxonomy nodes                       
+INFO[0003] 2653519 Taxonomy nodes read                  
+INFO[0003] Loading Taxon names                          
+INFO[0005] 2653519 taxon names read                     
+INFO[0005] Loading Merged taxa                          
+INFO[0005] 88919 merged taxa read                       
+WARN[0005] AF023201: Taxid 67561 has to be updated to taxon:305503 [Lepidomeda copei]@species 
+WARN[0005] JN897380: Taxid 1114968 has to be updated to taxon:2734678 [Neotrypaea thermophila]@species 
+WARN[0005] KC236422: Taxid: 5799994 is unknown from taxonomy (Taxid 5799994 is not part of the taxonomy NCBI Taxonomy) 
+</code></pre><p>Of the four sequences, only the first sequence has a taxid known from the 
+  <a href="https://www.ncbi.nlm.nih.gov/taxonomy">NCBI taxonomy</a>. The other three sequences have taxids that are not part of the 
+  <a href="https://www.ncbi.nlm.nih.gov/taxonomy">NCBI taxonomy</a>. In fact, the second and third sequences have taxids that were known in the 
+  <a href="https://www.ncbi.nlm.nih.gov/taxonomy">NCBI taxonomy</a>, but are now transferred to other taxids. The fourth sequence has a taxid that is actually unknown in the 
+  <a href="https://www.ncbi.nlm.nih.gov/taxonomy">NCBI taxonomy</a>.</p>
+<p>Since only the first sequence <em>AY189646</em> has a known taxid in the output, the taxids are rewritten in long form for this sequence only. For the other three sequences, the taxids are left as they were before. Nevertheless, all four sequences are present in the output.</p>
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;AY189646 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Homo sapiens clone arCan119 12S ribosomal RNA gene, partial sequence; mitochondrial gene for mitochondrial product.&#34;,&#34;species_name&#34;:&#34;Homo sapiens&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;}
+ttagccctaaacctcaacagttaaatcaacaaaactgctcgccagaacactacgrgccac
+agcttaaaactcaaaggacctggcggtgcttcatatccct
+&gt;AF023201 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Snyderichthys copei 12S ribosomal RNA gene, mitochondrial gene for mitochondrial RNA, complete sequence.&#34;,&#34;species_name&#34;:&#34;Snyderichthys copei&#34;,&#34;taxid&#34;:&#34;67561&#34;}
+tcagccataaacctagatgtccagctacagttagacatccgcccgggtactacgagcatt
+agcttgaaacccaaaggacctgacggtgccttagaccccc
+&gt;JN897380 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Nihonotrypaea thermophila mitochondrion, complete genome.&#34;,&#34;species_name&#34;:&#34;Nihonotrypaea thermophila&#34;,&#34;taxid&#34;:&#34;1114968&#34;}
+tagccttaacaaacatactaaaatattaaaagttatggtctctaaatttaaaggatttgg
+cggtaatttagtccag
+&gt;KC236422 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Nihonotrypaea japonica mitochondrion, complete genome.&#34;,&#34;species_name&#34;:&#34;Nihonotrypaea japonica&#34;,&#34;taxid&#34;:&#34;5799994&#34;}
+cagctttaacaaacatactaaaatattaaaagttatggtctctaaatttaaaggatttgg
+cggtaatttagtccag
+</code></pre><p>If the <code>--update-taxid</code> option is used, the <em>OBITools4</em> command will update the taxids of sequences that have been transferred to other taxids. When executed on the same sequence file, the same three warnings appear, but the first two warnings announce that the taxids have been updated.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiconvert -t ncbitaxo.tgz --update-taxid four_sequences.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>WARN[0007] AF023201: Taxid: 67561 is updated to taxon:305503 [Lepidomeda copei]@species 
+WARN[0007] JN897380: Taxid: 1114968 is updated to taxon:2734678 [Neotrypaea thermophila]@species 
+WARN[0007] KC236422: Taxid: 5799994 is unknown from taxonomy (Taxid 5799994 is not part of the taxonomy NCBI Taxonomy) 
+</code></pre><p>In the output, the taxids are rewritten in long format for the first sequence as before, but also for the next two sequences, taking into account their updated taxids.</p>
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;AY189646 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Homo sapiens clone arCan119 12S ribosomal RNA gene, partial sequence; mitochondrial gene for mitochondrial product.&#34;,&#34;species_name&#34;:&#34;Homo sapiens&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;}
+ttagccctaaacctcaacagttaaatcaacaaaactgctcgccagaacactacgrgccac
+agcttaaaactcaaaggacctggcggtgcttcatatccct
+&gt;AF023201 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Snyderichthys copei 12S ribosomal RNA gene, mitochondrial gene for mitochondrial RNA, complete sequence.&#34;,&#34;species_name&#34;:&#34;Snyderichthys copei&#34;,&#34;taxid&#34;:&#34;taxon:305503 [Lepidomeda copei]@species&#34;}
+tcagccataaacctagatgtccagctacagttagacatccgcccgggtactacgagcatt
+agcttgaaacccaaaggacctgacggtgccttagaccccc
+&gt;JN897380 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Nihonotrypaea thermophila mitochondrion, complete genome.&#34;,&#34;species_name&#34;:&#34;Nihonotrypaea thermophila&#34;,&#34;taxid&#34;:&#34;taxon:2734678 [Neotrypaea thermophila]@species&#34;}
+tagccttaacaaacatactaaaatattaaaagttatggtctctaaatttaaaggatttgg
+cggtaatttagtccag
+&gt;KC236422 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Nihonotrypaea japonica mitochondrion, complete genome.&#34;,&#34;species_name&#34;:&#34;Nihonotrypaea japonica&#34;,&#34;taxid&#34;:&#34;5799994&#34;}
+cagctttaacaaacatactaaaatattaaaagttatggtctctaaatttaaaggatttgg
+cggtaatttagtccag
+</code></pre><p>If the <code>--fail-on-taxonomy</code> option is used, the <em>OBITools4</em> command will abort if it encounters a taxid that is not in the 
+  <a href="https://www.ncbi.nlm.nih.gov/taxonomy">NCBI taxonomy</a>. If it is run on the same sequence file, you will see the error message that stops the command when reading the last sequence annotated with a taxid that is not in the 
+  <a href="https://www.ncbi.nlm.nih.gov/taxonomy">NCBI taxonomy</a>. If the <code>--update-taxid</code> option was not used, the command would also have been aborted on the sequence AF023201.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiconvert -t ncbitaxo.tgz --update-taxid --fail-on-taxonomy four_sequences.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>WARN[0007] AF023201: Taxid: 67561 is updated to taxon:305503 [Lepidomeda copei]@species 
+WARN[0007] JN897380: Taxid: 1114968 is updated to taxon:2734678 [Neotrypaea thermophila]@species 
+FATA[0007] KC236422: Taxid: 5799994 is unknown from taxonomy (Taxid 5799994 is not part of the taxonomy NCBI Taxonomy) 
+</code></pre><p>To remove invalid taxids from your file, you can use <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> to keep only sequences with a valid taxid.
+This is the role of the `&ndash;valid-taxid&rsquo; option.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -t ncbitaxo.tgz <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --update-taxid <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        --valid-taxid four_sequences.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>WARN[0006] KC236422: Taxid: 5799994 is unknown from taxonomy (Taxid 5799994 is not part of the taxonomy NCBI Taxonomy) 
+WARN[0006] AF023201: Taxid: 67561 is updated to taxon:305503 [Lepidomeda copei]@species 
+WARN[0006] JN897380: Taxid: 1114968 is updated to taxon:2734678 [Neotrypaea thermophila]@species 
+</code></pre><p>If the same three warnings occur, you will notice that only the first three sequences are preserved in the resulting file.</p>
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;AY189646 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Homo sapiens clone arCan119 12S ribosomal RNA gene, partial sequence; mitochondrial gene for mitochondrial product.&#34;,&#34;species_name&#34;:&#34;Homo sapiens&#34;,&#34;taxid&#34;:&#34;taxon:9606 [Homo sapiens]@species&#34;}
+ttagccctaaacctcaacagttaaatcaacaaaactgctcgccagaacactacgrgccac
+agcttaaaactcaaaggacctggcggtgcttcatatccct
+&gt;AF023201 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Snyderichthys copei 12S ribosomal RNA gene, mitochondrial gene for mitochondrial RNA, complete sequence.&#34;,&#34;species_name&#34;:&#34;Snyderichthys copei&#34;,&#34;taxid&#34;:&#34;taxon:305503 [Lepidomeda copei]@species&#34;}
+tcagccataaacctagatgtccagctacagttagacatccgcccgggtactacgagcatt
+agcttgaaacccaaaggacctgacggtgccttagaccccc
+&gt;JN897380 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Nihonotrypaea thermophila mitochondrion, complete genome.&#34;,&#34;species_name&#34;:&#34;Nihonotrypaea thermophila&#34;,&#34;taxid&#34;:&#34;taxon:2734678 [Neotrypaea thermophila]@species&#34;}
+tagccttaacaaacatactaaaatattaaaagttatggtctctaaatttaaaggatttgg
+cggtaatttagtccag
+</code></pre><h2 id="manipulating-paired-sequence-files-with-obitools4">
+  Manipulating paired sequence files with <em>OBITools4</em>
+  <a class="anchor" href="#manipulating-paired-sequence-files-with-obitools4">#</a>
+</h2>
+<p>Sequencing machines, particularly Illumina machines, produce paired-read data sets.
+The two paired reads correspond to two sequencings of the same DNA molecule from either end. They are commonly referred to as &lsquo;forward reads&rsquo; and &lsquo;reverse reads&rsquo;.</p>
+<p>Today, these paired reads are provided to the biologist in the form of two 
+  <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a>
+files.
+These files assume that the two reads corresponding to the sequencing of the same DNA molecule are in the same position in the two files. If the data manipulations that delete or insert sequences in these files are not performed symmetrically, it is very likely that they will be out of phase, so that the two sequences will no longer be in the same position.</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="forward.fastq" download="forward.fastq">📄 forward.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:14968:1570 1:N:0:CTCACCAA+CTAGGCAA
+TGTTCCACGGGCAATCCTGAGCCAAATCTTTCATTTTGAAAAAATGAGAGATATAATGTATCTCTTATTTATTATAAGAAATAAAATATTTCTTATCTAATATTAAAGTTAGGTGCAGAGACTCAATGGGTGGAACTAGATCGGATGTGCA
++
+11&gt;A&gt;@3@A11&gt;ACFFEG110BFB00BAFGHE2DFGG201110/B11111/D1D2222D2FDFDFGDGHHBGG2F222110D11@1D1FGHFHGFF@GE1F2FG22112B220F1@111/0&gt;BF11B210B&gt;//11B1&lt;1BB&lt;///&lt;1122
+@M01334:147:000000000-LBRVD:1:1101:15946:1586 1:N:0:CTCACCAA+CTAGGCAA
+TCCTAACCCCATTGAGTCTCTGCACCTATCTTTAATATTAGATAAGAAATATTTTATTTCTTATAATAAATAAGAGATATTTTATATCTCTCATTTTTTCAAAATGAAAGATTTGGCTCAGGATTGCCCACGTAACGGAGATCGGAAGAGC
++
+1&gt;&gt;A111&gt;&gt;&gt;AFGGB1FFGFGFF3BBF1GGHHH33D2GH2B1D211110D1DGHHBFGGGGG2FA2F221F21A1F0D1DGHH2FAFFGFHFFGHHHHGG22@1BD111@0FFHE11GC1001BGF1B1B/EF00??////BF////&lt;000
+@M01334:147:000000000-LBRVD:1:1101:15399:1590 1:N:0:CTCACCAA+CTAGGCAA
+TGTTCCACCCATTGAGTCTCTGCACCTATCTTTAATATTAGATAAGAAATATTTTACTTCTTATAATAAATAAGAGTTATTTTATATCTCTCATTTTTTCAAAATGAAAGATTTGGCTCAGGATTGCCCGTGGAACTAGATCGGAAGAGCA
++
+11&gt;A&gt;@3B&gt;&gt;1CF111BBFAG3A3AAF1FFGHHF3FBGH221F211110D1DGHH2BBGBFF2F22D221D211111A2DDGG2F2FFFEGD1FFHHHGFD221B111110BFGD11F@1001BF0@@1/EA//1&gt;F1B1FD/////00&lt;1
+@M01334:147:000000000-LBRVD:1:1101:13773:1687 1:N:0:CTCACCAA+CTAGGCAA
+CTCGGATCACCATTGAGTCTCTGCACCTATCTTTAATATTAGATAAGAAAAAATATTATTTCTTATCTGAAATAAGAAATATTTTATATATTTCTTTTTCTCAAAATGAAAGATTTGGCTCAGGATTGCCCTGATCCGAGGGATAGCACCA
++
+3AAAAAADFFFFGGGGFGGGGGHHHHHHFHHHHHHHHGHHHHGHGGHFFHHHCGFHHHHHHHHHHHHHGHHGGFHFFHHHGHHHHBHHHGHHHHHHHHHHHHHFFHHFBDFBCGHHF4BGHFGFFHHBDGFHHEHHFAAEECEGF3FDGFC
+</code></pre></td>
+    
+</DIV>
+
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="reverse.fastq" download="reverse.fastq">📄 reverse.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@M01334:147:000000000-LBRVD:1:1101:14968:1570 2:N:0:CTCACCAA+CTAGGCAA
+TTTTCCTCCCTTTTTTTCTCTGCACCTTTCTTTTTTATTAGTTTTTTATTATTTTTTTTCTTTTTTTATTTTATTGATACTTTATATCTCTCTTTTTTTCTTTTTTATTGATTTTTCTCTGGTTTTCCCTTGTTACTTGTTCTTTTTTGCT
++
+11&gt;&gt;1131111BB111A0B3B313A0B1BAFGG11E/DG222B22///1D2DDGG1AE&gt;&gt;FG1D1/&gt;/12B221212@21BFD2B2B2B2F11BFGHEEC1111B//1212BBF110@22111@@/2111?01111@111?111111--11
+@M01334:147:000000000-LBRVD:1:1101:15946:1586 2:N:0:CTCACCAA+CTAGGCAA
+CCGTTACGTGGGCAATCCTGAGCCAATTCTTTCTTTTTGAAAAAATGAGAGATATAAAATATCTCTTATTTATTATAAGAAATAAAATATTTCTTATCTAATATTAATGATAGGTGCAGTGACTCTATGGGGTTAGGTAGTTCGGATGAGC
++
+111&gt;&gt;111B111111BA0B1101B001BAGGH22DGGH?01110/B11111/D1D2221D1DBEDGH1GHH2GG2F222110D@111D1DFGEGFBG@GB1B2FG22222B220B11111111B@11B210/?E/00B211B2/////111
+@M01334:147:000000000-LBRVD:1:1101:15399:1590 2:N:0:CTCACCAA+CTAGGCAA
+TTTTCCTCGGGCTATCCTGAGCCAAATCTTTCCTTTTGAAAAATTTAGAGATATAAAATATCTCTTATTTATTTTATGTAGTATTATATTTCTTATCTAATATTAAATTTAGTTGCTTTTTCTCATTTTGTTTTACTTTTTCTTTTTTGCT
++
+11&gt;&gt;1131111111B11B1101A000B1DFF21DDFG1011100B122111D1D2221D1DADAFG1DGH2FG2D212222D2222D2DAF2FG2D@F21B2DE22122B221@11111110B222B222B00021B221B011111//11
+@M01334:147:000000000-LBRVD:1:1101:13773:1687 2:N:0:CTCACCAA+CTAGGCAA
+TGATAGCAGGGCTATCCTGAGCCAAATCCGTGTTTTGAGAAAACAAGGGGGTTCTCGAACTAGAATACAAAAGAAAAGGATAGGTGCAGAGACTCAATGGTGCTATCCCTCGGATCAGGGCAATCCTTAGCCAAATCTTTCATTTTTTGAA
++
+111&gt;13@1111&gt;11B1AF11BABC00B110BAFGGH0000DFAB//0///EEECGFA10AG1111D@@11100/0000/0F110B11@11/0&gt;FC@1B&gt;1B11FEFEC&gt;E&gt;///?&lt;0110/?/FF&lt;G22111@00@&lt;GHHB&gt;FHHH1///1
+</code></pre></td>
+    
+</DIV>
+
+<p>In the two files above, the first sequence of the 
+      
+  <a href="forward.fastq"><code>forward.fastq</code></a> file with the ID <code>M01334:147:000000000-LBRVD:1:1101:14968:1570</code> is paired with the first sequence of the 
+      
+  <a href="reverse.fastq"><code>reverse.fastq</code></a> file with the same ID <code>M01334:147:000000000-LBRVD:1:1101:14968:1570</code>, not because they have the same identifier, but because they are both the first sequence of their respective files.</p>
+<p>Some of the <em>OBITools4</em> commands, such as <a href="http://metabar:8888/obidoc/obitools/obiconvert/">
+    <abbr title="obiconvert: convert format of a sequence file"><code>obiconvert</code></abbr>
+    </a>, <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> or <a href="http://metabar:8888/obidoc/obitools/obiannotate/">
+    <abbr title="obiannotate: edit sequence annotations"><code>obiannotate</code></abbr>
+    </a> offer a <code>--paired-with</code> option. This option takes a filename as a parameter. It tells the <em>OBITools4</em> command that the file given as an argument is paired with the file being processed. Therefore, the <em>OBITools4</em> commands will process both the forward and reverse files in parallel.</p>
+<p>As the <code>--paired-with</code> option allows the <em>OBITools4</em> command to process two files, it also produces two result files. As a result, standard output cannot be used to return the results. Therefore, when using the <code>--paired-with</code> option, the <code>--out</code> option must be used. The <code>--out</code> option takes a filename as a parameter and tells the <em>OBITools4</em> command to write the result to the specified file. As a single filename is given, the <em>OBITools4</em> command modifies this filename by adding a suffix <code>_R1</code> or <code>_R2</code> to create two filenames.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiconvert --paired-with reverse.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>           --out result.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>           --fasta-output <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>           forward.fastq 
+</span></span></code></pre></div><p>This command processes the 
+      
+  <a href="forward.fastq"><code>forward.fastq</code></a> and the 
+      
+  <a href="reverse.fastq"><code>reverse.fastq</code></a> as two paired files. It then converts them into two fasta files named 
+      
+  <a href="result_R1.fasta"><code>result_R1.fasta</code></a> and 
+      
+  <a href="result_R2.fasta"><code>result_R2.fasta</code></a> for the forward and reverse reads respectively.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ls -l *.fast?
+</span></span></code></pre></div><pre tabindex="0"><code>-rw-r--r--@ 1 myself  staff  1504  8 mar 15:09 forward.fastq
+-rw-r-----@ 1 myself  staff   964  8 mar 17:36 result_R1.fasta
+-rw-r-----@ 1 myself  staff   964  8 mar 17:36 result_R2.fasta
+-rw-r--r--@ 1 myself  staff  1504  8 mar 15:09 reverse.fastq
+</code></pre><p>The <code>ls</code> command is used here to see the results of the above <a href="http://metabar:8888/obidoc/obitools/obiconvert/">
+    <abbr title="obiconvert: convert format of a sequence file"><code>obiconvert</code></abbr>
+    </a> command, with the two resulting files and their names built by adding the suffixes <code>_R1</code> or <code>_R2</code> at the end of the filename just before the extension.</p>
+<!--  --></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#general-operating-principles-for-obitools">General operating principles for <em>OBITools</em></a>
+      <ul>
+        <li><a href="#specifying-the-input-data">Specifying the input data</a></li>
+        <li><a href="#specifying-what-to-do-with-the-output">Specifying what to do with the output</a></li>
+        <li><a href="#combining-obitools-commands-using-pipes">Combining <em>OBITools</em> commands using pipes</a></li>
+        <li><a href="#the-tagging-system-of-obitools">The tagging system of <em>OBITools</em></a>
+          <ul>
+            <li><a href="#the-key-names">The key names</a></li>
+            <li><a href="#the-tag-values">The tag values</a></li>
+          </ul>
+        </li>
+        <li><a href="#obitools4-and-the-taxonomic-information"><em>OBITools4</em> and the taxonomic information</a></li>
+        <li><a href="#manipulating-paired-sequence-files-with-obitools4">Manipulating paired sequence files with <em>OBITools4</em></a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

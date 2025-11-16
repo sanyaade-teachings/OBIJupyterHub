@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
+  The CSV format to describe a taxonomy
+  #
+
+OBITools4 allow to describe a taxonomy with a CSV file of four columns that must be named as below:
+
+  
+      
+          Field
+          Description
+      
+  
+  
+      
+          taxid
+          A unique taxonomic identifier composed only of digits (0-9) lower case (a-z) and upper case (A-Z) characters
+      
+      
+          parent
+          The taxid of the parent taxon of the current taxon
+      
+      
+          scientific_name
+          The name used by the OBITools as the scientific name of the taxon
+      
+      
+          taxonomic_rank
+          The taxonomic rank of the taxon (e.g. species, genus, family, etc.)
+      
+  
+
+The four columns can be freely ordered.">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://metabar:8888/obidoc/docs/file_format/taxonomy_file/csv_taxdump/">
+  <meta property="og:site_name" content="OBITools4 documentation">
+  <meta property="og:title" content="CSV formatted taxdump">
+  <meta property="og:description" content="The CSV format to describe a taxonomy # OBITools4 allow to describe a taxonomy with a CSV file of four columns that must be named as below:
+Field Description taxid A unique taxonomic identifier composed only of digits (0-9) lower case (a-z) and upper case (A-Z) characters parent The taxid of the parent taxon of the current taxon scientific_name The name used by the OBITools as the scientific name of the taxon taxonomic_rank The taxonomic rank of the taxon (e.g. species, genus, family, etc.) The four columns can be freely ordered.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+<title>CSV formatted taxdump | OBITools4 documentation</title>
+<link rel="icon" href="/obidoc/favicon.png" >
+<link rel="manifest" href="/obidoc/manifest.json">
+<link rel="canonical" href="http://metabar:8888/obidoc/docs/file_format/taxonomy_file/csv_taxdump/">
+<link rel="stylesheet" href="/obidoc/book.min.5fd7b8e2d1c0ae15da279c52ff32731130386f71b58f011468f20d0056fe6b78.css" integrity="sha256-X9e44tHArhXaJ5xS/zJzETA4b3G1jwEUaPINAFb&#43;a3g=" crossorigin="anonymous">
+  <script defer src="/obidoc/fuse.min.js"></script>
+  <script defer src="/obidoc/en.search.min.4da51bdd2d833922fdbc0e19df517221387fc625ffb68ee140d605b3c5b68058.js" integrity="sha256-TaUb3S2DOSL9vA4Z31FyITh/xiX/to7hQNYFs8W2gFg=" crossorigin="anonymous"></script>
+
+  <script defer src="/obidoc/sw.min.32af8eafce4180aa1c5dea66d99fb26ba9043ea7c7a4c706138c91d9051b285e.js" integrity="sha256-Mq&#43;Or85BgKocXepm2Z&#43;ya6kEPqfHpMcGE4yR2QUbKF4=" crossorigin="anonymous"></script>
+<link rel="alternate" type="application/rss+xml" href="http://metabar:8888/obidoc/docs/file_format/taxonomy_file/csv_taxdump/index.xml" title="OBITools4 documentation" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  <link rel="stylesheet" type="text/css" href="http://metabar:8888/obidoc/hugo-cite.css" />
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/obidoc/"><img src="/obidoc/obitools_logo.jpg" alt="Logo" class="book-icon" /><span>OBITools4 documentation</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Docs</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/about/" class="">About</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/installation/" class="">Installation</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/principles/" class="">General operating principles</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-08756b4c1f14be6ee584ece005b9f621" class="toggle" checked />
+    <label for="section-08756b4c1f14be6ee584ece005b9f621" class="flex justify-between">
+      <a role="button" class="">File formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-933c2e64b905b84e22aa5273cea2d0bd" class="toggle"  />
+    <label for="section-933c2e64b905b84e22aa5273cea2d0bd" class="flex justify-between">
+      <a role="button" class="">Sequence file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fasta/" class="">FASTA file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fastq/" class="">FASTQ file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/genbank/" class="">GenBank Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/embl/" class="">EMBL Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/csv/" class="">CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/json/" class="">JSON format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/annotations/" class="">Annotation of sequences</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-0258ae1c222f9a38cc1b75254c93b0f4" class="toggle" checked />
+    <label for="section-0258ae1c222f9a38cc1b75254c93b0f4" class="flex justify-between">
+      <a role="button" class="">Taxonomy file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/csv_taxdump/" class="active">CSV formatted taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/ncbi_taxdump/" class="">NCBI taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/csv/" class="">The CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-70b1e6e5ec7f3ccab643155fa50659b6" class="toggle"  />
+    <label for="section-70b1e6e5ec7f3ccab643155fa50659b6" class="flex justify-between">
+      <a role="button" class="">Patterns</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/regular/" class="">Regular Expressions</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/dnagrep/" class="">DNA Patterns</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8223f464911a1fe6c655972143684e93" class="toggle"  />
+    <label for="section-8223f464911a1fe6c655972143684e93" class="flex justify-between">
+      <a role="button" class="">The OBITools4 commands</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/options/" class="">Shared command options</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8921ea65523c266b128dd4263232b0fc" class="toggle"  />
+    <label for="section-8921ea65523c266b128dd4263232b0fc" class="flex justify-between">
+      <a role="button" class="">Basics</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiannotate/" class="">obiannotate</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicomplement/" class="">obicomplement</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconvert/" class="">obiconvert</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicount/" class="">obicount</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicsv/" class="">obicsv</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidemerge/" class="">obidemerge</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidistribute/" class="">obidistribute</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obigrep/" class="">obigrep</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obijoin/" class="">obijoin</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimatrix/" class="">obimatrix</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisplit/" class="">obisplit</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisummary/" class="">obisummary</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiuniq/" class="">obiuniq</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-dbdf1bb5377572439394e60e08c30f50" class="toggle"  />
+    <label for="section-dbdf1bb5377572439394e60e08c30f50" class="flex justify-between">
+      <a role="button" class="">Demultiplexing samples</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimultiplex/" class="">obimultiplex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitagpcr/" class="">obitagpcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-aa98fedd067b51150db59691a8ea8edd" class="toggle"  />
+    <label for="section-aa98fedd067b51150db59691a8ea8edd" class="flex justify-between">
+      <a role="button" class="">Sequence alignments</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiclean/" class="">obiclean</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7433746525d8c2b29b033f765c869acd" class="toggle"  />
+    <label for="section-7433746525d8c2b29b033f765c869acd" class="flex justify-between">
+      <a href="/obidoc/obitools/obipairing/" class="">obipairing</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/fasta-like/" class="">The FASTA-like alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/exact-alignment/" class="">Exact alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obipcr/" class="">obipcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obirefidx/" class="">obirefidx</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitag/" class="">obitag</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-5746f699d10490780dec8e30ab2dd3ce" class="toggle"  />
+    <label for="section-5746f699d10490780dec8e30ab2dd3ce" class="flex justify-between">
+      <a role="button" class="">Taxonomy</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitaxonomy/" class="">obitaxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-3f50c4fe7ab436a56ae92897d5444956" class="toggle"  />
+    <label for="section-3f50c4fe7ab436a56ae92897d5444956" class="flex justify-between">
+      <a role="button" class="">Advanced tools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiscript/" class="">obiscript</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-549be3934679fcb82a232f6bd5435563" class="toggle"  />
+    <label for="section-549be3934679fcb82a232f6bd5435563" class="flex justify-between">
+      <a role="button" class="">Others</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimicrosat/" class="">obimicrosat</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-ceca4455173761e30cbc0a6dc2327167" class="toggle"  />
+    <label for="section-ceca4455173761e30cbc0a6dc2327167" class="flex justify-between">
+      <a role="button" class="">Experimentals</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicleandb/" class="">obicleandb</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconsensus/" class="">obiconsensus</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obilandmark/" class="">obilandmark</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/tags/" class="">Glossary of tags</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9b1bcd52530c59dc4819b1f61c128f54" class="toggle"  />
+    <label for="section-9b1bcd52530c59dc4819b1f61c128f54" class="flex justify-between">
+      <a role="button" class="">Cookbook</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/illumina/" class="">Analysing an Illumina data set</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/ecoprimers/" class="">Designing new barcodes</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/local_genbank/" class="">Prepare a local copy of Genbank</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/reference_db/" class="">Build a reference database</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/minion/" class="">Oxford Nanopore data analysis</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Programming OBITools</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/expression/" class="">Expression language</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-6d580829a667b5cca790b286d99a10fe" class="toggle"  />
+    <label for="section-6d580829a667b5cca790b286d99a10fe" class="flex justify-between">
+      <a href="/obidoc/docs/programming/lua/" class="">Lua: for scripting OBITools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-2fb081dac812d624eea5f4268fca9e26" class="toggle"  />
+    <label for="section-2fb081dac812d624eea5f4268fca9e26" class="flex justify-between">
+      <a role="button" class="">Obitools Classes</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequence/" class="">BioSequence</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequenceslice/" class="">BioSequenceSlice</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxonomy/" class="">Taxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxon/" class="">Taxon</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/mutex/" class="">Mutex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/obidoc/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>CSV formatted taxdump</h3>
+
+  <label for="toc-control">
+    
+    <img src="/obidoc/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-csv-format-to-describe-a-taxonomy">The <em>CSV</em> format to describe a taxonomy</a>
+      <ul>
+        <li><a href="#example-of-a-taxonomy-formatted-in-csv">Example of a taxonomy formatted in CSV</a></li>
+        <li><a href="#generating-a-csv-taxonomy-file-from-a-larger-taxonomy">Generating a CSV taxonomy file from a larger taxonomy</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="the-csv-format-to-describe-a-taxonomy">
+  The <em>CSV</em> format to describe a taxonomy
+  <a class="anchor" href="#the-csv-format-to-describe-a-taxonomy">#</a>
+</h1>
+<p><em>OBITools4</em> allow to describe a taxonomy with a CSV file of four columns that must be named as below:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Field</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>taxid</code></td>
+          <td>A unique taxonomic identifier composed only of digits (0-9) lower case (a-z) and upper case (A-Z) characters</td>
+      </tr>
+      <tr>
+          <td><code>parent</code></td>
+          <td>The taxid of the parent taxon of the current taxon</td>
+      </tr>
+      <tr>
+          <td><code>scientific_name</code></td>
+          <td>The name used by the <em>OBITools</em> as the scientific name of the taxon</td>
+      </tr>
+      <tr>
+          <td><code>taxonomic_rank</code></td>
+          <td>The taxonomic rank of the taxon (<em>e.g.</em> species, genus, family, etc.)</td>
+      </tr>
+  </tbody>
+</table>
+<p>The four columns can be freely ordered.</p>
+<p>Some constraints exist on the order of the rows describing the taxa in the CSV file. The first row must contain the taxid of the root taxon (<em>i.e.</em> the taxid of the first taxon in the taxonomic hierarchy). The taxid of the parent taxon of the root taxon must be the same as the taxid of the root taxon. For the following taxa, the parent taxon must precede the declaration of a taxon using it as parent.</p>
+<h2 id="example-of-a-taxonomy-formatted-in-csv">
+  Example of a taxonomy formatted in CSV
+  <a class="anchor" href="#example-of-a-taxonomy-formatted-in-csv">#</a>
+</h2>
+<p>Following this format, here a four-taxa example with the root taxon, the <em>Betula</em> genus and two species <em>Betula nana</em> and <em>Betula pubescence</em>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-CSV" data-lang="CSV"><span style="display:flex;"><span><span style="color:#e6db74">taxid</span>,<span style="color:#e6db74">parents</span>,<span style="color:#e6db74">scientific_name</span>,<span style="color:#e6db74">taxonomic_rank</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">1</span>,<span style="color:#e6db74">1</span>,<span style="color:#e6db74">root</span>,<span style="color:#e6db74">root</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">2ABC</span>,<span style="color:#e6db74">1</span>,<span style="color:#e6db74">Betula</span>,<span style="color:#e6db74">genus</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">3</span>,<span style="color:#e6db74">2ABC</span>,<span style="color:#e6db74">Betula nana</span>,<span style="color:#e6db74">species</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">4</span>,<span style="color:#e6db74">2ABC</span>,<span style="color:#e6db74">Betula pubescens</span>,<span style="color:#e6db74">species</span>
+</span></span></code></pre></div><p>The corresponding taxonomic hierarchy is displayed below:</p>
+
+
+<script src="/obidoc/mermaid.min.js"></script>
+
+  <script>mermaid.initialize({
+  "flowchart": {
+    "useMaxWidth":true
+  },
+  "theme": "default"
+}
+)</script>
+
+
+
+
+<pre class="mermaid workflow">
+graph RL
+    1[/"root (1)"\]
+    2ABC["Betula (2ABC)"]
+    3["Betula nana (3)"]
+    4["Betula pubescence (4)"]
+    
+    2ABC --> 1
+    3 --> 2ABC
+    4 --> 2ABC 
+
+    classDef root fill:#fff,stroke:#333,stroke-width:2px
+    classDef genus fill:#bbf,stroke:#333,stroke-width:1px
+    classDef species fill:#dfd,stroke:#333,stroke-width:1px
+    
+    class 1 root
+    class 2ABC genus
+    class 3,4 species
+</pre>
+
+<p>That simple format allows to convert easily with a small UNIX script any available taxonomic hierarchy into a format useable by <em>OBITools4</em>.</p>
+<h2 id="generating-a-csv-taxonomy-file-from-a-larger-taxonomy">
+  Generating a CSV taxonomy file from a larger taxonomy
+  <a class="anchor" href="#generating-a-csv-taxonomy-file-from-a-larger-taxonomy">#</a>
+</h2>
+<p>The <a href="http://metabar:8888/obidoc/obitools/obitaxonomy/">
+    <abbr title="obitaxonomy: manage and search in the taxonomic database"><code>obitaxonomy</code></abbr>
+    </a> command can be used to generate a CSV file from another taxonomy format. The main aim of this command functionality is to extract a subtaxonomy corresponding to a clade from a largest taxonomy.</p>
+<p>If it was not already done, a copy of the NCBI taxonomy can be downloaded and saved into the <code>ncbitaxo.tgz</code> file.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obitaxonomy --download-ncbi --out ncbitaxo.tgz
+</span></span></code></pre></div><p><a href="http://metabar:8888/obidoc/obitools/obitaxonomy/">
+    <abbr title="obitaxonomy: manage and search in the taxonomic database"><code>obitaxonomy</code></abbr>
+    </a> is used to identify the taxid of the taxon of interest, here the genus <em>Betula</em>.</p>
+<ul>
+<li>The <strong>-t</strong> option allows for specifying the file containing the taxonomy</li>
+<li>The <strong>&ndash;rank</strong> option allows for restricting the search to the taxa with the <strong>genus</strong> taxonomic rank</li>
+<li>The <strong>&ndash;fixed</strong> option indicates to look for an exact match with the taxon name</li>
+<li><code>Betula</code> is the pattern used to match the taxon name.</li>
+</ul>
+<p>The result of the following <a href="http://metabar:8888/obidoc/obitools/obitaxonomy/">
+    <abbr title="obitaxonomy: manage and search in the taxonomic database"><code>obitaxonomy</code></abbr>
+    </a> command is 
+  <a href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">CSV</a>
+formatted, and the piped result can be displayed as a nice table with the <code>csvlook</code> command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obitaxonomy -t ncbitaxo.tgz <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>            --rank genus <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>            --fixed Betula <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| taxid                     | parent                         | taxonomic_rank | scientific_name |
+| ------------------------- | ------------------------------ | -------------- | --------------- |
+| taxon:3504 [Betula]@genus | taxon:3514 [Betulaceae]@family | genus          | Betula          |
+</code></pre><p>A single taxon meets all the specified criteria. It has the taxid <code>3504</code> or <code>taxon:3504</code> if we include the taxonomy code.</p>
+<p>It is now possible to request <a href="http://metabar:8888/obidoc/obitools/obitaxonomy/">
+    <abbr title="obitaxonomy: manage and search in the taxonomic database"><code>obitaxonomy</code></abbr>
+    </a> for dumping the sub taxonomy corresponding to the <code>taxon:3504</code> taxon. The result is saved by redirecting the <strong>stdout</strong> to the file  <a href="betula_subtaxo.csv" download="betula_subtaxo.csv"><code>betula_subtaxo.csv</code></a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obitaxonomy -t ncbitaxo.tgz <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>            --dump taxon:3504 &gt; betula_subtaxo.csv
+</span></span></code></pre></div><p>As usual with <a href="http://metabar:8888/obidoc/obitools/obitaxonomy/">
+    <abbr title="obitaxonomy: manage and search in the taxonomic database"><code>obitaxonomy</code></abbr>
+    </a> the result is 
+  <a href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">CSV</a>
+formatted. That allows for using the <code>csvtk dim</code> UNIX command from 
+  <a href="https://github.com/shenwei356/csvtk">csvtk program</a> to display the number of columns (four as expected) and of rows, here <em>131</em> taxa. Once again <code>csvlook</code> is used to  print out the result in the form of a nice ASCII table:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>csvtk dim betula_subtaxo.csv <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| file               | num_cols | num_rows |
+| ------------------ | -------- | -------- |
+| betula_subtaxo.csv |        4 |      131 |
+</code></pre><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>head -30 betula_subtaxo.csv <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| taxid                                         | parent                                    | taxonomic_rank | scientific_name       |
+| --------------------------------------------- | ----------------------------------------- | -------------- | --------------------- |
+| taxon:1 [root]@no rank                        | taxon:1 [root]@no rank                    | no rank        | root                  |
+| taxon:131567 [cellular organisms]@no rank     | taxon:1 [root]@no rank                    | no rank        | cellular organisms    |
+| taxon:2759 [Eukaryota]@superkingdom           | taxon:131567 [cellular organisms]@no rank | superkingdom   | Eukaryota             |
+| taxon:33090 [Viridiplantae]@kingdom           | taxon:2759 [Eukaryota]@superkingdom       | kingdom        | Viridiplantae         |
+| taxon:35493 [Streptophyta]@phylum             | taxon:33090 [Viridiplantae]@kingdom       | phylum         | Streptophyta          |
+| taxon:131221 [Streptophytina]@subphylum       | taxon:35493 [Streptophyta]@phylum         | subphylum      | Streptophytina        |
+| taxon:3193 [Embryophyta]@clade                | taxon:131221 [Streptophytina]@subphylum   | clade          | Embryophyta           |
+| taxon:58023 [Tracheophyta]@clade              | taxon:3193 [Embryophyta]@clade            | clade          | Tracheophyta          |
+| taxon:78536 [Euphyllophyta]@clade             | taxon:58023 [Tracheophyta]@clade          | clade          | Euphyllophyta         |
+| taxon:58024 [Spermatophyta]@clade             | taxon:78536 [Euphyllophyta]@clade         | clade          | Spermatophyta         |
+| taxon:3398 [Magnoliopsida]@class              | taxon:58024 [Spermatophyta]@clade         | class          | Magnoliopsida         |
+| taxon:1437183 [Mesangiospermae]@clade         | taxon:3398 [Magnoliopsida]@class          | clade          | Mesangiospermae       |
+| taxon:71240 [eudicotyledons]@clade            | taxon:1437183 [Mesangiospermae]@clade     | clade          | eudicotyledons        |
+| taxon:91827 [Gunneridae]@clade                | taxon:71240 [eudicotyledons]@clade        | clade          | Gunneridae            |
+| taxon:1437201 [Pentapetalae]@clade            | taxon:91827 [Gunneridae]@clade            | clade          | Pentapetalae          |
+| taxon:71275 [rosids]@clade                    | taxon:1437201 [Pentapetalae]@clade        | clade          | rosids                |
+| taxon:91835 [fabids]@clade                    | taxon:71275 [rosids]@clade                | clade          | fabids                |
+| taxon:3502 [Fagales]@order                    | taxon:91835 [fabids]@clade                | order          | Fagales               |
+| taxon:3514 [Betulaceae]@family                | taxon:3502 [Fagales]@order                | family         | Betulaceae            |
+| taxon:3504 [Betula]@genus                     | taxon:3514 [Betulaceae]@family            | genus          | Betula                |
+| taxon:361421 [Betula middendorffii]@species   | taxon:3504 [Betula]@genus                 | species        | Betula middendorffii  |
+| taxon:1603696 [Betula austrosinensis]@species | taxon:3504 [Betula]@genus                 | species        | Betula austrosinensis |
+| taxon:216993 [Betula fruticosa]@species       | taxon:3504 [Betula]@genus                 | species        | Betula fruticosa      |
+| taxon:361422 [Betula ovalifolia]@species      | taxon:3504 [Betula]@genus                 | species        | Betula ovalifolia     |
+| taxon:253223 [Betula uber]@species            | taxon:3504 [Betula]@genus                 | species        | Betula uber           |
+| taxon:1685986 [Betula megrelica]@species      | taxon:3504 [Betula]@genus                 | species        | Betula megrelica      |
+| taxon:1685997 [Betula tianschanica]@species   | taxon:3504 [Betula]@genus                 | species        | Betula tianschanica   |
+| taxon:312792 [Betula raddeana]@species        | taxon:3504 [Betula]@genus                 | species        | Betula raddeana       |
+| taxon:1685980 [Betula bomiensis]@species      | taxon:3504 [Betula]@genus                 | species        | Betula bomiensis      |
+</code></pre><p>From <strong>taxon:1</strong> (the root taxon) to <strong>taxon:3504</strong> (the taxon of interest <em>Betula</em>), the command <a href="http://metabar:8888/obidoc/obitools/obitaxonomy/">
+    <abbr title="obitaxonomy: manage and search in the taxonomic database"><code>obitaxonomy</code></abbr>
+    </a> has dumped the taxonomic path classifying the <em>Betula</em> genus. The following taxa correspond to the species belonging to the <em>Betula</em> genus.</p>
+<p>This new taxonomy saved as a CSV file <a href="betula_subtaxo.csv" download="betula_subtaxo.csv"><code>betula_subtaxo.csv</code></a> can be used by any <em>OBITools</em> as a taxonomy.
+For example, <a href="http://metabar:8888/obidoc/obitools/obitaxonomy/">
+    <abbr title="obitaxonomy: manage and search in the taxonomic database"><code>obitaxonomy</code></abbr>
+    </a> can use it to identify the taxid of <em>Betula megrelica</em>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obitaxonomy -t betula_subtaxo.csv <span style="color:#e6db74">&#34;Betula megrelica&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| taxid                                    | parent                    | taxonomic_rank | scientific_name  |
+| ---------------------------------------- | ------------------------- | -------------- | ---------------- |
+| taxon:1685986 [Betula megrelica]@species | taxon:3504 [Betula]@genus | species        | Betula megrelica |
+</code></pre><p>or to just dump the subtree of the <em>Betula nana</em> species:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obitaxonomy -t betula_subtaxo.csv <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>            --dump taxon:216990 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| taxid                                                   | parent                                    | taxonomic_rank | scientific_name              |
+| ------------------------------------------------------- | ----------------------------------------- | -------------- | ---------------------------- |
+| taxon:1 [root]@no rank                                  | taxon:1 [root]@no rank                    | no rank        | root                         |
+| taxon:131567 [cellular organisms]@no rank               | taxon:1 [root]@no rank                    | no rank        | cellular organisms           |
+| taxon:2759 [Eukaryota]@superkingdom                     | taxon:131567 [cellular organisms]@no rank | superkingdom   | Eukaryota                    |
+| taxon:33090 [Viridiplantae]@kingdom                     | taxon:2759 [Eukaryota]@superkingdom       | kingdom        | Viridiplantae                |
+| taxon:35493 [Streptophyta]@phylum                       | taxon:33090 [Viridiplantae]@kingdom       | phylum         | Streptophyta                 |
+| taxon:131221 [Streptophytina]@subphylum                 | taxon:35493 [Streptophyta]@phylum         | subphylum      | Streptophytina               |
+| taxon:3193 [Embryophyta]@clade                          | taxon:131221 [Streptophytina]@subphylum   | clade          | Embryophyta                  |
+| taxon:58023 [Tracheophyta]@clade                        | taxon:3193 [Embryophyta]@clade            | clade          | Tracheophyta                 |
+| taxon:78536 [Euphyllophyta]@clade                       | taxon:58023 [Tracheophyta]@clade          | clade          | Euphyllophyta                |
+| taxon:58024 [Spermatophyta]@clade                       | taxon:78536 [Euphyllophyta]@clade         | clade          | Spermatophyta                |
+| taxon:3398 [Magnoliopsida]@class                        | taxon:58024 [Spermatophyta]@clade         | class          | Magnoliopsida                |
+| taxon:1437183 [Mesangiospermae]@clade                   | taxon:3398 [Magnoliopsida]@class          | clade          | Mesangiospermae              |
+| taxon:71240 [eudicotyledons]@clade                      | taxon:1437183 [Mesangiospermae]@clade     | clade          | eudicotyledons               |
+| taxon:91827 [Gunneridae]@clade                          | taxon:71240 [eudicotyledons]@clade        | clade          | Gunneridae                   |
+| taxon:1437201 [Pentapetalae]@clade                      | taxon:91827 [Gunneridae]@clade            | clade          | Pentapetalae                 |
+| taxon:71275 [rosids]@clade                              | taxon:1437201 [Pentapetalae]@clade        | clade          | rosids                       |
+| taxon:91835 [fabids]@clade                              | taxon:71275 [rosids]@clade                | clade          | fabids                       |
+| taxon:3502 [Fagales]@order                              | taxon:91835 [fabids]@clade                | order          | Fagales                      |
+| taxon:3514 [Betulaceae]@family                          | taxon:3502 [Fagales]@order                | family         | Betulaceae                   |
+| taxon:3504 [Betula]@genus                               | taxon:3514 [Betulaceae]@family            | genus          | Betula                       |
+| taxon:216990 [Betula nana]@species                      | taxon:3504 [Betula]@genus                 | species        | Betula nana                  |
+| taxon:2820156 [Betula nana subsp. tundrarum]@subspecies | taxon:216990 [Betula nana]@species        | subspecies     | Betula nana subsp. tundrarum |
+| taxon:717482 [Betula nana subsp. exilis]@subspecies     | taxon:216990 [Betula nana]@species        | subspecies     | Betula nana subsp. exilis    |
+| taxon:3080005 [Betula nana var. macrophylla]@varietas   | taxon:216990 [Betula nana]@species        | varietas       | Betula nana var. macrophylla |
+| taxon:1623466 [Betula nana subsp. nana]@subspecies      | taxon:216990 [Betula nana]@species        | subspecies     | Betula nana subsp. nana      |
+</code></pre><p>Using an appropriate sub-taxonomy can significantly reduce the time needed for an <em>OBITools</em> to read the taxonomy, compared with the time needed to read the entire taxonomy.</p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-csv-format-to-describe-a-taxonomy">The <em>CSV</em> format to describe a taxonomy</a>
+      <ul>
+        <li><a href="#example-of-a-taxonomy-formatted-in-csv">Example of a taxonomy formatted in CSV</a></li>
+        <li><a href="#generating-a-csv-taxonomy-file-from-a-larger-taxonomy">Generating a CSV taxonomy file from a larger taxonomy</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

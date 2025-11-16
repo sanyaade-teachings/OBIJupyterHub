@@ -10,6 +10,7 @@ format:
     scrollable: true
     theme: beige 
     html-math-method: mathjax
+    embed-resources: true
 editor: visual
 ---
 
@@ -347,9 +348,9 @@ knitr::include_graphics("figures/diversity.svg")
 -   $\beta\text{-diversity}$ : $\beta = \frac{\gamma}{\alpha}$ ($sites/region$)
 :::
 
-# $\alpha$-diversity
+# alpha-diversity
 
-## Which is th most diverse environment ? {.flexbox .vcenter}
+## Which is the most diverse environment ? {.flexbox .vcenter}
 
 ```{r out.width = "400px"}
 knitr::include_graphics("figures/alpha_diversity.svg")

@@ -156,7 +156,7 @@ def main() -> None:
     generated = 0
     for directory, pdf_files in iter_pdf_directories(PAGES_DIR):
         html_content = build_gallery_html(directory, pdf_files)
-        output_path = directory / "document.html"
+        output_path = directory / "documents.html"
         output_path.write_text(html_content, encoding="utf-8")
         rel_out = output_path.relative_to(PAGES_DIR)
         print(f"✅ {rel_out} ({len(pdf_files)} PDF)")

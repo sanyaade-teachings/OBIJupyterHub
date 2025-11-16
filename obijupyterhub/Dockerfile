@@ -61,12 +61,13 @@ RUN gem install youplot
 RUN mkdir -p /home/${NB_USER}/.local/share/jupyter && \
     chown -R ${NB_UID}:${NB_GID} /home/${NB_USER} 
 
-COPY start-notebook.sh /usr/local/bin/start-notebook.sh
-RUN chmod +x /usr/local/bin/start-notebook.sh
 
 # Copier uniquement le binaire csvlens du builder
 COPY --from=rust-builder /home/jovyan/.cargo/bin/csvlens /usr/local/bin/
 COPY --from=rust-builder /usr/local/bin/* /usr/local/bin/
+
+COPY start-notebook.sh /usr/local/bin/start-notebook.sh
+RUN chmod +x /usr/local/bin/start-notebook.sh
 
 # Switch back to Jupyter user
 USER ${NB_UID}:${NB_GID}

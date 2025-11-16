@@ -1,0 +1,2812 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
+  The wolf diet tutorial
+  #
+
+Here is a short tutorial for analyzing metabarcoding data, on an Illumina dataset from a wolf diet study, using the OBITools 4 and basic unix commands.
+It presents the following analysis steps:
+
+Pairing (i.e. partial alignment) of forward and reverse reads
+Exclusion of unpaired reads
+Reads demultiplexing (i.e. assignment to their original sample)
+Reads dereplication
+Dataset denoising
+Sequence taxonomic assignment
+Exporting the results in a tabular format
+
+
+  The dataset to analyze and the reference database
+  #
+
+The dataset used in this tutorial corresponds to data obtained from the analysis of four wolf scats
+using the protocol published in 
+
+
+
+
+
+
+
+(
+
+          Citation: Shehzad,&#32;Riaz
+                  &amp; al.,&#32;2012 
+
+
+
+
+
+
+
+
+
+
+Shehzad,&#32;
+    
+    W.,&#32;
+  Riaz,&#32;
+    
+    T.,&#32;
+  Nawaz,&#32;
+    
+    M.,&#32;
+  Miquel,&#32;
+    
+    C.,&#32;
+  Poillot,&#32;
+    
+    C.,&#32;
+  Shah,&#32;
+    
+    S.,&#32;
+  Pompanon,&#32;
+    
+    F.,&#32;
+  Coissac,&#32;
+    
+    E.&#32;&amp;&#32;Taberlet,&#32;
+    
+    P.
+  &#32;
+    (2012).
+  &#32;Carnivore diet analysis based on next-generation sequencing: application to the leopard cat (Prionailurus bengalensis) in Pakistan: LEOPARD CAT DIET.
+    Molecular ecology,&#32;21(8).&#32;1951–1965.
+  https://doi.org/10.1111/j.1365-294X.2011.05424.x
+
+
+
+
+)
+ for carnivore diet assessment.
+After extraction of DNA from feces, DNA amplification was performed using the Vert01
+primers (TTAGATACCCCACTATGC and TAGAACAGGCTCCTCTAG amplifying the 12S-V5
+region 
+
+
+
+
+
+
+
+(
+
+          Citation: Riaz,&#32;Shehzad
+                  &amp; al.,&#32;2011 
+
+
+
+
+
+
+
+
+
+
+Riaz,&#32;
+    
+    T.,&#32;
+  Shehzad,&#32;
+    
+    W.,&#32;
+  Viari,&#32;
+    
+    A.,&#32;
+  Pompanon,&#32;
+    
+    F.,&#32;
+  Taberlet,&#32;
+    
+    P.&#32;&amp;&#32;Coissac,&#32;
+    
+    E.
+  &#32;
+    (2011).
+  &#32;ecoPrimers: inference of new DNA barcode markers from whole genome sequence analysis.
+    Nucleic acids research,&#32;39(21).&#32;e145.
+  https://doi.org/10.1093/nar/gkr732
+
+
+
+
+)
+), together with a wolf blocking oligonucleotide.">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://metabar:8888/obidoc/docs/cookbook/illumina/">
+  <meta property="og:site_name" content="OBITools4 documentation">
+  <meta property="og:title" content="Analysing an Illumina data set">
+  <meta property="og:description" content="The wolf diet tutorial # Here is a short tutorial for analyzing metabarcoding data, on an Illumina dataset from a wolf diet study, using the OBITools 4 and basic unix commands. It presents the following analysis steps:
+Pairing (i.e. partial alignment) of forward and reverse reads Exclusion of unpaired reads Reads demultiplexing (i.e. assignment to their original sample) Reads dereplication Dataset denoising Sequence taxonomic assignment Exporting the results in a tabular format The dataset to analyze and the reference database # The dataset used in this tutorial corresponds to data obtained from the analysis of four wolf scats using the protocol published in ( Citation: Shehzad, Riaz &amp; al., 2012 Shehzad,  W.,  Riaz,  T.,  Nawaz,  M.,  Miquel,  C.,  Poillot,  C.,  Shah,  S.,  Pompanon,  F.,  Coissac,  E. &amp; Taberlet,  P.   (2012).  Carnivore diet analysis based on next-generation sequencing: application to the leopard cat (Prionailurus bengalensis) in Pakistan: LEOPARD CAT DIET. Molecular ecology, 21(8). 1951–1965. https://doi.org/10.1111/j.1365-294X.2011.05424.x ) for carnivore diet assessment. After extraction of DNA from feces, DNA amplification was performed using the Vert01 primers (TTAGATACCCCACTATGC and TAGAACAGGCTCCTCTAG amplifying the 12S-V5 region ( Citation: Riaz, Shehzad &amp; al., 2011 Riaz,  T.,  Shehzad,  W.,  Viari,  A.,  Pompanon,  F.,  Taberlet,  P. &amp; Coissac,  E.   (2011).  ecoPrimers: inference of new DNA barcode markers from whole genome sequence analysis. Nucleic acids research, 39(21). e145. https://doi.org/10.1093/nar/gkr732 ) ), together with a wolf blocking oligonucleotide.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+<title>Analysing an Illumina data set | OBITools4 documentation</title>
+<link rel="icon" href="/obidoc/favicon.png" >
+<link rel="manifest" href="/obidoc/manifest.json">
+<link rel="canonical" href="http://metabar:8888/obidoc/docs/cookbook/illumina/">
+<link rel="stylesheet" href="/obidoc/book.min.5fd7b8e2d1c0ae15da279c52ff32731130386f71b58f011468f20d0056fe6b78.css" integrity="sha256-X9e44tHArhXaJ5xS/zJzETA4b3G1jwEUaPINAFb&#43;a3g=" crossorigin="anonymous">
+  <script defer src="/obidoc/fuse.min.js"></script>
+  <script defer src="/obidoc/en.search.min.4da51bdd2d833922fdbc0e19df517221387fc625ffb68ee140d605b3c5b68058.js" integrity="sha256-TaUb3S2DOSL9vA4Z31FyITh/xiX/to7hQNYFs8W2gFg=" crossorigin="anonymous"></script>
+
+  <script defer src="/obidoc/sw.min.32af8eafce4180aa1c5dea66d99fb26ba9043ea7c7a4c706138c91d9051b285e.js" integrity="sha256-Mq&#43;Or85BgKocXepm2Z&#43;ya6kEPqfHpMcGE4yR2QUbKF4=" crossorigin="anonymous"></script>
+<link rel="alternate" type="application/rss+xml" href="http://metabar:8888/obidoc/docs/cookbook/illumina/index.xml" title="OBITools4 documentation" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  <link rel="stylesheet" type="text/css" href="http://metabar:8888/obidoc/hugo-cite.css" />
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/obidoc/"><img src="/obidoc/obitools_logo.jpg" alt="Logo" class="book-icon" /><span>OBITools4 documentation</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Docs</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/about/" class="">About</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/installation/" class="">Installation</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/principles/" class="">General operating principles</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-08756b4c1f14be6ee584ece005b9f621" class="toggle"  />
+    <label for="section-08756b4c1f14be6ee584ece005b9f621" class="flex justify-between">
+      <a role="button" class="">File formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-933c2e64b905b84e22aa5273cea2d0bd" class="toggle"  />
+    <label for="section-933c2e64b905b84e22aa5273cea2d0bd" class="flex justify-between">
+      <a role="button" class="">Sequence file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fasta/" class="">FASTA file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fastq/" class="">FASTQ file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/genbank/" class="">GenBank Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/embl/" class="">EMBL Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/csv/" class="">CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/json/" class="">JSON format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/annotations/" class="">Annotation of sequences</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-0258ae1c222f9a38cc1b75254c93b0f4" class="toggle"  />
+    <label for="section-0258ae1c222f9a38cc1b75254c93b0f4" class="flex justify-between">
+      <a role="button" class="">Taxonomy file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/csv_taxdump/" class="">CSV formatted taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/ncbi_taxdump/" class="">NCBI taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/csv/" class="">The CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-70b1e6e5ec7f3ccab643155fa50659b6" class="toggle"  />
+    <label for="section-70b1e6e5ec7f3ccab643155fa50659b6" class="flex justify-between">
+      <a role="button" class="">Patterns</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/regular/" class="">Regular Expressions</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/dnagrep/" class="">DNA Patterns</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8223f464911a1fe6c655972143684e93" class="toggle"  />
+    <label for="section-8223f464911a1fe6c655972143684e93" class="flex justify-between">
+      <a role="button" class="">The OBITools4 commands</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/options/" class="">Shared command options</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8921ea65523c266b128dd4263232b0fc" class="toggle"  />
+    <label for="section-8921ea65523c266b128dd4263232b0fc" class="flex justify-between">
+      <a role="button" class="">Basics</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiannotate/" class="">obiannotate</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicomplement/" class="">obicomplement</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconvert/" class="">obiconvert</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicount/" class="">obicount</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicsv/" class="">obicsv</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidemerge/" class="">obidemerge</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidistribute/" class="">obidistribute</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obigrep/" class="">obigrep</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obijoin/" class="">obijoin</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimatrix/" class="">obimatrix</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisplit/" class="">obisplit</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisummary/" class="">obisummary</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiuniq/" class="">obiuniq</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-dbdf1bb5377572439394e60e08c30f50" class="toggle"  />
+    <label for="section-dbdf1bb5377572439394e60e08c30f50" class="flex justify-between">
+      <a role="button" class="">Demultiplexing samples</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimultiplex/" class="">obimultiplex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitagpcr/" class="">obitagpcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-aa98fedd067b51150db59691a8ea8edd" class="toggle"  />
+    <label for="section-aa98fedd067b51150db59691a8ea8edd" class="flex justify-between">
+      <a role="button" class="">Sequence alignments</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiclean/" class="">obiclean</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7433746525d8c2b29b033f765c869acd" class="toggle"  />
+    <label for="section-7433746525d8c2b29b033f765c869acd" class="flex justify-between">
+      <a href="/obidoc/obitools/obipairing/" class="">obipairing</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/fasta-like/" class="">The FASTA-like alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/exact-alignment/" class="">Exact alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obipcr/" class="">obipcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obirefidx/" class="">obirefidx</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitag/" class="">obitag</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-5746f699d10490780dec8e30ab2dd3ce" class="toggle"  />
+    <label for="section-5746f699d10490780dec8e30ab2dd3ce" class="flex justify-between">
+      <a role="button" class="">Taxonomy</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitaxonomy/" class="">obitaxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-3f50c4fe7ab436a56ae92897d5444956" class="toggle"  />
+    <label for="section-3f50c4fe7ab436a56ae92897d5444956" class="flex justify-between">
+      <a role="button" class="">Advanced tools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiscript/" class="">obiscript</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-549be3934679fcb82a232f6bd5435563" class="toggle"  />
+    <label for="section-549be3934679fcb82a232f6bd5435563" class="flex justify-between">
+      <a role="button" class="">Others</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimicrosat/" class="">obimicrosat</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-ceca4455173761e30cbc0a6dc2327167" class="toggle"  />
+    <label for="section-ceca4455173761e30cbc0a6dc2327167" class="flex justify-between">
+      <a role="button" class="">Experimentals</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicleandb/" class="">obicleandb</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconsensus/" class="">obiconsensus</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obilandmark/" class="">obilandmark</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/tags/" class="">Glossary of tags</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9b1bcd52530c59dc4819b1f61c128f54" class="toggle" checked />
+    <label for="section-9b1bcd52530c59dc4819b1f61c128f54" class="flex justify-between">
+      <a role="button" class="">Cookbook</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/illumina/" class="active">Analysing an Illumina data set</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/ecoprimers/" class="">Designing new barcodes</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/local_genbank/" class="">Prepare a local copy of Genbank</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/reference_db/" class="">Build a reference database</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/minion/" class="">Oxford Nanopore data analysis</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Programming OBITools</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/expression/" class="">Expression language</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-6d580829a667b5cca790b286d99a10fe" class="toggle"  />
+    <label for="section-6d580829a667b5cca790b286d99a10fe" class="flex justify-between">
+      <a href="/obidoc/docs/programming/lua/" class="">Lua: for scripting OBITools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-2fb081dac812d624eea5f4268fca9e26" class="toggle"  />
+    <label for="section-2fb081dac812d624eea5f4268fca9e26" class="flex justify-between">
+      <a role="button" class="">Obitools Classes</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequence/" class="">BioSequence</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequenceslice/" class="">BioSequenceSlice</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxonomy/" class="">Taxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxon/" class="">Taxon</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/mutex/" class="">Mutex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/obidoc/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Analysing an Illumina data set</h3>
+
+  <label for="toc-control">
+    
+    <img src="/obidoc/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-wolf-diet-tutorial">The wolf diet tutorial</a>
+      <ul>
+        <li><a href="#the-dataset-to-analyze-and-the-reference-database">The dataset to analyze and the reference database</a></li>
+        <li><a href="#recover-full-length-sequences-from-forward-and-reverse-reads">Recover full length sequences from forward and reverse reads</a></li>
+        <li><a href="#exclude-unpaired-reads">Exclude unpaired reads</a></li>
+        <li><a href="#assign-each-sequence-record-to-the-corresponding-sample-and-marker-combination">Assign each sequence record to the corresponding sample and marker combination</a></li>
+        <li><a href="#reads-dereplication">Reads dereplication</a></li>
+        <li><a href="#dataset-denoising">Dataset denoising</a>
+          <ul>
+            <li></li>
+          </ul>
+        </li>
+        <li><a href="#sequences-taxonomic-assignment">Sequences taxonomic assignment</a>
+          <ul>
+            <li><a href="#downloading-of-the-taxonomy">Downloading of the taxonomy</a></li>
+            <li><a href="#assigning-taxa-to-the-sequences">Assigning taxa to the sequences</a></li>
+          </ul>
+        </li>
+        <li><a href="#exporting-the-results-in-a-tabular-format">Exporting the results in a tabular format</a>
+          <ul>
+            <li><a href="#the-motu-occurrence-table">The MOTU occurrence table</a></li>
+          </ul>
+        </li>
+        <li><a href="#references">References</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="the-wolf-diet-tutorial">
+  The wolf diet tutorial
+  <a class="anchor" href="#the-wolf-diet-tutorial">#</a>
+</h1>
+<p>Here is a short tutorial for analyzing metabarcoding data, on an Illumina dataset from a wolf diet study, using the OBITools 4 and basic unix commands.
+It presents the following analysis steps:</p>
+<ol>
+<li>Pairing (i.e. partial alignment) of forward and reverse reads</li>
+<li>Exclusion of unpaired reads</li>
+<li>Reads demultiplexing (i.e. assignment to their original sample)</li>
+<li>Reads dereplication</li>
+<li>Dataset denoising</li>
+<li>Sequence taxonomic assignment</li>
+<li>Exporting the results in a tabular format</li>
+</ol>
+<h2 id="the-dataset-to-analyze-and-the-reference-database">
+  The dataset to analyze and the reference database
+  <a class="anchor" href="#the-dataset-to-analyze-and-the-reference-database">#</a>
+</h2>
+<p>The dataset used in this tutorial corresponds to data obtained from the analysis of four wolf scats
+using the protocol published in 
+
+
+
+
+
+
+
+<span class="hugo-cite-intext"
+        itemprop="citation">(<span class="hugo-cite-group">
+
+          <a href="#shehzad2012-pn"><span class="visually-hidden">Citation: </span><span itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="givenName" content="Wasim"><span itemprop="familyName">Shehzad</span></span>,&#32;<span itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="givenName" content="Tiayyba"><span itemprop="familyName">Riaz</span></span>
+                  <em>&amp; al.</em>,&#32;<span itemprop="datePublished">2012</span></a><span class="hugo-cite-citation"> 
+
+
+
+
+
+
+
+
+
+
+<span itemscope
+      itemtype="https://schema.org/Article"
+      data-type="article"><span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Shehzad</span>,&#32;
+    <meta itemprop="givenName" content="Wasim" />
+    W.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Riaz</span>,&#32;
+    <meta itemprop="givenName" content="Tiayyba" />
+    T.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Nawaz</span>,&#32;
+    <meta itemprop="givenName" content="Muhammad A" />
+    M.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Miquel</span>,&#32;
+    <meta itemprop="givenName" content="Christian" />
+    C.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Poillot</span>,&#32;
+    <meta itemprop="givenName" content="Carole" />
+    C.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Shah</span>,&#32;
+    <meta itemprop="givenName" content="Safdar A" />
+    S.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Pompanon</span>,&#32;
+    <meta itemprop="givenName" content="François" />
+    F.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Coissac</span>,&#32;
+    <meta itemprop="givenName" content="Eric" />
+    E.</span>&#32;&amp;&#32;<span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Taberlet</span>,&#32;
+    <meta itemprop="givenName" content="Pierre" />
+    P.</span>
+  &#32;
+    (<span itemprop="datePublished">2012</span>).
+  &#32;<span itemprop="name">Carnivore diet analysis based on next-generation sequencing: application to the leopard cat (Prionailurus bengalensis) in Pakistan: LEOPARD CAT DIET</span>.<i>
+    <span itemprop="about">Molecular ecology</span>,&#32;21(8)</i>.&#32;<span itemprop="pagination">1951–1965</span>.
+  <a href="https://doi.org/10.1111/j.1365-294X.2011.05424.x"
+     itemprop="identifier"
+     itemtype="https://schema.org/URL">https://doi.org/10.1111/j.1365-294X.2011.05424.x</a></span>
+
+
+
+
+</span></span>)</span>
+ for carnivore diet assessment.
+After extraction of DNA from feces, DNA amplification was performed using the Vert01
+primers (<code>TTAGATACCCCACTATGC</code> and <code>TAGAACAGGCTCCTCTAG</code> amplifying the <em>12S-V5</em>
+region 
+
+
+
+
+
+
+
+<span class="hugo-cite-intext"
+        itemprop="citation">(<span class="hugo-cite-group">
+
+          <a href="#riaz2011-gn"><span class="visually-hidden">Citation: </span><span itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="givenName" content="Tiayyba"><span itemprop="familyName">Riaz</span></span>,&#32;<span itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="givenName" content="Wasim"><span itemprop="familyName">Shehzad</span></span>
+                  <em>&amp; al.</em>,&#32;<span itemprop="datePublished">2011</span></a><span class="hugo-cite-citation"> 
+
+
+
+
+
+
+
+
+
+
+<span itemscope
+      itemtype="https://schema.org/Article"
+      data-type="article"><span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Riaz</span>,&#32;
+    <meta itemprop="givenName" content="Tiayyba" />
+    T.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Shehzad</span>,&#32;
+    <meta itemprop="givenName" content="Wasim" />
+    W.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Viari</span>,&#32;
+    <meta itemprop="givenName" content="Alain" />
+    A.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Pompanon</span>,&#32;
+    <meta itemprop="givenName" content="François" />
+    F.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Taberlet</span>,&#32;
+    <meta itemprop="givenName" content="Pierre" />
+    P.</span>&#32;&amp;&#32;<span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Coissac</span>,&#32;
+    <meta itemprop="givenName" content="Eric" />
+    E.</span>
+  &#32;
+    (<span itemprop="datePublished">2011</span>).
+  &#32;<span itemprop="name">ecoPrimers: inference of new DNA barcode markers from whole genome sequence analysis</span>.<i>
+    <span itemprop="about">Nucleic acids research</span>,&#32;39(21)</i>.&#32;<span itemprop="pagination">e145</span>.
+  <a href="https://doi.org/10.1093/nar/gkr732"
+     itemprop="identifier"
+     itemtype="https://schema.org/URL">https://doi.org/10.1093/nar/gkr732</a></span>
+
+
+
+
+</span></span>)</span>
+), together with a wolf blocking oligonucleotide.</p>
+<p>An archive containing all the files needed for the analysis can be downloaded by clicking here: 
+      
+  <a href="wolf_diet_dataset.tgz">wolf_diet_dataset</a></p>
+<p>The downloaded archive can be unarchived using the following unix command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>tar zxvf wolf_diet_dataset.tgz
+</span></span></code></pre></div><p>It creates a directory named <code>wolf_data</code>, containing the following files:</p>
+<ul>
+<li>
+<p>Two 
+  <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a>
+files generated by the sequencing of DNA extracted and amplified from four wolf feces using the Genome Analyzer IIx plateform (Illumina) and the paired-end (2 x 108 bp) sequencing chemistry:</p>
+<ul>
+<li>
+      
+  <a href="wolf_data/wolf_F.fastq.gz"><code>wolf_F.fastq.gz</code></a> with the forward sequences</li>
+<li>
+      
+  <a href="wolf_data/wolf_R.fastq.gz"><code>wolf_R.fastq.gz</code></a> with the reverse sequences</li>
+</ul>
+</li>
+<li>
+<p>A 
+  <a href="https://obitools4.metabarcoding.org/docs/formats/csv/">csv tabular file</a> for the reads demultiplexing step, named 
+      
+  <a href="wolf_data/wolf_diet_ngsfilter.csv"><code>wolf_diet_ngsfilter.csv</code></a>. This file contains the primer and tag sequences used for each sample. The tags correspond to short and specific sequences added to the 5' end of each primer to distinguish the different samples.</p>
+</li>
+<li>
+<p>A reference database in 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+format named
+
+      
+  <a href="wolf_data/db_v05_r117.fasta.gz"><code>db_v05_r117.fasta.gz</code></a>, extracted from the EMBL release 117 following the procedure indicated in the tutorial 
+  <a href="https://obitools4.metabarcoding.org/docs/cookbook/reference_db/">build a reference database</a>.</p>
+</li>
+</ul>
+<p>We recommend to create a new folder to store the results and separate them from the raw data:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mkdir results
+</span></span></code></pre></div><h2 id="recover-full-length-sequences-from-forward-and-reverse-reads">
+  Recover full length sequences from forward and reverse reads
+  <a class="anchor" href="#recover-full-length-sequences-from-forward-and-reverse-reads">#</a>
+</h2>
+<p>When using the result of a paired-end sequencing with supposedly overlapping forward and reverse reads,
+the first step is to assemble them in order to recover the corresponding full length sequence.</p>
+<p>The forward and reverse reads of the same fragment are located at the same line position in both fastq files. These two files are used as inputs by the <a href="http://metabar:8888/obidoc/obitools/obipairing/">
+<abbr title="obipairing: align the forward and reverse paired reads"><code>obipairing</code></abbr>
+</a> program to assemble the forward and reverse reads. This program then returns the reconstructed sequence as output:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obipairing --min-identity<span style="color:#f92672">=</span>0.8 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>           --min-overlap<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>           -F wolf_data/wolf_F.fastq.gz <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>           -R wolf_data/wolf_R.fastq.gz <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>           &gt; results/wolf.fastq 
+</span></span></code></pre></div><p>The <code>--min-identity</code> and <code>--min-overlap</code> options allow to discard sequences with low alignment quality. In the example command above, a low alignment quality corresponds to paired-end reads overlapping over less than 10 base pairs, or to paired-end reads exhibiting an alignment of less than 80% of identity. Paired-end reads producing such low quality alignments are returned concatenated with an attribute <code>&quot;mode&quot;:&quot;join&quot;</code>. Those that do not fulfill the above criteria are assembled and the result is returned with the attribute <code>&quot;mode&quot;:&quot;alignment&quot;</code>. For more information, please refer to the command <a href="http://metabar:8888/obidoc/obitools/obipairing/">
+<abbr title="obipairing: align the forward and reverse paired reads"><code>obipairing</code></abbr>
+</a>.</p>
+<p>The output of the above procedure can be rapidly checked by looking at the first sequence record of <code>wolf_assembled.fastq</code>. This can be done with the unix command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>head -n <span style="color:#ae81ff">4</span> results/wolf.fastq
+</span></span></code></pre></div><pre tabindex="0"><code>@HELIUM_000100422_612GNAAXX:7:108:5640:3823#0/1 {&#34;ali_dir&#34;:&#34;left&#34;,&#34;ali_length&#34;:62,&#34;mode&#34;:&#34;alignment&#34;,&#34;pairing_fast_count&#34;:53,&#34;pairing_fast_overlap&#34;:62,&#34;pairing_fast_score&#34;:0.898,&#34;pairing_mismatches&#34;:{&#34;(T:26)-&gt;(G:13)&#34;:62,&#34;(T:34)-&gt;(G:18)&#34;:48},&#34;score&#34;:1826,&#34;score_norm&#34;:0.968,&#34;seq_a_single&#34;:46,&#34;seq_ab_match&#34;:60,&#34;seq_b_single&#34;:46}
+ccgcctcctttagataccccactatgcttagccctaaacacaagtaattaatataacaaaattgttcgccagagtactaccggcaatagcttaaaactcaaaggacttggcggtgctttatacccttctagaggagcctgttctaaggaggcgg
++
+CCCCCCCBCCCCCCCCCCCCCCCCCCCCCCBCCCCCBCCCCCCC&lt;CcDccbe[`F`accXV=TA\RYU\\ee_e[XZ[XEEEEEEEEEE?EEEEEEEEEEDEEEEEEECCCCCCCCCCCCCCCCCCCCCCCACCCCCACCCCCCCCCCCCCCCC
+</code></pre><p>The <code>-n 4</code> option of the head command indicates to print only the first four lines of the file, i.e. to print only the first sequence record (each sequence record in the 
+  <a href="https://obitools4.metabarcoding.org/docs/formats/fastq/">fastq format</a> is stored on four lines).</p>
+<h2 id="exclude-unpaired-reads">
+  Exclude unpaired reads
+  <a class="anchor" href="#exclude-unpaired-reads">#</a>
+</h2>
+<p>Sequences corresponding to unpaired reads exhibit an attribute <code>&quot;mode&quot;:&quot;join&quot;</code> and cannot be reliably used in downstream analyses. They can be removed from the dataset using the <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+<abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+</a> command, as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -p <span style="color:#e6db74">&#39;annotations.mode != &#34;join&#34;&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        results/wolf.fastq &gt; results/wolf_assembled.fastq
+</span></span></code></pre></div><p>The <code>-p</code> requires a 
+  <a href="http://metabar:8888/obidoc/docs/programming/expression/"><em>OBITools4</em> expression</a>, here <code>annotations.mode != &quot;join&quot;</code>, which means that
+if the value of the <code>mode</code> annotation of a sequence is different from <code>join</code>,
+then the corresponding sequence record should be kept in the output.</p>
+<h2 id="assign-each-sequence-record-to-the-corresponding-sample-and-marker-combination">
+  Assign each sequence record to the corresponding sample and marker combination
+  <a class="anchor" href="#assign-each-sequence-record-to-the-corresponding-sample-and-marker-combination">#</a>
+</h2>
+<p>Each sequence record is assigned to its corresponding sample and marker using the information provided in the file 
+      
+  <a href="wolf_data/wolf_diet_ngsfilter.csv"><code>wolf_diet_ngsfilter.csv</code></a>.
+This file, which is in a  
+  <a href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">CSV</a>
+tabular format, exemplifies the type of information necessary for the <a href="http://metabar:8888/obidoc/obitools/obimultiplex/">
+<abbr title="obimultiplex: "><code>obimultiplex</code></abbr>
+</a> program to run.</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="wolf_data/wolf_diet_ngsfilter.csv" download="wolf_data/wolf_diet_ngsfilter.csv">📄 wolf_diet_ngsfilter.csv</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csv" data-lang="csv"><span style="display:flex;"><span><span style="color:#e6db74">@param</span>,<span style="color:#e6db74">matching</span>,<span style="color:#e6db74">strict</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">@param</span>,<span style="color:#e6db74">primer_mismatches</span>,<span style="color:#e6db74">2</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">@param</span>,<span style="color:#e6db74">indels</span>,<span style="color:#e6db74">false</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">experiment</span>,<span style="color:#e6db74">sample</span>,<span style="color:#e6db74">sample_tag</span>,<span style="color:#e6db74">forward_primer</span>,<span style="color:#e6db74">reverse_primer</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">wolf_diet</span>,<span style="color:#e6db74">13a_F730603</span>,<span style="color:#e6db74">aattaac</span>,<span style="color:#e6db74">TTAGATACCCCACTATGC</span>,<span style="color:#e6db74">TAGAACAGGCTCCTCTAG</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">wolf_diet</span>,<span style="color:#e6db74">15a_F730814</span>,<span style="color:#e6db74">gaagtag</span>,<span style="color:#e6db74">TTAGATACCCCACTATGC</span>,<span style="color:#e6db74">TAGAACAGGCTCCTCTAG</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">wolf_diet</span>,<span style="color:#e6db74">26a_F040644</span>,<span style="color:#e6db74">gaatatc</span>,<span style="color:#e6db74">TTAGATACCCCACTATGC</span>,<span style="color:#e6db74">TAGAACAGGCTCCTCTAG</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">wolf_diet</span>,<span style="color:#e6db74">29a_F260619</span>,<span style="color:#e6db74">gcctcct</span>,<span style="color:#e6db74">TTAGATACCCCACTATGC</span>,<span style="color:#e6db74">TAGAACAGGCTCCTCTAG</span></span></span></code></pre></td></tr></table>
+</div>
+</div></td>
+    
+</DIV>
+
+<p>The minimal file should contain at least the five columns below.
+The order of the column is not mandatory.</p>
+<ul>
+<li><strong>experiment</strong>: the name/identifier of the experiment/project (several experiments/projects can be
+included in the same file)</li>
+<li><strong>sample</strong>: the name/identifier of the sample or of the PCR</li>
+<li><strong>sample_tag</strong>: the sequences of the tags (<em>e.g.</em> <code>aattaac</code> if a same tag has been used on each
+extremity of the PCR products, or <code>aattaac:gaagtag</code> if two different tags were
+used)</li>
+<li><strong>forward_primer</strong>: the sequence of the forward primer</li>
+<li><strong>reverse_primer</strong>: the sequence of the reverse primer</li>
+</ul>
+<p>Other information can be added as extra columns (e.g. position of the sample/PCR in the PCR plate, type of sample or control, etc.)</p>
+<p>Some extra lines can be added at the top of this file. They start with the <code>@param</code> value.
+Here three parameters have been provided:</p>
+<ul>
+<li><code>@param,matching,strict</code>: The match between the sequence of the tags in the file [<code>wolf_diet_ngsfilter.csv</code>] and their corresponding sequences in the sequencing data should be strict, without any mismatches.</li>
+<li><code>@param,primer_mismatches,2</code>: The match between the primers and their corresponding sequences in the sequencing data can exhibit at most two mismatches.</li>
+<li><code>@param,indels,false</code>: The mismatches between the primers and their corresponding sequences in the sequencing data cannot be insertions or deletions, but only substitutions.</li>
+</ul>
+<p>See <a href="http://metabar:8888/obidoc/obitools/obimultiplex/">
+<abbr title="obimultiplex: "><code>obimultiplex</code></abbr>
+</a> for more details.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obimultiplex -s wolf_data/wolf_diet_ngsfilter.csv <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>             -u results/unidentified.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>             results/wolf_assembled.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>             &gt; results/wolf_assembled_assigned.fastq
+</span></span></code></pre></div><p>The command <a href="http://metabar:8888/obidoc/obitools/obimultiplex/">
+<abbr title="obimultiplex: "><code>obimultiplex</code></abbr>
+</a> written above creates two files:</p>
+<ul>
+<li>
+      
+  <a href="results/unidentified.fastq"><code>unidentified.fastq</code></a> containing the sequences records that
+failed to be assigned to a sample/marker combination</li>
+<li>
+      
+  <a href="results/wolf_assembled_assigned.fastq"><code>wolf_assembled_assigned.fastq</code></a>
+containing the sequence records that were properly assigned to a sample/marker
+combination</li>
+</ul>
+<p>Note that each sequence record of the
+
+      
+  <a href="results/wolf_assembled_assigned.fastq"><code>wolf_assembled_assigned.fastq</code></a> file
+contains only the barcode sequence as the sequences of primers and tags are
+removed by the <a href="http://metabar:8888/obidoc/obitools/obimultiplex/">
+<abbr title="obimultiplex: "><code>obimultiplex</code></abbr>
+</a> program. Information concerning the
+experiment, sample, primers and tags is added as attributes in the sequence
+header.</p>
+<p>For example, the first sequence record of 
+      
+  <a href="results/wolf_assembled_assigned.fastq"><code>wolf_assembled_assigned.fastq</code></a> is:</p>
+<pre tabindex="0"><code>@HELIUM_000100422_612GNAAXX:7:108:5640:3823#0/1_sub[28..127] {&#34;ali_dir&#34;:&#34;left&#34;,&#34;ali_length&#34;:62,&#34;experiment&#34;:&#34;wolf_diet&#34;,&#34;mode&#34;:&#34;alignment&#34;,&#34;obimultiplex_amplicon_rank&#34;:&#34;1/1&#34;,&#34;obimultiplex_direction&#34;:&#34;forward&#34;,&#34;obimultiplex_forward_error&#34;:0,&#34;obimultiplex_forward_match&#34;:&#34;ttagataccccactatgc&#34;,&#34;obimultiplex_forward_matching&#34;:&#34;strict&#34;,&#34;obimultiplex_forward_primer&#34;:&#34;ttagataccccactatgc&#34;,&#34;obimultiplex_forward_proposed_tag&#34;:&#34;gcctcct&#34;,&#34;obimultiplex_forward_tag&#34;:&#34;gcctcct&#34;,&#34;obimultiplex_forward_tag_dist&#34;:0,&#34;obimultiplex_reverse_error&#34;:0,&#34;obimultiplex_reverse_match&#34;:&#34;tagaacaggctcctctag&#34;,&#34;obimultiplex_reverse_matching&#34;:&#34;strict&#34;,&#34;obimultiplex_reverse_primer&#34;:&#34;tagaacaggctcctctag&#34;,&#34;obimultiplex_reverse_proposed_tag&#34;:&#34;gcctcct&#34;,&#34;obimultiplex_reverse_tag&#34;:&#34;gcctcct&#34;,&#34;obimultiplex_reverse_tag_dist&#34;:0,&#34;pairing_mismatches&#34;:{&#34;(T:26)-&gt;(G:13)&#34;:35,&#34;(T:34)-&gt;(G:18)&#34;:21},&#34;paring_fast_count&#34;:53,&#34;paring_fast_overlap&#34;:62,&#34;paring_fast_score&#34;:0.898,&#34;sample&#34;:&#34;29a_F260619&#34;,&#34;score&#34;:1826,&#34;score_norm&#34;:0.968,&#34;seq_a_single&#34;:46,&#34;seq_ab_match&#34;:60,&#34;seq_b_single&#34;:46}
+ttagccctaaacacaagtaattaatataacaaaattgttcgccagagtactaccggcaatagcttaaaactcaaaggacttggcggtgctttataccctt
++
+CCCBCCCCCBCCCCCCC&lt;CcDccbe[`F`accXV=TA\RYU\\ee_e[XZ[XEEEEEEEEEE?EEEEEEEEEEDEEEEEEECCCCCCCCCCCCCCCCCCC
+</code></pre><p>The sample to which the sequence above belongs to is shown in the attribute <code>&quot;sample&quot;:&quot;29a_F260619&quot;</code>. The other attributes added correspond to the tags and primers matching properties against the sequence.</p>
+<h2 id="reads-dereplication">
+  Reads dereplication
+  <a class="anchor" href="#reads-dereplication">#</a>
+</h2>
+<p>A DNA metabarcoding experiment inherently yields the same DNA
+sequence several times (i.e. replicated reads). Such a redundancy can be reduced by processing unique
+<em>sequences</em> instead of <em>reads</em> so as to reduce both file size and computation time,
+as well as to obtain more interpretable results. Dereplicating replicated <em>reads</em> into unique
+<em>sequences</em> can be done with the <a href="http://metabar:8888/obidoc/obitools/obiuniq/">
+    <abbr title="obiuniq: dereplicate a sequence file"><code>obiuniq</code></abbr>
+    </a> command.</p>
+<p>The program performs a pairwise comparison of all reads in the dataset. For reads that are strictly
+identical, only one representative sequence is kept while its frequency in the dataset is saved in the <code>count</code> attribute.</p>
+<p>In the command below, we use the <a href="http://metabar:8888/obidoc/obitools/obiuniq/">
+<abbr title="obiuniq: dereplicate a sequence file"><code>obiuniq</code></abbr>
+</a> command with the <code>-m sample</code> option to also store the frequency of the sequence in each sample. The program returns a 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+file.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiuniq -m sample <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        results/wolf_assembled_assigned.fastq <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        &gt; results/wolf_assembled_assigned_uniq.fasta
+</span></span></code></pre></div><p>The first sequence record of the output, 
+      
+  <a href="results/wolf_assembled_assigned_uniq.fasta"><code>wolf_assembled_assigned_uniq.fasta</code></a> is:</p>
+<pre tabindex="0"><code>&gt;HELIUM_000100422_612GNAAXX:7:99:12017:19418#0/1_sub[28..127] {&#34;ali_dir&#34;:&#34;left&#34;,&#34;ali_length&#34;:62,&#34;count&#34;:1,&#34;experiment&#34;:&#34;wolf_diet&#34;,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:1},&#34;mode&#34;:&#34;alignment&#34;,&#34;obimultiplex_amplicon_rank&#34;:&#34;1/1&#34;,&#34;obimultiplex_direction&#34;:&#34;forward&#34;,&#34;obimultiplex_forward_error&#34;:0,&#34;obimultiplex_forward_match&#34;:&#34;ttagataccccactatgc&#34;,&#34;obimultiplex_forward_matching&#34;:&#34;strict&#34;,&#34;obimultiplex_forward_primer&#34;:&#34;ttagataccccactatgc&#34;,&#34;obimultiplex_forward_proposed_tag&#34;:&#34;gcctcct&#34;,&#34;obimultiplex_forward_tag&#34;:&#34;gcctcct&#34;,&#34;obimultiplex_forward_tag_dist&#34;:0,&#34;obimultiplex_reverse_error&#34;:0,&#34;obimultiplex_reverse_match&#34;:&#34;tagaacaggctcctctag&#34;,&#34;obimultiplex_reverse_matching&#34;:&#34;strict&#34;,&#34;obimultiplex_reverse_primer&#34;:&#34;tagaacaggctcctctag&#34;,&#34;obimultiplex_reverse_proposed_tag&#34;:&#34;gcctcct&#34;,&#34;obimultiplex_reverse_tag&#34;:&#34;gcctcct&#34;,&#34;obimultiplex_reverse_tag_dist&#34;:0,&#34;pairing_mismatches&#34;:{&#34;(A:02)-&gt;(C:07)&#34;:54,&#34;(A:02)-&gt;(G:17)&#34;:59,&#34;(C:02)-&gt;(G:10)&#34;:42},&#34;paring_fast_count&#34;:43,&#34;paring_fast_overlap&#34;:62,&#34;paring_fast_score&#34;:0.729,&#34;sample&#34;:&#34;29a_F260619&#34;,&#34;score&#34;:567,&#34;score_norm&#34;:0.935,&#34;seq_a_single&#34;:46,&#34;seq_ab_match&#34;:58,&#34;seq_b_single&#34;:46}
+ttagccctaaacacaagtaattaatataacaaaattattcggcagagtactaccggcagt
+agcttaaaactcaaaggacttggcggtgctttatacccct
+</code></pre><p>The <a href="http://metabar:8888/obidoc/obitools/obiuniq/">
+<abbr title="obiuniq: dereplicate a sequence file"><code>obiuniq</code></abbr>
+</a> command has added two <code>key:value</code> entries in the sequences attributes:</p>
+<ul>
+<li><code>&quot;merged_sample&quot;:{&quot;29a_F260619&quot;:1}</code>: means that this sequence has been found once, in a single sample called &ldquo;29a_F260619&rdquo;.</li>
+<li><code>&quot;count&quot;:1</code> : represents the number of times, i.e. 1, this sequence has been found in the whole dataset.</li>
+</ul>
+<p>To keep only these two attributes in the sequence definition, we can use the <a href="http://metabar:8888/obidoc/obitools/obiannotate/">
+<abbr title="obiannotate: edit sequence annotations"><code>obiannotate</code></abbr>
+</a> command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiannotate -k count -k merged_sample <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  results/wolf_assembled_assigned_uniq.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  &gt; results/wolf_assembled_assigned_simple.fasta
+</span></span></code></pre></div><p>The first five sequence records of the result, 
+      
+  <a href="results/wolf_assembled_assigned_simple.fasta"><code>wolf_assembled_assigned_simple.fasta</code></a>, become:</p>
+<pre tabindex="0"><code>&gt;HELIUM_000100422_612GNAAXX:7:99:12017:19418#0/1_sub[28..127] {&#34;count&#34;:1,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:1}}
+ttagccctaaacacaagtaattaatataacaaaattattcggcagagtactaccggcagt
+agcttaaaactcaaaggacttggcggtgctttatacccct
+&gt;HELIUM_000100422_612GNAAXX:7:56:19300:10949#0/1_sub[28..127] {&#34;count&#34;:37,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:37}}
+ttagccctaaacacaagtaattaatataacaaaattgttcaccagagtactagcggcaac
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:117:10934:7472#0/1_sub[28..127] {&#34;count&#34;:1,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:1}}
+ttagccctaaacacaagtaattattataacaaaattattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttatacccgt
+&gt;HELIUM_000100422_612GNAAXX:7:28:9432:2506#0/1_sub[28..127] {&#34;count&#34;:4,&#34;merged_sample&#34;:{&#34;13a_F730603&#34;:4}}
+ccagccttaaacacaaatagttatgcaaacaaaactattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:94:11447:14902#0/1_sub[28..127] {&#34;count&#34;:1,&#34;merged_sample&#34;:{&#34;15a_F730814&#34;:1}}
+ttagccctaaacacaagtaattagtataacaaaattattccccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+</code></pre><h2 id="dataset-denoising">
+  Dataset denoising
+  <a class="anchor" href="#dataset-denoising">#</a>
+</h2>
+<p>Having all sequences assigned to their respective samples does
+not mean that all these sequences are <em>biologically</em> meaningful. Some of
+these sequences can correspond to PCR/sequencing errors, or chimeras.</p>
+<h4 id="flagging-pcr-errors">
+  Flagging PCR errors
+  <a class="anchor" href="#flagging-pcr-errors">#</a>
+</h4>
+<p>The <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+<abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+</a> program flags sequence variants as:</p>
+<ul>
+<li>potential error generated during PCR amplification (flagged as <code>internal</code> sequences),</li>
+<li>genuine sequences:
+<ul>
+<li>flagged as <code>head</code>,</li>
+<li>or <code>singletons</code> sequences, i.e. sequences for which the program could not identify a variant.</li>
+</ul>
+</li>
+</ul>
+<p>In the example below, a sequence is considered as a variant of another one if:</p>
+<ul>
+<li>both occurred in the same sample (<code>-s sample</code>),</li>
+<li>it exist only a single difference between both sequences (substitution, insertion, or deletion)</li>
+<li>if the abondance of the variant is less than 5% of the abondance of the main sequence (<code>-r 0.05</code> option).
+We ask <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+<abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+</a> to keep only the sequences that are considered as genuine <code>head</code> or <code>singleton</code> in at least one sample (<code>-H</code> option). See the <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+<abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+</a> documentation for details.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiclean -s sample -r 0.05 --detect-chimera -H <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         results/wolf_assembled_assigned_simple.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         &gt; results/wolf_assembled_assigned_simple_clean.fasta
+</span></span></code></pre></div><p>Below an example of a sequence record of 
+      
+  <a href="results/wolf_assembled_assigned_simple_clean.fasta"><code>wolf_assembled_assigned_simple_clean.fasta</code></a>:</p>
+<pre tabindex="0"><code>&gt;HELIUM_000100422_612GNAAXX:7:3:3008:16359#0/1_sub[28..127] {&#34;count&#34;:1,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:1},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:0,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:1,&#34;obiclean_singletoncount&#34;:1,&#34;obiclean_status&#34;:{&#34;29a_F260619&#34;:&#34;s&#34;},&#34;obiclean_weight&#34;:{&#34;29a_F260619&#34;:1}}
+ttagccctaaacacaagtaattaatataacaaaattattcgacagagtaccaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+</code></pre><p>The attribute <code>&quot;obiclean_head&quot;:true</code> indicates that this sequence record is considered as a <code>head</code>, hence a genuine sequence, but the attributes <code>&quot;obiclean_status&quot;:{&quot;29a_F260619&quot;:&quot;s&quot;}</code> also indicates that this sequence is actually a &ldquo;singleton&rdquo; sequence.</p>
+<h4 id="getting-some-statistics-on-the-dataset-size">
+  Getting some statistics on the dataset size
+  <a class="anchor" href="#getting-some-statistics-on-the-dataset-size">#</a>
+</h4>
+<p>A good practice is to monitor the effect of each filtering step on the dataset characteristics. Basic statistics can be obtained with <a href="http://metabar:8888/obidoc/obitools/obicount/">
+    <abbr title="obicount: counting sequence records"><code>obicount</code></abbr>
+    </a> command. This command counts the number of sequence <em>variants</em>, of <em>reads</em> and of <em>symbols</em> (i.e. nucleotides) in the dataset. The output is a 
+  <a href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">CSV</a>
+file
+with two columns: the first one being the type of entity/statistic and the
+second one its corresponding count in the whole dataset.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount results/wolf_assembled_assigned_simple_clean.fasta
+</span></span></code></pre></div><pre tabindex="0"><code>entities,n
+variants,715
+reads,33762
+symbols,70775
+</code></pre><p>As a 
+  <a href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">CSV</a>
+file, the result can be easily read by many tools, such as the <code>csvlook</code> command-line tool from the csvkit package to return the result in a more readable way (pretty-print):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount results/wolf_assembled_assigned_simple_clean.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| entities |      n |
+| -------- | ------ |
+| variants |    715 |
+| reads    | 33 762 |
+| symbols  | 70 775 |
+</code></pre><p>At this stage of the analysis, the 
+      
+  <a href="results/wolf_assembled_assigned_simple_clean.fasta"><code>wolf_assembled_assigned_simple_clean.fasta</code></a> file contains 715 sequence variants corresponding to 33762 sequencing reads. Amongst these variants, we expect many of them to occur only once in the whole data set, i.e. to be <em>singletons</em>. Using the <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> command, we can see how many singletons there are:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -p <span style="color:#e6db74">&#39;sequence.Count() == 1&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        results/wolf_assembled_assigned_simple_clean.fasta |<span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        obicount | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| entities |      n |
+| -------- | ------ |
+| variants |    604 |
+| reads    |    604 |
+| symbols  | 60 101 |
+</code></pre><p>To understand the <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> command, you need to know more about the <code>-p</code>
+option. This option allows you to specify a predicate function to be applied to
+each sequence in the dataset. If the function returns <code>True</code>, the sequence is
+included in the output; if it returns <code>False</code>, it is excluded. In this case, we
+use a predicate that checks whether the count of sequences (which is what
+<code>sequence.Count()</code> gives us) is equal to 1. In our data set, there are 649
+singletons (or variants). These singleton sequences have more chances to be errors
+than genuine sequences, and it is of common practice to exclude them from the dataset.
+The <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a> command below keeps only sequences that occur at least twice in the data set.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -c <span style="color:#ae81ff">2</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        results/wolf_assembled_assigned_simple_clean.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        &gt; results/wolf_assembled_no_singleton.fasta
+</span></span></code></pre></div><p>We can also get insights into the distribution of the sequence across samples with <a href="http://metabar:8888/obidoc/obitools/obisummary/">
+    <abbr title="obisummary: generate summary statistics"><code>obisummary</code></abbr>
+    </a>. This command provides a summary of the dataset including the number of sequencing reads, sequence variants and singletons occurring in each sample. Here singleton has to be interpreted as sequence
+variants occurring only once in the sample.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obisummary --yaml results/wolf_assembled_no_singleton.fasta
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">keys</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">map</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">merged_sample</span>: <span style="color:#ae81ff">111</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">obiclean_mutation</span>: <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">obiclean_status</span>: <span style="color:#ae81ff">111</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">obiclean_weight</span>: <span style="color:#ae81ff">111</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">scalar</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">count</span>: <span style="color:#ae81ff">111</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">obiclean_head</span>: <span style="color:#ae81ff">111</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">obiclean_headcount</span>: <span style="color:#ae81ff">111</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">obiclean_internalcount</span>: <span style="color:#ae81ff">111</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">obiclean_samplecount</span>: <span style="color:#ae81ff">111</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">obiclean_singletoncount</span>: <span style="color:#ae81ff">111</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">map_attributes</span>: <span style="color:#ae81ff">4</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">scalar_attributes</span>: <span style="color:#ae81ff">6</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">vector_attributes</span>: <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">count</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">reads</span>: <span style="color:#ae81ff">33158</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">total_length</span>: <span style="color:#ae81ff">10674</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">variants</span>: <span style="color:#ae81ff">111</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">samples</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">sample_count</span>: <span style="color:#ae81ff">4</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">sample_stats</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">13a_F730603</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">obiclean_bad</span>: <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">reads</span>: <span style="color:#ae81ff">7318</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">singletons</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">variants</span>: <span style="color:#ae81ff">22</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">15a_F730814</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">obiclean_bad</span>: <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">reads</span>: <span style="color:#ae81ff">7503</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">singletons</span>: <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">variants</span>: <span style="color:#ae81ff">18</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">26a_F040644</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">obiclean_bad</span>: <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">reads</span>: <span style="color:#ae81ff">10963</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">singletons</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">variants</span>: <span style="color:#ae81ff">49</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">29a_F260619</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">obiclean_bad</span>: <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">reads</span>: <span style="color:#ae81ff">7374</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">singletons</span>: <span style="color:#ae81ff">7</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">variants</span>: <span style="color:#ae81ff">36</span>
+</span></span></code></pre></div><p>In this example, the sample <em>29a_F260619</em> produced <em>7374</em> reads that are
+distributed over <em>36</em> sequence variants. Amongst these variants, <em>7</em> occur only once, i.e. are singletons.</p>
+<p>In a diet analysis - and many other DNA metabarcoding application, we are often not interested in sequences that represent less than one percent of the diet. In other words, we can filter out any sequence that occurs less than one percent of the <em>7000</em> times in the dataset, i.e. less than <em>70</em> times.</p>
+<p>To get an idea of the effect of this filtering, we can run the following command to
+plot the distribution of the <code>count</code> attribute in the data set:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicsv -k count results/wolf_assembled_no_singleton.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>     | tail -n +2 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>     | sort -n <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>     | uniq -c <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>     | awk <span style="color:#e6db74">&#39;{print $2,$1}&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>     | uplot -d <span style="color:#e6db74">&#39; &#39;</span> barplot 
+</span></span></code></pre></div><pre tabindex="0"><code>         ┌                                        ┐ 
+       2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 43.0   
+       3 ┤■■■■■■■■ 10.0                             
+       4 ┤■■■■■■ 8.0                                
+       5 ┤■■■■■■■ 9.0                               
+       6 ┤■■■■ 5.0                                  
+       7 ┤■■■ 4.0                                   
+       8 ┤■■ 2.0                                    
+       9 ┤■■ 2.0                                    
+      10 ┤■■ 2.0                                    
+      11 ┤■ 1.0                                     
+      12 ┤■■ 2.0                                    
+      13 ┤■■ 2.0                                    
+      14 ┤■ 1.0                                     
+      15 ┤■ 1.0                                     
+      16 ┤■ 1.0                                     
+      17 ┤■ 1.0                                     
+      19 ┤■ 1.0                                     
+      20 ┤■ 1.0                                     
+      22 ┤■ 1.0                                     
+      26 ┤■ 1.0                                     
+      37 ┤■ 1.0                                     
+      38 ┤■ 1.0                                     
+      43 ┤■ 1.0                                     
+      69 ┤■ 1.0                                     
+      87 ┤■ 1.0                                     
+      95 ┤■ 1.0                                     
+     260 ┤■ 1.0                                     
+     319 ┤■ 1.0                                     
+     366 ┤■ 1.0                                     
+    2007 ┤■ 1.0                                     
+    7146 ┤■ 1.0                                     
+   10172 ┤■ 1.0                                     
+   12004 ┤■ 1.0                                     
+         └                                        ┘                                  
+</code></pre><p>The y-axis represents the &lsquo;count&rsquo; attribute, which is the number of occurrences of a sequence in the dataset. The x-axis represents the number of sequences that occur that many times. For example, 43 sequences occur twice in the data set.</p>
+<p>In this sequence abundance distribution, we can see that with a 1% filter, we will only keep
+9 sequence variants, i.e. those that occur at least 87 times in the entire dataset.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -c <span style="color:#ae81ff">70</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        results/wolf_assembled_no_singleton.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        &gt; results/wolf_assembled_1_percent.fasta
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicount results/wolf_assembled_1_percent.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  | csvlook
+</span></span></code></pre></div><pre tabindex="0"><code>| entities |      n |
+| -------- | ------ |
+| variants |      9 |
+| reads    | 32 456 |
+| symbols  |    800 |
+</code></pre><p>Another criterion commonly used to filter out sequences relies on their length. We
+know the expected length of the marker, as well as that of the sequences in our dataset. Therefore, we can define the sequences that are too long or too short as potential errors. Inspired by the command above, we can build another command plotting the distribution of sequences length in the
+dataset:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiannotate --length <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>            results/wolf_assembled_1_percent.fasta<span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>     | obicsv -k seq_length <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>     | uplot -H hist -n <span style="color:#ae81ff">20</span>
+</span></span></code></pre></div><pre tabindex="0"><code>                                 seq_length
+                  ┌                                        ┐ 
+   [  0.0,   5.0) ┤▇▇▇▇▇▇▇▇▇ 1                               
+   [  5.0,  10.0) ┤ 0                                        
+   [ 10.0,  15.0) ┤ 0                                        
+   [ 15.0,  20.0) ┤ 0                                        
+   [ 20.0,  25.0) ┤ 0                                        
+   [ 25.0,  30.0) ┤ 0                                        
+   [ 30.0,  35.0) ┤ 0                                        
+   [ 35.0,  40.0) ┤ 0                                        
+   [ 40.0,  45.0) ┤ 0                                        
+   [ 45.0,  50.0) ┤ 0                                        
+   [ 50.0,  55.0) ┤ 0                                        
+   [ 55.0,  60.0) ┤ 0                                        
+   [ 60.0,  65.0) ┤ 0                                        
+   [ 65.0,  70.0) ┤ 0                                        
+   [ 70.0,  75.0) ┤ 0                                        
+   [ 75.0,  80.0) ┤ 0                                        
+   [ 80.0,  85.0) ┤ 0                                        
+   [ 85.0,  90.0) ┤ 0                                        
+   [ 90.0,  95.0) ┤ 0                                        
+   [ 95.0, 100.0) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 4   
+   [100.0, 105.0) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 4   
+                  └                                        ┘ 
+                                  Frequency
+</code></pre><p>The DNA marker amplified here, i.e. the v5 region of the mitochondrial 12S rRNA gene, should be about 100 bp long. Here, one sequence is very short (&lt;5 bp). We can filter this sequence out with <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+<abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+</a>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obigrep -l <span style="color:#ae81ff">50</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        results/wolf_assembled_1_percent.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        &gt; results/wolf_assembled_no_short.fasta
+</span></span></code></pre></div><p>To check the effectiveness of your filtering command, you can check the distribution of sequences length in the new file
+
+      
+  <a href="results/wolf_assembled_no_short.fasta">wolf_assembled_no_short.fasta</a>:
+wolf_assembled_no_short.fasta):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiannotate --length <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>            results/wolf_assembled_no_short.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>     | obicsv -k seq_length <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>     | uplot -H hist
+</span></span></code></pre></div><pre tabindex="0"><code>                                 seq_length
+                  ┌                                        ┐ 
+   [ 99.0,  99.5) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 4   
+   [ 99.5, 100.0) ┤ 0                                        
+   [100.0, 100.5) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 4   
+                  └                                        ┘ 
+                                  Frequency
+</code></pre>    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="results/wolf_assembled_no_short.fasta" download="results/wolf_assembled_no_short.fasta">📄 wolf_assembled_no_short.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;HELIUM_000100422_612GNAAXX:7:118:3572:14633#0/1_sub[28..126] {&#34;count&#34;:10172,&#34;merged_sample&#34;:{&#34;26a_F040644&#34;:10172},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:1,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;26a_F040644&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;26a_F040644&#34;:12205}}
+ttagccctaaacataaacattcaataaacaagaatgttcgccagagtactactagcaaca
+gcctgaaactcaaaggacttggcggtgctttacatccct
+&gt;HELIUM_000100422_612GNAAXX:7:99:9351:13090#0/1_sub[28..127] {&#34;count&#34;:260,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:260},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:1,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;29a_F260619&#34;:337}}
+ttagccctaaacacaaataattacacaaacaaaattgttcaccagagtactagcggcaac
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:108:10111:9078#0/1_sub[28..127] {&#34;count&#34;:7146,&#34;merged_sample&#34;:{&#34;13a_F730603&#34;:7146},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:1,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;13a_F730603&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;13a_F730603&#34;:8039}}
+ctagccttaaacacaaatagttatgcaaacaaaactattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:38:14204:12725#0/1_sub[28..126] {&#34;count&#34;:87,&#34;merged_sample&#34;:{&#34;26a_F040644&#34;:87},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:1,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;26a_F040644&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;26a_F040644&#34;:202}}
+ttagccctaaacataaacattcaataaacaagaatgttcgccagaggactactagcaata
+gcttaaaactcaaaggacttggcggtgctttatatccct
+&gt;HELIUM_000100422_612GNAAXX:7:30:9942:4495#0/1_sub[28..126] {&#34;count&#34;:95,&#34;merged_sample&#34;:{&#34;26a_F040644&#34;:11,&#34;29a_F260619&#34;:84},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:2,&#34;obiclean_singletoncount&#34;:1,&#34;obiclean_status&#34;:{&#34;26a_F040644&#34;:&#34;s&#34;,&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;26a_F040644&#34;:12,&#34;29a_F260619&#34;:105}}
+ttagccctaaacataagctattccataacaaaataattcgccagagaactactagcaaca
+gattaaacctcaaaggacttggcagtgctttatacccct
+&gt;HELIUM_000100422_612GNAAXX:7:51:16702:19393#0/1_sub[28..127] {&#34;count&#34;:12004,&#34;merged_sample&#34;:{&#34;15a_F730814&#34;:7465,&#34;29a_F260619&#34;:4539},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:2,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:2,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;15a_F730814&#34;:&#34;h&#34;,&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;15a_F730814&#34;:8822,&#34;29a_F260619&#34;:5789}}
+ttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:84:14502:1617#0/1_sub[28..127] {&#34;count&#34;:319,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:319},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:1,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;29a_F260619&#34;:376}}
+ttagccctaaacacaagtaattattataacaaaattattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:50:10637:6527#0/1_sub[28..126] {&#34;count&#34;:366,&#34;merged_sample&#34;:{&#34;13a_F730603&#34;:13,&#34;15a_F730814&#34;:5,&#34;26a_F040644&#34;:347,&#34;29a_F260619&#34;:1},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:4,&#34;obiclean_singletoncount&#34;:3,&#34;obiclean_status&#34;:{&#34;13a_F730603&#34;:&#34;s&#34;,&#34;15a_F730814&#34;:&#34;s&#34;,&#34;26a_F040644&#34;:&#34;h&#34;,&#34;29a_F260619&#34;:&#34;s&#34;},&#34;obiclean_weight&#34;:{&#34;13a_F730603&#34;:17,&#34;15a_F730814&#34;:5,&#34;26a_F040644&#34;:468,&#34;29a_F260619&#34;:1}}
+ttagccctaaacatagataattttacaacaaaataattcgccagaggactactagcaata
+gcttaaaactcaaaggacttggcggtgctttatatccct
+</code></pre></td>
+    
+</DIV>
+
+<h2 id="sequences-taxonomic-assignment">
+  Sequences taxonomic assignment
+  <a class="anchor" href="#sequences-taxonomic-assignment">#</a>
+</h2>
+<p>Once the dataset is curated, the next step in a classical diet metabarcoding analysis is to assign the
+barcodes a taxon name (species, genus, etc.), in order to retrieve the list
+of taxa detected in each sample.</p>
+<p>The taxonomic assignment of sequences requires a reference database to detect
+all possible taxa identified in the samples, which is provided in this tutorial
+as 
+      
+  <a href="wolf_data/db_v05_r117.fasta.gz"><code>db_v05_r117.fasta.gz</code></a> (see the tutorial 
+  <a href="https://obitools4.metabarcoding.org/docs/cookbook/reference_db/">build a reference database</a> for know how to obtain this reference
+database). The taxonomic annotation is then based on a comparison of the metabarcoding sequences against a pool of reference sequences. This operation is done with the <a href="http://metabar:8888/obidoc/obitools/obitag/">
+    <abbr title="obitag: annotate sequences with taxonomic information"><code>obitag</code></abbr>
+    </a> programm.</p>
+<h3 id="downloading-of-the-taxonomy">
+  Downloading of the taxonomy
+  <a class="anchor" href="#downloading-of-the-taxonomy">#</a>
+</h3>
+<p>The <a href="http://metabar:8888/obidoc/obitools/obitag/">
+    <abbr title="obitag: annotate sequences with taxonomic information"><code>obitag</code></abbr>
+    </a> programm requires access to the full taxonomy in order to compute its inferences.
+The 
+  <a href="https://www.ncbi.nlm.nih.gov/taxonomy">NCBI taxonomy</a> is complete and available online. It is possible to download a copy of it with the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obitaxonomy --download-ncbi --out ncbitaxo.tgz
+</span></span></code></pre></div><p>The full copy of the NCBI taxonomy is now locally stored in the <code>ncbitaxo.tgz</code> file of your current working
+directory.</p>
+<h3 id="assigning-taxa-to-the-sequences">
+  Assigning taxa to the sequences
+  <a class="anchor" href="#assigning-taxa-to-the-sequences">#</a>
+</h3>
+<p>Using the reference database 
+      
+  <a href="wolf_data/db_v05_r117.fasta.gz"><code>db_v05_r117.fasta.gz</code></a> and the full NCBI taxonomy, assigning taxa to the sequences can be done with <a href="http://metabar:8888/obidoc/obitools/obitag/">
+<abbr title="obitag: annotate sequences with taxonomic information"><code>obitag</code></abbr>
+</a> as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obitag -t ncbitaxo.tgz <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>       -R wolf_data/db_v05_r117.fasta.gz <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>       results/wolf_assembled_no_short.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>       &gt; results/wolf_assembled_taxo.fasta
+</span></span></code></pre></div><p>The resulting file, containing only few sequences in this tutorial, looks like this:</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="results/wolf_assembled_taxo.fasta" download="results/wolf_assembled_taxo.fasta">📄 wolf_assembled_taxo.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;HELIUM_000100422_612GNAAXX:7:118:3572:14633#0/1_sub[28..126] {&#34;count&#34;:10172,&#34;merged_sample&#34;:{&#34;26a_F040644&#34;:10172},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:1,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;26a_F040644&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;26a_F040644&#34;:12205},&#34;obitag_bestid&#34;:0.9797979797979798,&#34;obitag_bestmatch&#34;:&#34;AY227529&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;genus&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:9992 [Marmota]@genus&#34;}
+ttagccctaaacataaacattcaataaacaagaatgttcgccagagtactactagcaaca
+gcctgaaactcaaaggacttggcggtgctttacatccct
+&gt;HELIUM_000100422_612GNAAXX:7:99:9351:13090#0/1_sub[28..127] {&#34;count&#34;:260,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:260},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:1,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;29a_F260619&#34;:337},&#34;obitag_bestid&#34;:0.9405940594059405,&#34;obitag_bestmatch&#34;:&#34;AF154263&#34;,&#34;obitag_match_count&#34;:9,&#34;obitag_rank&#34;:&#34;infraorder&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:35500 [Pecora]@infraorder&#34;}
+ttagccctaaacacaaataattacacaaacaaaattgttcaccagagtactagcggcaac
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:108:10111:9078#0/1_sub[28..127] {&#34;count&#34;:7146,&#34;merged_sample&#34;:{&#34;13a_F730603&#34;:7146},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:1,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;13a_F730603&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;13a_F730603&#34;:8039},&#34;obitag_bestid&#34;:1,&#34;obitag_bestmatch&#34;:&#34;AB245427&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;species&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:9860 [Cervus elaphus]@species&#34;}
+ctagccttaaacacaaatagttatgcaaacaaaactattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:38:14204:12725#0/1_sub[28..126] {&#34;count&#34;:87,&#34;merged_sample&#34;:{&#34;26a_F040644&#34;:87},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:1,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;26a_F040644&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;26a_F040644&#34;:202},&#34;obitag_bestid&#34;:0.9494949494949495,&#34;obitag_bestmatch&#34;:&#34;AY227530&#34;,&#34;obitag_match_count&#34;:2,&#34;obitag_rank&#34;:&#34;tribe&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:337730 [Marmotini]@tribe&#34;}
+ttagccctaaacataaacattcaataaacaagaatgttcgccagaggactactagcaata
+gcttaaaactcaaaggacttggcggtgctttatatccct
+&gt;HELIUM_000100422_612GNAAXX:7:30:9942:4495#0/1_sub[28..126] {&#34;count&#34;:95,&#34;merged_sample&#34;:{&#34;26a_F040644&#34;:11,&#34;29a_F260619&#34;:84},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:2,&#34;obiclean_singletoncount&#34;:1,&#34;obiclean_status&#34;:{&#34;26a_F040644&#34;:&#34;s&#34;,&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;26a_F040644&#34;:12,&#34;29a_F260619&#34;:105},&#34;obitag_bestid&#34;:0.9595959595959596,&#34;obitag_bestmatch&#34;:&#34;AC187326&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;subspecies&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:9615 [Canis lupus familiaris]@subspecies&#34;}
+ttagccctaaacataagctattccataacaaaataattcgccagagaactactagcaaca
+gattaaacctcaaaggacttggcagtgctttatacccct
+&gt;HELIUM_000100422_612GNAAXX:7:51:16702:19393#0/1_sub[28..127] {&#34;count&#34;:12004,&#34;merged_sample&#34;:{&#34;15a_F730814&#34;:7465,&#34;29a_F260619&#34;:4539},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:2,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:2,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;15a_F730814&#34;:&#34;h&#34;,&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;15a_F730814&#34;:8822,&#34;29a_F260619&#34;:5789},&#34;obitag_bestid&#34;:1,&#34;obitag_bestmatch&#34;:&#34;AJ885202&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;species&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:9858 [Capreolus capreolus]@species&#34;}
+ttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:84:14502:1617#0/1_sub[28..127] {&#34;count&#34;:319,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:319},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:1,&#34;obiclean_singletoncount&#34;:0,&#34;obiclean_status&#34;:{&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;29a_F260619&#34;:376},&#34;obitag_bestid&#34;:1,&#34;obitag_bestmatch&#34;:&#34;AJ972683&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;species&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:9858 [Capreolus capreolus]@species&#34;}
+ttagccctaaacacaagtaattattataacaaaattattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:50:10637:6527#0/1_sub[28..126] {&#34;count&#34;:366,&#34;merged_sample&#34;:{&#34;13a_F730603&#34;:13,&#34;15a_F730814&#34;:5,&#34;26a_F040644&#34;:347,&#34;29a_F260619&#34;:1},&#34;obiclean_head&#34;:true,&#34;obiclean_headcount&#34;:1,&#34;obiclean_internalcount&#34;:0,&#34;obiclean_samplecount&#34;:4,&#34;obiclean_singletoncount&#34;:3,&#34;obiclean_status&#34;:{&#34;13a_F730603&#34;:&#34;s&#34;,&#34;15a_F730814&#34;:&#34;s&#34;,&#34;26a_F040644&#34;:&#34;h&#34;,&#34;29a_F260619&#34;:&#34;s&#34;},&#34;obiclean_weight&#34;:{&#34;13a_F730603&#34;:17,&#34;15a_F730814&#34;:5,&#34;26a_F040644&#34;:468,&#34;29a_F260619&#34;:1},&#34;obitag_bestid&#34;:1,&#34;obitag_bestmatch&#34;:&#34;AB048590&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;genus&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:9611 [Canis]@genus&#34;}
+ttagccctaaacatagataattttacaacaaaataattcgccagaggactactagcaata
+gcttaaaactcaaaggacttggcggtgctttatatccct
+</code></pre></td>
+    
+</DIV>
+
+<p>The <a href="http://metabar:8888/obidoc/obitools/obitag/">
+<abbr title="obitag: annotate sequences with taxonomic information"><code>obitag</code></abbr>
+</a> command adds several attributes in the sequence record header, like:</p>
+<ul>
+<li><code>obitag_bestmatch:ACCESSION</code> where ACCESSION is the id of the sequence in
+the reference database that best aligns to the query sequence</li>
+<li><code>obitag_bestid:FLOAT</code> where FLOAT*100 is the percentage of identity between
+the best match sequence and the query sequence</li>
+<li><code>taxid:TAXID</code> where TAXID is the taxonomic ID of the taxon assigned to the sequence by <a href="http://metabar:8888/obidoc/obitools/obitag/">
+<abbr title="obitag: annotate sequences with taxonomic information"><code>obitag</code></abbr>
+</a></li>
+</ul>
+<h2 id="exporting-the-results-in-a-tabular-format">
+  Exporting the results in a tabular format
+  <a class="anchor" href="#exporting-the-results-in-a-tabular-format">#</a>
+</h2>
+<p>To reduce the file size and make it easier to analyze, we can make some
+cosmetic changes to the data file, for example by removing some useless information that
+<em>OBITools4</em> inserts in the sequence header to explain its decisions.</p>
+<a href="http://metabar:8888/obidoc/obitools/obiannotate/">
+    <abbr title="obiannotate: edit sequence annotations"><code>obiannotate</code></abbr>
+    </a> is the tool to make such changes. In the next command,
+we will remove some tags inserted by <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a>.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiannotate  --delete-tag<span style="color:#f92672">=</span>obiclean_head <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>             --delete-tag<span style="color:#f92672">=</span>obiclean_headcount <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>             --delete-tag<span style="color:#f92672">=</span>obiclean_internalcount <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>             --delete-tag<span style="color:#f92672">=</span>obiclean_samplecount <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>             --delete-tag<span style="color:#f92672">=</span>obiclean_singletoncount <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>             results/wolf_assembled_taxo.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>             &gt; results/wolf_minimal.fasta
+</span></span></code></pre></div><p>The effect of the above command can be seen below:</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="results/wolf_minimal.fasta" download="results/wolf_minimal.fasta">📄 wolf_minimal.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;HELIUM_000100422_612GNAAXX:7:118:3572:14633#0/1_sub[28..126] {&#34;count&#34;:10172,&#34;merged_sample&#34;:{&#34;26a_F040644&#34;:10172},&#34;obiclean_status&#34;:{&#34;26a_F040644&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;26a_F040644&#34;:12205},&#34;obitag_bestid&#34;:0.9797979797979798,&#34;obitag_bestmatch&#34;:&#34;AY227529&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;genus&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:9992 [Marmota]@genus&#34;}
+ttagccctaaacataaacattcaataaacaagaatgttcgccagagtactactagcaaca
+gcctgaaactcaaaggacttggcggtgctttacatccct
+&gt;HELIUM_000100422_612GNAAXX:7:99:9351:13090#0/1_sub[28..127] {&#34;count&#34;:260,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:260},&#34;obiclean_status&#34;:{&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;29a_F260619&#34;:337},&#34;obitag_bestid&#34;:0.9405940594059405,&#34;obitag_bestmatch&#34;:&#34;AF154263&#34;,&#34;obitag_match_count&#34;:9,&#34;obitag_rank&#34;:&#34;infraorder&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:35500 [Pecora]@infraorder&#34;}
+ttagccctaaacacaaataattacacaaacaaaattgttcaccagagtactagcggcaac
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:108:10111:9078#0/1_sub[28..127] {&#34;count&#34;:7146,&#34;merged_sample&#34;:{&#34;13a_F730603&#34;:7146},&#34;obiclean_status&#34;:{&#34;13a_F730603&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;13a_F730603&#34;:8039},&#34;obitag_bestid&#34;:1,&#34;obitag_bestmatch&#34;:&#34;AB245427&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;species&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:9860 [Cervus elaphus]@species&#34;}
+ctagccttaaacacaaatagttatgcaaacaaaactattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:38:14204:12725#0/1_sub[28..126] {&#34;count&#34;:87,&#34;merged_sample&#34;:{&#34;26a_F040644&#34;:87},&#34;obiclean_status&#34;:{&#34;26a_F040644&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;26a_F040644&#34;:202},&#34;obitag_bestid&#34;:0.9494949494949495,&#34;obitag_bestmatch&#34;:&#34;AY227530&#34;,&#34;obitag_match_count&#34;:2,&#34;obitag_rank&#34;:&#34;tribe&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:337730 [Marmotini]@tribe&#34;}
+ttagccctaaacataaacattcaataaacaagaatgttcgccagaggactactagcaata
+gcttaaaactcaaaggacttggcggtgctttatatccct
+&gt;HELIUM_000100422_612GNAAXX:7:30:9942:4495#0/1_sub[28..126] {&#34;count&#34;:95,&#34;merged_sample&#34;:{&#34;26a_F040644&#34;:11,&#34;29a_F260619&#34;:84},&#34;obiclean_status&#34;:{&#34;26a_F040644&#34;:&#34;s&#34;,&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;26a_F040644&#34;:12,&#34;29a_F260619&#34;:105},&#34;obitag_bestid&#34;:0.9595959595959596,&#34;obitag_bestmatch&#34;:&#34;AC187326&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;subspecies&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:9615 [Canis lupus familiaris]@subspecies&#34;}
+ttagccctaaacataagctattccataacaaaataattcgccagagaactactagcaaca
+gattaaacctcaaaggacttggcagtgctttatacccct
+&gt;HELIUM_000100422_612GNAAXX:7:51:16702:19393#0/1_sub[28..127] {&#34;count&#34;:12004,&#34;merged_sample&#34;:{&#34;15a_F730814&#34;:7465,&#34;29a_F260619&#34;:4539},&#34;obiclean_status&#34;:{&#34;15a_F730814&#34;:&#34;h&#34;,&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;15a_F730814&#34;:8822,&#34;29a_F260619&#34;:5789},&#34;obitag_bestid&#34;:1,&#34;obitag_bestmatch&#34;:&#34;AJ885202&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;species&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:9858 [Capreolus capreolus]@species&#34;}
+ttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:84:14502:1617#0/1_sub[28..127] {&#34;count&#34;:319,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:319},&#34;obiclean_status&#34;:{&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;29a_F260619&#34;:376},&#34;obitag_bestid&#34;:1,&#34;obitag_bestmatch&#34;:&#34;AJ972683&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;species&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:9858 [Capreolus capreolus]@species&#34;}
+ttagccctaaacacaagtaattattataacaaaattattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;HELIUM_000100422_612GNAAXX:7:50:10637:6527#0/1_sub[28..126] {&#34;count&#34;:366,&#34;merged_sample&#34;:{&#34;13a_F730603&#34;:13,&#34;15a_F730814&#34;:5,&#34;26a_F040644&#34;:347,&#34;29a_F260619&#34;:1},&#34;obiclean_status&#34;:{&#34;13a_F730603&#34;:&#34;s&#34;,&#34;15a_F730814&#34;:&#34;s&#34;,&#34;26a_F040644&#34;:&#34;h&#34;,&#34;29a_F260619&#34;:&#34;s&#34;},&#34;obiclean_weight&#34;:{&#34;13a_F730603&#34;:17,&#34;15a_F730814&#34;:5,&#34;26a_F040644&#34;:468,&#34;29a_F260619&#34;:1},&#34;obitag_bestid&#34;:1,&#34;obitag_bestmatch&#34;:&#34;AB048590&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;genus&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;taxid&#34;:&#34;taxon:9611 [Canis]@genus&#34;}
+ttagccctaaacatagataattttacaacaaaataattcgccagaggactactagcaata
+gcttaaaactcaaaggacttggcggtgctttatatccct
+</code></pre></td>
+    
+</DIV>
+
+<p>The sequence id is very long and refers to some information that is useful for
+analyzing the sequencing process, but useless for us, especially after a <a href="http://metabar:8888/obidoc/obitools/obiuniq/">
+    <abbr title="obiuniq: dereplicate a sequence file"><code>obiuniq</code></abbr>
+    </a> command, as the sequence id correponds to the id of only one of the merged sequences. We can thus change it to make it more readable. This is done in two steps. First, we use the first <a href="http://metabar:8888/obidoc/obitools/obiannotate/">
+    <abbr title="obiannotate: edit sequence annotations"><code>obiannotate</code></abbr>
+    </a>
+command to add a <code>seq_number</code> attribute in the sequence header that numbers the sequence from <em>1</em>
+to <em>n</em>, the number of sequence variants. Second, we use the value of this new attribute to create a new, more readable sequence identifier using the <code>sprintf</code> function of the <em>OBITools4</em> expression language. The new sequence identifier is a string consisting of the prefix &ldquo;seq&rdquo; followed by the sequence
+number, padded with zeros to make it 4 characters long (e.g., seq0001, seq0002,
+etc.).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiannotate --number results/wolf_minimal.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  | obiannotate --set-id <span style="color:#e6db74">&#39;sprintf(&#34;seq%04d&#34;,annotations.seq_number)&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  &gt; results/wolf_final.fasta
+</span></span></code></pre></div>    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="results/wolf_final.fasta" download="results/wolf_final.fasta">📄 wolf_final.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;seq0001 {&#34;count&#34;:10172,&#34;merged_sample&#34;:{&#34;26a_F040644&#34;:10172},&#34;obiclean_status&#34;:{&#34;26a_F040644&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;26a_F040644&#34;:12205},&#34;obitag_bestid&#34;:0.9797979797979798,&#34;obitag_bestmatch&#34;:&#34;AY227529&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;genus&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;seq_number&#34;:1,&#34;taxid&#34;:&#34;taxon:9992 [Marmota]@genus&#34;}
+ttagccctaaacataaacattcaataaacaagaatgttcgccagagtactactagcaaca
+gcctgaaactcaaaggacttggcggtgctttacatccct
+&gt;seq0002 {&#34;count&#34;:260,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:260},&#34;obiclean_status&#34;:{&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;29a_F260619&#34;:337},&#34;obitag_bestid&#34;:0.9405940594059405,&#34;obitag_bestmatch&#34;:&#34;AF154263&#34;,&#34;obitag_match_count&#34;:9,&#34;obitag_rank&#34;:&#34;infraorder&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;seq_number&#34;:2,&#34;taxid&#34;:&#34;taxon:35500 [Pecora]@infraorder&#34;}
+ttagccctaaacacaaataattacacaaacaaaattgttcaccagagtactagcggcaac
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;seq0003 {&#34;count&#34;:7146,&#34;merged_sample&#34;:{&#34;13a_F730603&#34;:7146},&#34;obiclean_status&#34;:{&#34;13a_F730603&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;13a_F730603&#34;:8039},&#34;obitag_bestid&#34;:1,&#34;obitag_bestmatch&#34;:&#34;AB245427&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;species&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;seq_number&#34;:3,&#34;taxid&#34;:&#34;taxon:9860 [Cervus elaphus]@species&#34;}
+ctagccttaaacacaaatagttatgcaaacaaaactattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;seq0004 {&#34;count&#34;:87,&#34;merged_sample&#34;:{&#34;26a_F040644&#34;:87},&#34;obiclean_status&#34;:{&#34;26a_F040644&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;26a_F040644&#34;:202},&#34;obitag_bestid&#34;:0.9494949494949495,&#34;obitag_bestmatch&#34;:&#34;AY227530&#34;,&#34;obitag_match_count&#34;:2,&#34;obitag_rank&#34;:&#34;tribe&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;seq_number&#34;:4,&#34;taxid&#34;:&#34;taxon:337730 [Marmotini]@tribe&#34;}
+ttagccctaaacataaacattcaataaacaagaatgttcgccagaggactactagcaata
+gcttaaaactcaaaggacttggcggtgctttatatccct
+&gt;seq0005 {&#34;count&#34;:95,&#34;merged_sample&#34;:{&#34;26a_F040644&#34;:11,&#34;29a_F260619&#34;:84},&#34;obiclean_status&#34;:{&#34;26a_F040644&#34;:&#34;s&#34;,&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;26a_F040644&#34;:12,&#34;29a_F260619&#34;:105},&#34;obitag_bestid&#34;:0.9595959595959596,&#34;obitag_bestmatch&#34;:&#34;AC187326&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;subspecies&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;seq_number&#34;:5,&#34;taxid&#34;:&#34;taxon:9615 [Canis lupus familiaris]@subspecies&#34;}
+ttagccctaaacataagctattccataacaaaataattcgccagagaactactagcaaca
+gattaaacctcaaaggacttggcagtgctttatacccct
+&gt;seq0006 {&#34;count&#34;:12004,&#34;merged_sample&#34;:{&#34;15a_F730814&#34;:7465,&#34;29a_F260619&#34;:4539},&#34;obiclean_status&#34;:{&#34;15a_F730814&#34;:&#34;h&#34;,&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;15a_F730814&#34;:8822,&#34;29a_F260619&#34;:5789},&#34;obitag_bestid&#34;:1,&#34;obitag_bestmatch&#34;:&#34;AJ885202&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;species&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;seq_number&#34;:6,&#34;taxid&#34;:&#34;taxon:9858 [Capreolus capreolus]@species&#34;}
+ttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;seq0007 {&#34;count&#34;:319,&#34;merged_sample&#34;:{&#34;29a_F260619&#34;:319},&#34;obiclean_status&#34;:{&#34;29a_F260619&#34;:&#34;h&#34;},&#34;obiclean_weight&#34;:{&#34;29a_F260619&#34;:376},&#34;obitag_bestid&#34;:1,&#34;obitag_bestmatch&#34;:&#34;AJ972683&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;species&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;seq_number&#34;:7,&#34;taxid&#34;:&#34;taxon:9858 [Capreolus capreolus]@species&#34;}
+ttagccctaaacacaagtaattattataacaaaattattcgccagagtactaccggcaat
+agcttaaaactcaaaggacttggcggtgctttataccctt
+&gt;seq0008 {&#34;count&#34;:366,&#34;merged_sample&#34;:{&#34;13a_F730603&#34;:13,&#34;15a_F730814&#34;:5,&#34;26a_F040644&#34;:347,&#34;29a_F260619&#34;:1},&#34;obiclean_status&#34;:{&#34;13a_F730603&#34;:&#34;s&#34;,&#34;15a_F730814&#34;:&#34;s&#34;,&#34;26a_F040644&#34;:&#34;h&#34;,&#34;29a_F260619&#34;:&#34;s&#34;},&#34;obiclean_weight&#34;:{&#34;13a_F730603&#34;:17,&#34;15a_F730814&#34;:5,&#34;26a_F040644&#34;:468,&#34;29a_F260619&#34;:1},&#34;obitag_bestid&#34;:1,&#34;obitag_bestmatch&#34;:&#34;AB048590&#34;,&#34;obitag_match_count&#34;:1,&#34;obitag_rank&#34;:&#34;genus&#34;,&#34;obitag_similarity_method&#34;:&#34;lcs&#34;,&#34;seq_number&#34;:8,&#34;taxid&#34;:&#34;taxon:9611 [Canis]@genus&#34;}
+ttagccctaaacatagataattttacaacaaaataattcgccagaggactactagcaata
+gcttaaaactcaaaggacttggcggtgctttatatccct
+</code></pre></td>
+    
+</DIV>
+
+<p>It is now possible to extract the useful information for our ecological analysis
+from our sequence file. The results of this extraction consists of two 
+  <a href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">CSV</a>
+files, one describing the occurrence of each sequence variant in the different samples, and one for the
+metadata describing each sequence variant, which can at this stage of the analysis be considered as a Molecular Taxonomic Unit, i.e. MOTU.</p>
+<h3 id="the-motu-occurrence-table">
+  The MOTU occurrence table
+  <a class="anchor" href="#the-motu-occurrence-table">#</a>
+</h3>
+<p>In the results file 
+      
+  <a href="results/wolf_final.fasta"><code>wolf_final.fasta</code></a>, two
+attributes inform us about the distribution of MOTU abundances across samples
+(which here correspond to individual PCR): the <code>merge_sample</code> attribute and the <code>obiclean_weight</code> attribute.</p>
+<p>The <code>merge_sample</code> attribute was set by <a href="http://metabar:8888/obidoc/obitools/obiuniq/">
+    <abbr title="obiuniq: dereplicate a sequence file"><code>obiuniq</code></abbr>
+    </a> during the initial
+reads dereplication procedure. It contains the observed number of reads for each
+sequence variant in the different samples. The <code>obiclean_weight</code> attribute is
+the number of reads assigned to each sequence variant after the <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a>
+denoising (or clustering) step. The number of reads shown in this attribute takes into
+account not only the number of reads observed for this variant, but also the
+number of reads observed for the erroneous sequences clustered to this estimated
+genuine sequence. According to <a href="http://metabar:8888/obidoc/obitools/obiclean/">
+    <abbr title="obiclean: a PCR aware denoising algorithm"><code>obiclean</code></abbr>
+    </a>, <code>obiclean_weight</code> is a better
+estimate of the true sequence occurrence than the <code>merge_sample</code> attribute.</p>
+<p>The <a href="http://metabar:8888/obidoc/obitools/obimatrix/">
+    <abbr title="obimatrix: convert a sequence file into a data matrix file"><code>obimatrix</code></abbr>
+    </a> command creates the 
+  <a href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">CSV</a>
+file representing any map
+attribute of a <em>OBITools4</em> sequence file. By default, it dumps the
+<code>merge_sample</code> attribute, but you can specify any other map attribute. Here we
+decided to use the <code>obiclean_weight</code> attribute, as we prefer to report the
+abundances of the MOTUs.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obimatrix --map obiclean_weight <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>          results/wolf_final.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>          &gt; results/wolf_final_occurrency.csv
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>csvlook results/wolf_final_occurrency.csv
+</span></span></code></pre></div><pre tabindex="0"><code>| id          | seq0001 | seq0002 | seq0003 | seq0004 | seq0005 | seq0006 | seq0007 | seq0008 |
+| ----------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- |
+| 29a_F260619 |       0 |     337 |       0 |       0 |     105 |   5 789 |     376 |       1 |
+| 15a_F730814 |       0 |       0 |       0 |       0 |       0 |   8 822 |       0 |       5 |
+| 13a_F730603 |       0 |       0 |   8 039 |       0 |       0 |       0 |       0 |      17 |
+| 26a_F040644 |  12 205 |       0 |       0 |     202 |      12 |       0 |       0 |     468 |
+|             |         |         |         |         |         |         |         |         |
+</code></pre><p>To create the 
+      
+  <a href="results/wolf_final_motus.csv">CSV metadata file</a> describing the
+MOTUs attributes, you can use <a href="http://metabar:8888/obidoc/obitools/obicsv/">
+    <abbr title="obicsv: convert a sequence file to a CSV file"><code>obicsv</code></abbr>
+    </a> with the <code>--auto</code> option. This will create
+a 
+  <a href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">CSV</a>
+file from the 
+      
+  <a href="results/wolf_final.fasta"><code>wolf_final.fasta</code></a> file and automatically determine which columns to include based on their contents from the first sequence records of the input
+dataset. In the example below, the <code>-i</code> and <code>-s</code> options are used to include the sequence identifier and the sequence itself in the output 
+  <a href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">CSV</a>
+file. The result can be viewed with <code>csvlook</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicsv --auto -i -s <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>       results/wolf_final.fasta <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>       &gt; results/wolf_final_motus.csv 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>csvlook results/wolf_final_motus.csv
+</span></span></code></pre></div><pre tabindex="0"><code>| id      |  count | obitag_bestid | obitag_bestmatch | obitag_match_count | obitag_rank | obitag_similarity_method | seq_number | taxid                                          | sequence                                                                                             |
+| ------- | ------ | ------------- | ---------------- | ------------------ | ----------- | ------------------------ | ---------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| seq0001 | 10 172 |        0,980… | AY227529         |                  1 | genus       | lcs                      |          1 | taxon:9992 [Marmota]@genus                     | ttagccctaaacataaacattcaataaacaagaatgttcgccagagtactactagcaacagcctgaaactcaaaggacttggcggtgctttacatccct  |
+| seq0002 |    260 |        0,941… | AF154263         |                  9 | infraorder  | lcs                      |          2 | taxon:35500 [Pecora]@infraorder                | ttagccctaaacacaaataattacacaaacaaaattgttcaccagagtactagcggcaacagcttaaaactcaaaggacttggcggtgctttataccctt |
+| seq0003 |  7 146 |        1,000… | AB245427         |                  1 | species     | lcs                      |          3 | taxon:9860 [Cervus elaphus]@species            | ctagccttaaacacaaatagttatgcaaacaaaactattcgccagagtactaccggcaatagcttaaaactcaaaggacttggcggtgctttataccctt |
+| seq0004 |     87 |        0,949… | AY227530         |                  2 | tribe       | lcs                      |          4 | taxon:337730 [Marmotini]@tribe                 | ttagccctaaacataaacattcaataaacaagaatgttcgccagaggactactagcaatagcttaaaactcaaaggacttggcggtgctttatatccct  |
+| seq0005 |     95 |        0,960… | AC187326         |                  1 | subspecies  | lcs                      |          5 | taxon:9615 [Canis lupus familiaris]@subspecies | ttagccctaaacataagctattccataacaaaataattcgccagagaactactagcaacagattaaacctcaaaggacttggcagtgctttatacccct  |
+| seq0006 | 12 004 |        1,000… | AJ885202         |                  1 | species     | lcs                      |          6 | taxon:9858 [Capreolus capreolus]@species       | ttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcaatagcttaaaactcaaaggacttggcggtgctttataccctt |
+| seq0007 |    319 |        1,000… | AJ972683         |                  1 | species     | lcs                      |          7 | taxon:9858 [Capreolus capreolus]@species       | ttagccctaaacacaagtaattattataacaaaattattcgccagagtactaccggcaatagcttaaaactcaaaggacttggcggtgctttataccctt |
+| seq0008 |    366 |        1,000… | AB048590         |                  1 | genus       | lcs                      |          8 | taxon:9611 [Canis]@genus                       | ttagccctaaacatagataattttacaacaaaataattcgccagaggactactagcaatagcttaaaactcaaaggacttggcggtgctttatatccct  |
+</code></pre><h2 id="references">
+  References
+  <a class="anchor" href="#references">#</a>
+</h2>
+
+  
+
+  
+
+
+
+
+
+
+
+
+
+
+<section class="hugo-cite-bibliography">
+  <dl>
+    
+
+      <div id="riaz2011-gn">
+        <dt>
+          Riaz,&#32;
+          Shehzad,&#32;
+          Viari,&#32;
+          Pompanon,&#32;
+          Taberlet&#32;&amp;&#32;Coissac
+
+          
+          (2011)</dt>
+
+        <dd>
+          
+
+
+
+
+
+
+
+
+
+
+<span itemscope
+      itemtype="https://schema.org/Article"
+      data-type="article"><span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Riaz</span>,&#32;
+    <meta itemprop="givenName" content="Tiayyba" />
+    T.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Shehzad</span>,&#32;
+    <meta itemprop="givenName" content="Wasim" />
+    W.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Viari</span>,&#32;
+    <meta itemprop="givenName" content="Alain" />
+    A.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Pompanon</span>,&#32;
+    <meta itemprop="givenName" content="François" />
+    F.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Taberlet</span>,&#32;
+    <meta itemprop="givenName" content="Pierre" />
+    P.</span>&#32;&amp;&#32;<span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Coissac</span>,&#32;
+    <meta itemprop="givenName" content="Eric" />
+    E.</span>
+  &#32;
+    (<span itemprop="datePublished">2011</span>).
+  &#32;<span itemprop="name">ecoPrimers: inference of new DNA barcode markers from whole genome sequence analysis</span>.<i>
+    <span itemprop="about">Nucleic acids research</span>,&#32;39(21)</i>.&#32;<span itemprop="pagination">e145</span>.
+  <a href="https://doi.org/10.1093/nar/gkr732"
+     itemprop="identifier"
+     itemtype="https://schema.org/URL">https://doi.org/10.1093/nar/gkr732</a></span>
+
+
+
+
+</dd>
+
+      </div>
+
+      <div id="shehzad2012-pn">
+        <dt>
+          Shehzad,&#32;
+          Riaz,&#32;
+          Nawaz,&#32;
+          Miquel,&#32;
+          Poillot,&#32;
+          Shah,&#32;
+          Pompanon,&#32;
+          Coissac&#32;&amp;&#32;Taberlet
+
+          
+          (2012)</dt>
+
+        <dd>
+          
+
+
+
+
+
+
+
+
+
+
+<span itemscope
+      itemtype="https://schema.org/Article"
+      data-type="article"><span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Shehzad</span>,&#32;
+    <meta itemprop="givenName" content="Wasim" />
+    W.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Riaz</span>,&#32;
+    <meta itemprop="givenName" content="Tiayyba" />
+    T.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Nawaz</span>,&#32;
+    <meta itemprop="givenName" content="Muhammad A" />
+    M.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Miquel</span>,&#32;
+    <meta itemprop="givenName" content="Christian" />
+    C.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Poillot</span>,&#32;
+    <meta itemprop="givenName" content="Carole" />
+    C.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Shah</span>,&#32;
+    <meta itemprop="givenName" content="Safdar A" />
+    S.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Pompanon</span>,&#32;
+    <meta itemprop="givenName" content="François" />
+    F.</span>,&#32;
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Coissac</span>,&#32;
+    <meta itemprop="givenName" content="Eric" />
+    E.</span>&#32;&amp;&#32;<span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="familyName">Taberlet</span>,&#32;
+    <meta itemprop="givenName" content="Pierre" />
+    P.</span>
+  &#32;
+    (<span itemprop="datePublished">2012</span>).
+  &#32;<span itemprop="name">Carnivore diet analysis based on next-generation sequencing: application to the leopard cat (Prionailurus bengalensis) in Pakistan: LEOPARD CAT DIET</span>.<i>
+    <span itemprop="about">Molecular ecology</span>,&#32;21(8)</i>.&#32;<span itemprop="pagination">1951–1965</span>.
+  <a href="https://doi.org/10.1111/j.1365-294X.2011.05424.x"
+     itemprop="identifier"
+     itemtype="https://schema.org/URL">https://doi.org/10.1111/j.1365-294X.2011.05424.x</a></span>
+
+
+
+
+</dd>
+
+      </div>
+  </dl>
+</section>
+
+
+
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-wolf-diet-tutorial">The wolf diet tutorial</a>
+      <ul>
+        <li><a href="#the-dataset-to-analyze-and-the-reference-database">The dataset to analyze and the reference database</a></li>
+        <li><a href="#recover-full-length-sequences-from-forward-and-reverse-reads">Recover full length sequences from forward and reverse reads</a></li>
+        <li><a href="#exclude-unpaired-reads">Exclude unpaired reads</a></li>
+        <li><a href="#assign-each-sequence-record-to-the-corresponding-sample-and-marker-combination">Assign each sequence record to the corresponding sample and marker combination</a></li>
+        <li><a href="#reads-dereplication">Reads dereplication</a></li>
+        <li><a href="#dataset-denoising">Dataset denoising</a>
+          <ul>
+            <li></li>
+          </ul>
+        </li>
+        <li><a href="#sequences-taxonomic-assignment">Sequences taxonomic assignment</a>
+          <ul>
+            <li><a href="#downloading-of-the-taxonomy">Downloading of the taxonomy</a></li>
+            <li><a href="#assigning-taxa-to-the-sequences">Assigning taxa to the sequences</a></li>
+          </ul>
+        </li>
+        <li><a href="#exporting-the-results-in-a-tabular-format">Exporting the results in a tabular format</a>
+          <ul>
+            <li><a href="#the-motu-occurrence-table">The MOTU occurrence table</a></li>
+          </ul>
+        </li>
+        <li><a href="#references">References</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

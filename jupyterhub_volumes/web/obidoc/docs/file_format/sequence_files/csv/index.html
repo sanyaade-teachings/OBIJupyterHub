@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
+  The CSV sequence file format
+  #
+
+The 
+  CSV (Comma-Separated Values) files are formatted as plain text where each line represents a data record, and each field within that record is separated by a comma.
+
+  Converting FASTA file to CSV
+  #
+
+Use the 
+obicsv
+ command to convert a 
+  fasta
+file to CSV format, with the -i and -s options, to print the sequence identifier and the nucleotide sequence respectively, and the -k option to retain the desired attributes. Each record in the FASTA file corresponds to a line in the output file:">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">
+  <meta property="og:site_name" content="OBITools4 documentation">
+  <meta property="og:title" content="CSV format">
+  <meta property="og:description" content="The CSV sequence file format # The CSV (Comma-Separated Values) files are formatted as plain text where each line represents a data record, and each field within that record is separated by a comma.
+Converting FASTA file to CSV # Use the obicsv command to convert a fasta file to CSV format, with the -i and -s options, to print the sequence identifier and the nucleotide sequence respectively, and the -k option to retain the desired attributes. Each record in the FASTA file corresponds to a line in the output file:">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+<title>CSV format | OBITools4 documentation</title>
+<link rel="icon" href="/obidoc/favicon.png" >
+<link rel="manifest" href="/obidoc/manifest.json">
+<link rel="canonical" href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/">
+<link rel="stylesheet" href="/obidoc/book.min.5fd7b8e2d1c0ae15da279c52ff32731130386f71b58f011468f20d0056fe6b78.css" integrity="sha256-X9e44tHArhXaJ5xS/zJzETA4b3G1jwEUaPINAFb&#43;a3g=" crossorigin="anonymous">
+  <script defer src="/obidoc/fuse.min.js"></script>
+  <script defer src="/obidoc/en.search.min.4da51bdd2d833922fdbc0e19df517221387fc625ffb68ee140d605b3c5b68058.js" integrity="sha256-TaUb3S2DOSL9vA4Z31FyITh/xiX/to7hQNYFs8W2gFg=" crossorigin="anonymous"></script>
+
+  <script defer src="/obidoc/sw.min.32af8eafce4180aa1c5dea66d99fb26ba9043ea7c7a4c706138c91d9051b285e.js" integrity="sha256-Mq&#43;Or85BgKocXepm2Z&#43;ya6kEPqfHpMcGE4yR2QUbKF4=" crossorigin="anonymous"></script>
+<link rel="alternate" type="application/rss+xml" href="http://metabar:8888/obidoc/docs/file_format/sequence_files/csv/index.xml" title="OBITools4 documentation" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  <link rel="stylesheet" type="text/css" href="http://metabar:8888/obidoc/hugo-cite.css" />
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/obidoc/"><img src="/obidoc/obitools_logo.jpg" alt="Logo" class="book-icon" /><span>OBITools4 documentation</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Docs</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/about/" class="">About</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/installation/" class="">Installation</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/principles/" class="">General operating principles</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-08756b4c1f14be6ee584ece005b9f621" class="toggle" checked />
+    <label for="section-08756b4c1f14be6ee584ece005b9f621" class="flex justify-between">
+      <a role="button" class="">File formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-933c2e64b905b84e22aa5273cea2d0bd" class="toggle" checked />
+    <label for="section-933c2e64b905b84e22aa5273cea2d0bd" class="flex justify-between">
+      <a role="button" class="">Sequence file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fasta/" class="">FASTA file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fastq/" class="">FASTQ file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/genbank/" class="">GenBank Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/embl/" class="">EMBL Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/csv/" class="active">CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/json/" class="">JSON format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/annotations/" class="">Annotation of sequences</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-0258ae1c222f9a38cc1b75254c93b0f4" class="toggle"  />
+    <label for="section-0258ae1c222f9a38cc1b75254c93b0f4" class="flex justify-between">
+      <a role="button" class="">Taxonomy file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/csv_taxdump/" class="">CSV formatted taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/ncbi_taxdump/" class="">NCBI taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/csv/" class="">The CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-70b1e6e5ec7f3ccab643155fa50659b6" class="toggle"  />
+    <label for="section-70b1e6e5ec7f3ccab643155fa50659b6" class="flex justify-between">
+      <a role="button" class="">Patterns</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/regular/" class="">Regular Expressions</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/dnagrep/" class="">DNA Patterns</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8223f464911a1fe6c655972143684e93" class="toggle"  />
+    <label for="section-8223f464911a1fe6c655972143684e93" class="flex justify-between">
+      <a role="button" class="">The OBITools4 commands</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/options/" class="">Shared command options</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8921ea65523c266b128dd4263232b0fc" class="toggle"  />
+    <label for="section-8921ea65523c266b128dd4263232b0fc" class="flex justify-between">
+      <a role="button" class="">Basics</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiannotate/" class="">obiannotate</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicomplement/" class="">obicomplement</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconvert/" class="">obiconvert</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicount/" class="">obicount</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicsv/" class="">obicsv</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidemerge/" class="">obidemerge</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidistribute/" class="">obidistribute</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obigrep/" class="">obigrep</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obijoin/" class="">obijoin</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimatrix/" class="">obimatrix</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisplit/" class="">obisplit</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisummary/" class="">obisummary</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiuniq/" class="">obiuniq</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-dbdf1bb5377572439394e60e08c30f50" class="toggle"  />
+    <label for="section-dbdf1bb5377572439394e60e08c30f50" class="flex justify-between">
+      <a role="button" class="">Demultiplexing samples</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimultiplex/" class="">obimultiplex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitagpcr/" class="">obitagpcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-aa98fedd067b51150db59691a8ea8edd" class="toggle"  />
+    <label for="section-aa98fedd067b51150db59691a8ea8edd" class="flex justify-between">
+      <a role="button" class="">Sequence alignments</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiclean/" class="">obiclean</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7433746525d8c2b29b033f765c869acd" class="toggle"  />
+    <label for="section-7433746525d8c2b29b033f765c869acd" class="flex justify-between">
+      <a href="/obidoc/obitools/obipairing/" class="">obipairing</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/fasta-like/" class="">The FASTA-like alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/exact-alignment/" class="">Exact alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obipcr/" class="">obipcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obirefidx/" class="">obirefidx</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitag/" class="">obitag</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-5746f699d10490780dec8e30ab2dd3ce" class="toggle"  />
+    <label for="section-5746f699d10490780dec8e30ab2dd3ce" class="flex justify-between">
+      <a role="button" class="">Taxonomy</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitaxonomy/" class="">obitaxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-3f50c4fe7ab436a56ae92897d5444956" class="toggle"  />
+    <label for="section-3f50c4fe7ab436a56ae92897d5444956" class="flex justify-between">
+      <a role="button" class="">Advanced tools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiscript/" class="">obiscript</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-549be3934679fcb82a232f6bd5435563" class="toggle"  />
+    <label for="section-549be3934679fcb82a232f6bd5435563" class="flex justify-between">
+      <a role="button" class="">Others</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimicrosat/" class="">obimicrosat</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-ceca4455173761e30cbc0a6dc2327167" class="toggle"  />
+    <label for="section-ceca4455173761e30cbc0a6dc2327167" class="flex justify-between">
+      <a role="button" class="">Experimentals</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicleandb/" class="">obicleandb</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconsensus/" class="">obiconsensus</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obilandmark/" class="">obilandmark</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/tags/" class="">Glossary of tags</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9b1bcd52530c59dc4819b1f61c128f54" class="toggle"  />
+    <label for="section-9b1bcd52530c59dc4819b1f61c128f54" class="flex justify-between">
+      <a role="button" class="">Cookbook</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/illumina/" class="">Analysing an Illumina data set</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/ecoprimers/" class="">Designing new barcodes</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/local_genbank/" class="">Prepare a local copy of Genbank</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/reference_db/" class="">Build a reference database</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/minion/" class="">Oxford Nanopore data analysis</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Programming OBITools</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/expression/" class="">Expression language</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-6d580829a667b5cca790b286d99a10fe" class="toggle"  />
+    <label for="section-6d580829a667b5cca790b286d99a10fe" class="flex justify-between">
+      <a href="/obidoc/docs/programming/lua/" class="">Lua: for scripting OBITools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-2fb081dac812d624eea5f4268fca9e26" class="toggle"  />
+    <label for="section-2fb081dac812d624eea5f4268fca9e26" class="flex justify-between">
+      <a role="button" class="">Obitools Classes</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequence/" class="">BioSequence</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequenceslice/" class="">BioSequenceSlice</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxonomy/" class="">Taxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxon/" class="">Taxon</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/mutex/" class="">Mutex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/obidoc/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>CSV format</h3>
+
+  <label for="toc-control">
+    
+    <img src="/obidoc/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-csv-sequence-file-format">The <em>CSV</em> sequence file format</a>
+      <ul>
+        <li><a href="#converting-fasta-file-to-csv">Converting FASTA file to CSV</a></li>
+        <li><a href="#converting-csv-file-to-fasta-format">Converting CSV file to FASTA format</a></li>
+        <li><a href="#converting-fastq-file-to-csv">Converting FASTQ file to CSV</a></li>
+        <li><a href="#converting-csv-file-to-fastq-format">Converting CSV file to FASTQ format</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="the-csv-sequence-file-format">
+  The <em>CSV</em> sequence file format
+  <a class="anchor" href="#the-csv-sequence-file-format">#</a>
+</h1>
+<p>The 
+  <a href="https://en.wikipedia.org/wiki/Comma-separated_values">CSV (Comma-Separated Values)</a> files are formatted as plain text where each line represents a data record, and each field within that record is separated by a comma.</p>
+<h2 id="converting-fasta-file-to-csv">
+  Converting FASTA file to CSV
+  <a class="anchor" href="#converting-fasta-file-to-csv">#</a>
+</h2>
+<p>Use the <a href="http://metabar:8888/obidoc/obitools/obicsv/">
+<abbr title="obicsv: convert a sequence file to a CSV file"><code>obicsv</code></abbr>
+</a> command to convert a 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+file to CSV format, with the <code>-i</code> and <code>-s</code> options, to print the sequence identifier and the nucleotide sequence respectively, and the <code>-k</code> option to retain the desired attributes. Each record in the FASTA file corresponds to a line in the output file:</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="two_sequences.fasta" download="two_sequences.fasta">📄 two_sequences.fasta</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fasta" data-lang="fasta">&gt;AB061527 {&#34;count&#34;:1,&#34;definition&#34;:&#34;Sorex unguiculatus mitochondrial NA, complete genome.&#34;,&#34;family_name&#34;:&#34;Soricidae&#34;,&#34;family_taxid&#34;:9376,&#34;genus_name&#34;:&#34;Sorex&#34;,&#34;genus_taxid&#34;:9379,&#34;obicleandb_level&#34;:&#34;family&#34;,&#34;obicleandb_trusted&#34;:2.2137847111025621e-13,&#34;species_name&#34;:&#34;Sorex unguiculatus&#34;,&#34;species_taxid&#34;:62275,&#34;taxid&#34;:62275}
+ttagccctaaacttaggtatttaatctaacaaaaatacccgtcagagaactactagcaat
+agcttaaaactcaaaggacttggcggtgctttatatccct
+&gt;AL355887 {&#34;count&#34;:2,&#34;definition&#34;:&#34;Human chromosome 14 NA sequence BAC R-179O11 of library RPCI-11 from chromosome 14 of Homo sapiens (Human)XXKW HTG.; HTGS_ACTIVFIN.&#34;,&#34;family_name&#34;:&#34;Hominidae&#34;,&#34;family_taxid&#34;:9604,&#34;genus_name&#34;:&#34;Homo&#34;,&#34;genus_taxid&#34;:9605,&#34;obicleandb_level&#34;:&#34;genus&#34;,&#34;obicleandb_trusted&#34;:0,&#34;species_name&#34;:&#34;Homo sapiens&#34;,&#34;species_taxid&#34;:9606,&#34;taxid&#34;:9606}
+ttagccctaaactctagtagttacattaacaaaaccattcgtcagaatactacgagcaac
+agcttaaaactcaaaggacctggcagttctttatatccct</code></pre></td>
+    
+</DIV>
+
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicsv -k count -k taxid -k family_taxid -k family_name <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>       -i -s <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>       two_sequences.fasta &gt; two_sequences.csv
+</span></span></code></pre></div><pre tabindex="0"><code>id,count,taxid,scientific_name,family_taxid,family_name,sequence
+AB061527,1,62275,NA,9376,Soricidae,ttagccctaaacttaggtatttaatctaacaaaaatacccgtcagagaactactagcaatagcttaaaactcaaaggacttggcggtgctttatatccct
+AL355887,2,9606,NA,9604,Hominidae,ttagccctaaactctagtagttacattaacaaaaccattcgtcagaatactacgagcaacagcttaaaactcaaaggacctggcagttctttatatccct
+</code></pre><p>The result of the <a href="http://metabar:8888/obidoc/obitools/obicsv/">
+    <abbr title="obicsv: convert a sequence file to a CSV file"><code>obicsv</code></abbr>
+    </a> can be reformatted with the 
+  <a href="https://csvplot.readthedocs.io/en/latest/scripts/csvlook.html">csvlook</a> command (the <code>-I</code> option disables the reformatting of values):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>csvlook -I two_sequences.csv
+</span></span></code></pre></div><pre tabindex="0"><code>| id       | count | taxid | family_taxid | family_name | sequence                                                                                             |
+| -------- | ----- | ----- | ------------ | ----------- | ---------------------------------------------------------------------------------------------------- |
+| AB061527 | 1     | 62275 | 9376         | Soricidae   | ttagccctaaacttaggtatttaatctaacaaaaatacccgtcagagaactactagcaatagcttaaaactcaaaggacttggcggtgctttatatccct |
+| AL355887 | 2     | 9606  | 9604         | Hominidae   | ttagccctaaactctagtagttacattaacaaaaccattcgtcagaatactacgagcaacagcttaaaactcaaaggacctggcagttctttatatccct |
+</code></pre><h2 id="converting-csv-file-to-fasta-format">
+  Converting CSV file to FASTA format
+  <a class="anchor" href="#converting-csv-file-to-fasta-format">#</a>
+</h2>
+<p>To convert a sequence file in CSV format to 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+format, you can use the <a href="http://metabar:8888/obidoc/obitools/obiconvert/">
+<abbr title="obiconvert: convert format of a sequence file"><code>obiconvert</code></abbr>
+</a> command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiconvert two_sequences.csv
+</span></span></code></pre></div><pre tabindex="0"><code>&gt;AB061527 {&#34;count&#34;:1,&#34;family_name&#34;:&#34;Soricidae&#34;,&#34;family_taxid&#34;:&#34;9376&#34;,&#34;taxid&#34;:&#34;62275&#34;}
+ttagccctaaacttaggtatttaatctaacaaaaatacccgtcagagaactactagcaat
+agcttaaaactcaaaggacttggcggtgctttatatccct
+&gt;AL355887 {&#34;count&#34;:2,&#34;family_name&#34;:&#34;Hominidae&#34;,&#34;family_taxid&#34;:&#34;9604&#34;,&#34;taxid&#34;:&#34;9606&#34;}
+ttagccctaaactctagtagttacattaacaaaaccattcgtcagaatactacgagcaac
+agcttaaaactcaaaggacctggcagttctttatatccct
+</code></pre><h2 id="converting-fastq-file-to-csv">
+  Converting FASTQ file to CSV
+  <a class="anchor" href="#converting-fastq-file-to-csv">#</a>
+</h2>
+<p>In the same way as for 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+files, use the <a href="http://metabar:8888/obidoc/obitools/obicsv/">
+<abbr title="obicsv: convert a sequence file to a CSV file"><code>obicsv</code></abbr>
+</a> command to convert a 
+  <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a>
+file to CSV format (the <code>-q</code> option prints the quality of the sequence in the output):</p>
+    
+<a style="padding: 10px 20px; background-color: #cacaca; border: 1px solid #8e8080; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)"
+   href="two_sequences.fastq" download="two_sequences.fastq">📄 two_sequences.fastq</a>
+<DIV style="border: 2px solid #8e8080; border-radius: 0 0 5px 5px; padding: 20px; background-color: white; ">
+
+<pre tabindex="0"><code class="language-fastq" data-lang="fastq">@HELIUM_000100422_612GNAAXX:7:108:5640:3823#0/1 {&#34;ali_dir&#34;:&#34;left&#34;,&#34;ali_length&#34;:62,&#34;mode&#34;:&#34;alignment&#34;,&#34;pairing_mismatches&#34;:{&#34;(T:26)-&gt;(G:13)&#34;:62,&#34;(T:34)-&gt;(G:18)&#34;:48},&#34;score&#34;:484,&#34;score_norm&#34;:0.968,&#34;seq_a_single&#34;:46,&#34;seq_ab_match&#34;:60,&#34;seq_b_single&#34;:46} 
+ccgcctcctttagataccccactatgcttagccctaaacacaagtaattaatataacaaaattgttcgccagagtactaccggcaatagcttaaaactcaaaggacttggcggtgctttatacccttctagaggagcctgttctaaggaggcgg
++
+CCCCCCCBCCCCCCCCCCCCCCCCCCCCCCBCCCCCBCCCCCCC&lt;CcCccbe[`F`accXV&lt;TA\RYU\\ee_e[XZ[XEEEEEEEEEE?EEEEEEEEEEDEEEEEEECCCCCCCCCCCCCCCCCCCCCCCACCCCCACCCCCCCCCCCCCCCC
+@HELIUM_000100422_612GNAAXX:7:97:14311:19299#0/1 {&#34;ali_dir&#34;:&#34;left&#34;,&#34;ali_length&#34;:62,&#34;mode&#34;:&#34;alignment&#34;,&#34;pairing_mismatches&#34;:{&#34;(A:02)-&gt;(G:30)&#34;:104,&#34;(A:34)-&gt;(G:14)&#34;:64,&#34;(C:02)-&gt;(A:30)&#34;:86,&#34;(C:02)-&gt;(T:20)&#34;:108,&#34;(C:27)-&gt;(G:32)&#34;:83,&#34;(C:34)-&gt;(G:18)&#34;:57,&#34;(T:02)-&gt;(G:26)&#34;:87,&#34;(T:22)-&gt;(G:14)&#34;:66,&#34;(T:29)-&gt;(G:11)&#34;:62,&#34;(T:32)-&gt;(G:30)&#34;:48},&#34;score&#34;:283,&#34;score_norm&#34;:0.839,&#34;seq_a_single&#34;:46,&#34;seq_ab_match&#34;:52,&#34;seq_b_single&#34;:46} 
+ccgcctcctttagataccccactatgcttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcaagagcttaaaactcaaaggacttggcggtgctttatacccttctagaggagcctgttctaaggaggcgg
++
+CCCCCCCCCCCCCCCCCCCCCCCBBCCC?BCCCCCBC?CCCC@@;AVA`cWeb_TYC\UIN?IDP8QJMKRPVGLQAFPPc`AbAFB5A4&gt;AAA56A&gt;&lt;&gt;8&gt;&gt;F@A&gt;&lt;8??@BB+&lt;?;?C@9CCCCCC&lt;CC=CCCCCCCCCBC?CBCCCCC@CC</code></pre></td>
+    
+</DIV>
+
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obicsv -i -s -q two_sequences.fastq &gt; two_sequences.csv
+</span></span><span style="display:flex;"><span>csvlook -I two_sequences.csv
+</span></span></code></pre></div><pre tabindex="0"><code>| id                                              | sequence                                                                                                                                                   | qualities                                                                                                                                                  |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| HELIUM_000100422_612GNAAXX:7:108:5640:3823#0/1  | ccgcctcctttagataccccactatgcttagccctaaacacaagtaattaatataacaaaattgttcgccagagtactaccggcaatagcttaaaactcaaaggacttggcggtgctttatacccttctagaggagcctgttctaaggaggcgg | CCCCCCCBCCCCCCCCCCCCCCCCCCCCCCBCCCCCBCCCCCCC&lt;CcCccbe[`F`accXV&lt;TA\RYU\\ee_e[XZ[XEEEEEEEEEE?EEEEEEEEEEDEEEEEEECCCCCCCCCCCCCCCCCCCCCCCACCCCCACCCCCCCCCCCCCCCC |
+| HELIUM_000100422_612GNAAXX:7:97:14311:19299#0/1 | ccgcctcctttagataccccactatgcttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcaagagcttaaaactcaaaggacttggcggtgctttatacccttctagaggagcctgttctaaggaggcgg | CCCCCCCCCCCCCCCCCCCCCCCBBCCC?BCCCCCBC?CCCC@@;AVA`cWeb_TYC\UIN?IDP8QJMKRPVGLQAFPPc`AbAFB5A4&gt;AAA56A&gt;&lt;&gt;8&gt;&gt;F@A&gt;&lt;8??@BB+&lt;?;?C@9CCCCCC&lt;CC=CCCCCCCCCBC?CBCCCCC@CC |
+</code></pre><h2 id="converting-csv-file-to-fastq-format">
+  Converting CSV file to FASTQ format
+  <a class="anchor" href="#converting-csv-file-to-fastq-format">#</a>
+</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>obiconvert --fastq-output two_sequences.csv
+</span></span></code></pre></div><pre tabindex="0"><code>@HELIUM_000100422_612GNAAXX:7:108:5640:3823#0/1 
+ccgcctcctttagataccccactatgcttagccctaaacacaagtaattaatataacaaaattgttcgccagagtactaccggcaatagcttaaaactcaaaggacttggcggtgctttatacccttctagaggagcctgttctaaggaggcgg
++
+CCCCCCCBCCCCCCCCCCCCCCCCCCCCCCBCCCCCBCCCCCCC&lt;CcCccbe[`F`accXV&lt;TA\RYU\\ee_e[XZ[XEEEEEEEEEE?EEEEEEEEEEDEEEEEEECCCCCCCCCCCCCCCCCCCCCCCACCCCCACCCCCCCCCCCCCCCC
+@HELIUM_000100422_612GNAAXX:7:97:14311:19299#0/1 
+ccgcctcctttagataccccactatgcttagccctaaacacaagtaattaatataacaaaattattcgccagagtactaccggcaagagcttaaaactcaaaggacttggcggtgctttatacccttctagaggagcctgttctaaggaggcgg
++
+CCCCCCCCCCCCCCCCCCCCCCCBBCCC?BCCCCCBC?CCCC@@;AVA`cWeb_TYC\UIN?IDP8QJMKRPVGLQAFPPc`AbAFB5A4&gt;AAA56A&gt;&lt;&gt;8&gt;&gt;F@A&gt;&lt;8??@BB+&lt;?;?C@9CCCCCC&lt;CC=CCCCCCCCCBC?CBCCCCC@CC
+</code></pre></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-csv-sequence-file-format">The <em>CSV</em> sequence file format</a>
+      <ul>
+        <li><a href="#converting-fasta-file-to-csv">Converting FASTA file to CSV</a></li>
+        <li><a href="#converting-csv-file-to-fasta-format">Converting CSV file to FASTA format</a></li>
+        <li><a href="#converting-fastq-file-to-csv">Converting FASTQ file to CSV</a></li>
+        <li><a href="#converting-csv-file-to-fastq-format">Converting CSV file to FASTQ format</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

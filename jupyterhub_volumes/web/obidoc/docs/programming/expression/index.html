@@ -1,0 +1,2208 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
+  OBITools Expression Language
+  #
+
+The OBITools expression language is based on 
+  Gval and extends it with extra functions useful for bioinformatics tasks, as well as predefined variables. It is designed to evaluate simple expressions used as arguments in some OBITools commands (e.g., 
+    obigrep
+    , 
+    obiannotate
+    ). For more complex scripting, you can use 
+  Lua through the 
+    obiscript
+     command.
+
+  Basic Expressions
+  #
+
+Expressions can be literal values, arithmetic or logical operations, or string manipulations.">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://metabar:8888/obidoc/docs/programming/expression/">
+  <meta property="og:site_name" content="OBITools4 documentation">
+  <meta property="og:title" content="Expression language">
+  <meta property="og:description" content="OBITools Expression Language # The OBITools expression language is based on Gval and extends it with extra functions useful for bioinformatics tasks, as well as predefined variables. It is designed to evaluate simple expressions used as arguments in some OBITools commands (e.g., obigrep , obiannotate ). For more complex scripting, you can use Lua through the obiscript command.
+Basic Expressions # Expressions can be literal values, arithmetic or logical operations, or string manipulations.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+<title>Expression language | OBITools4 documentation</title>
+<link rel="icon" href="/obidoc/favicon.png" >
+<link rel="manifest" href="/obidoc/manifest.json">
+<link rel="canonical" href="http://metabar:8888/obidoc/docs/programming/expression/">
+<link rel="stylesheet" href="/obidoc/book.min.5fd7b8e2d1c0ae15da279c52ff32731130386f71b58f011468f20d0056fe6b78.css" integrity="sha256-X9e44tHArhXaJ5xS/zJzETA4b3G1jwEUaPINAFb&#43;a3g=" crossorigin="anonymous">
+  <script defer src="/obidoc/fuse.min.js"></script>
+  <script defer src="/obidoc/en.search.min.4da51bdd2d833922fdbc0e19df517221387fc625ffb68ee140d605b3c5b68058.js" integrity="sha256-TaUb3S2DOSL9vA4Z31FyITh/xiX/to7hQNYFs8W2gFg=" crossorigin="anonymous"></script>
+
+  <script defer src="/obidoc/sw.min.32af8eafce4180aa1c5dea66d99fb26ba9043ea7c7a4c706138c91d9051b285e.js" integrity="sha256-Mq&#43;Or85BgKocXepm2Z&#43;ya6kEPqfHpMcGE4yR2QUbKF4=" crossorigin="anonymous"></script>
+<link rel="alternate" type="application/rss+xml" href="http://metabar:8888/obidoc/docs/programming/expression/index.xml" title="OBITools4 documentation" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  <link rel="stylesheet" type="text/css" href="http://metabar:8888/obidoc/hugo-cite.css" />
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/obidoc/"><img src="/obidoc/obitools_logo.jpg" alt="Logo" class="book-icon" /><span>OBITools4 documentation</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Docs</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/about/" class="">About</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/installation/" class="">Installation</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/principles/" class="">General operating principles</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-08756b4c1f14be6ee584ece005b9f621" class="toggle"  />
+    <label for="section-08756b4c1f14be6ee584ece005b9f621" class="flex justify-between">
+      <a role="button" class="">File formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-933c2e64b905b84e22aa5273cea2d0bd" class="toggle"  />
+    <label for="section-933c2e64b905b84e22aa5273cea2d0bd" class="flex justify-between">
+      <a role="button" class="">Sequence file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fasta/" class="">FASTA file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/fastq/" class="">FASTQ file format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/genbank/" class="">GenBank Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/embl/" class="">EMBL Flat File format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/csv/" class="">CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/json/" class="">JSON format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/sequence_files/annotations/" class="">Annotation of sequences</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-0258ae1c222f9a38cc1b75254c93b0f4" class="toggle"  />
+    <label for="section-0258ae1c222f9a38cc1b75254c93b0f4" class="flex justify-between">
+      <a role="button" class="">Taxonomy file formats</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/csv_taxdump/" class="">CSV formatted taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/file_format/taxonomy_file/ncbi_taxdump/" class="">NCBI taxdump</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/formats/csv/" class="">The CSV format</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-70b1e6e5ec7f3ccab643155fa50659b6" class="toggle"  />
+    <label for="section-70b1e6e5ec7f3ccab643155fa50659b6" class="flex justify-between">
+      <a role="button" class="">Patterns</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/regular/" class="">Regular Expressions</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/patterns/dnagrep/" class="">DNA Patterns</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8223f464911a1fe6c655972143684e93" class="toggle"  />
+    <label for="section-8223f464911a1fe6c655972143684e93" class="flex justify-between">
+      <a role="button" class="">The OBITools4 commands</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/options/" class="">Shared command options</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-8921ea65523c266b128dd4263232b0fc" class="toggle"  />
+    <label for="section-8921ea65523c266b128dd4263232b0fc" class="flex justify-between">
+      <a role="button" class="">Basics</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiannotate/" class="">obiannotate</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicomplement/" class="">obicomplement</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconvert/" class="">obiconvert</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicount/" class="">obicount</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicsv/" class="">obicsv</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidemerge/" class="">obidemerge</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obidistribute/" class="">obidistribute</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obigrep/" class="">obigrep</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obijoin/" class="">obijoin</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimatrix/" class="">obimatrix</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisplit/" class="">obisplit</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obisummary/" class="">obisummary</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiuniq/" class="">obiuniq</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-dbdf1bb5377572439394e60e08c30f50" class="toggle"  />
+    <label for="section-dbdf1bb5377572439394e60e08c30f50" class="flex justify-between">
+      <a role="button" class="">Demultiplexing samples</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimultiplex/" class="">obimultiplex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitagpcr/" class="">obitagpcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-aa98fedd067b51150db59691a8ea8edd" class="toggle"  />
+    <label for="section-aa98fedd067b51150db59691a8ea8edd" class="flex justify-between">
+      <a role="button" class="">Sequence alignments</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiclean/" class="">obiclean</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7433746525d8c2b29b033f765c869acd" class="toggle"  />
+    <label for="section-7433746525d8c2b29b033f765c869acd" class="flex justify-between">
+      <a href="/obidoc/obitools/obipairing/" class="">obipairing</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/fasta-like/" class="">The FASTA-like alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/alignments/obipairing/exact-alignment/" class="">Exact alignment</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obipcr/" class="">obipcr</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obirefidx/" class="">obirefidx</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitag/" class="">obitag</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-5746f699d10490780dec8e30ab2dd3ce" class="toggle"  />
+    <label for="section-5746f699d10490780dec8e30ab2dd3ce" class="flex justify-between">
+      <a role="button" class="">Taxonomy</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obitaxonomy/" class="">obitaxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-3f50c4fe7ab436a56ae92897d5444956" class="toggle"  />
+    <label for="section-3f50c4fe7ab436a56ae92897d5444956" class="flex justify-between">
+      <a role="button" class="">Advanced tools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiscript/" class="">obiscript</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-549be3934679fcb82a232f6bd5435563" class="toggle"  />
+    <label for="section-549be3934679fcb82a232f6bd5435563" class="flex justify-between">
+      <a role="button" class="">Others</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obimicrosat/" class="">obimicrosat</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-ceca4455173761e30cbc0a6dc2327167" class="toggle"  />
+    <label for="section-ceca4455173761e30cbc0a6dc2327167" class="flex justify-between">
+      <a role="button" class="">Experimentals</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obicleandb/" class="">obicleandb</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obiconsensus/" class="">obiconsensus</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/obitools/obilandmark/" class="">obilandmark</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/commands/tags/" class="">Glossary of tags</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9b1bcd52530c59dc4819b1f61c128f54" class="toggle"  />
+    <label for="section-9b1bcd52530c59dc4819b1f61c128f54" class="flex justify-between">
+      <a role="button" class="">Cookbook</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/illumina/" class="">Analysing an Illumina data set</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/ecoprimers/" class="">Designing new barcodes</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/local_genbank/" class="">Prepare a local copy of Genbank</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/reference_db/" class="">Build a reference database</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/cookbook/minion/" class="">Oxford Nanopore data analysis</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <span>Programming OBITools</span>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/expression/" class="active">Expression language</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-6d580829a667b5cca790b286d99a10fe" class="toggle"  />
+    <label for="section-6d580829a667b5cca790b286d99a10fe" class="flex justify-between">
+      <a href="/obidoc/docs/programming/lua/" class="">Lua: for scripting OBITools</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-2fb081dac812d624eea5f4268fca9e26" class="toggle"  />
+    <label for="section-2fb081dac812d624eea5f4268fca9e26" class="flex justify-between">
+      <a role="button" class="">Obitools Classes</a>
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequence/" class="">BioSequence</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/biosequenceslice/" class="">BioSequenceSlice</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxonomy/" class="">Taxonomy</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/taxon/" class="">Taxon</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/obidoc/docs/programming/lua/obitools_classes/mutex/" class="">Mutex</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/obidoc/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Expression language</h3>
+
+  <label for="toc-control">
+    
+    <img src="/obidoc/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#obitools-expression-language">OBITools Expression Language</a>
+          <ul>
+            <li><a href="#basic-expressions">Basic Expressions</a></li>
+            <li><a href="#parameterized-expressions">Parameterized Expressions</a></li>
+            <li><a href="#selectors-brackets-vs-dot">Selectors: Brackets vs Dot</a></li>
+            <li><a href="#struct-fields-and-methods">Struct Fields and Methods</a></li>
+            <li><a href="#built-in-features">Built-in Features</a></li>
+            <li><a href="#-list-of-variables-added-to-the-gval-language">🧩 List of variables Added to the Gval Language</a></li>
+            <li><a href="#-list-of-functions-added-to-the-gval-language">🧩 List of Functions Added to the Gval Language</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h2 id="obitools-expression-language">
+  OBITools Expression Language
+  <a class="anchor" href="#obitools-expression-language">#</a>
+</h2>
+<p>The OBITools expression language is based on 
+  <a href="https://github.com/PaesslerAG/gval">Gval</a> and extends it with extra functions useful for bioinformatics tasks, as well as predefined variables. It is designed to evaluate simple expressions used as arguments in some OBITools commands (e.g., <a href="http://metabar:8888/obidoc/obitools/obigrep/">
+    <abbr title="obigrep: filter a sequence file"><code>obigrep</code></abbr>
+    </a>, <a href="http://metabar:8888/obidoc/obitools/obiannotate/">
+    <abbr title="obiannotate: edit sequence annotations"><code>obiannotate</code></abbr>
+    </a>). For more complex scripting, you can use 
+  <a href="/obidoc/docs/programming/lua/">Lua</a> through the <a href="http://metabar:8888/obidoc/obitools/obiscript/">
+    <abbr title="obiscript: apply a LUA script to a sequence file"><code>obiscript</code></abbr>
+    </a> command.</p>
+<h3 id="basic-expressions">
+  Basic Expressions
+  <a class="anchor" href="#basic-expressions">#</a>
+</h3>
+<p>Expressions can be literal values, arithmetic or logical operations, or string manipulations.</p>
+<p><strong>Examples:</strong></p>
+<ul>
+<li>
+<p>Literal values:</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">42          // Number
+&#34;hello&#34;     // String
+true        // Boolean
+null        // Null value
+</code></pre></li>
+<li>
+<p>Arithmetic operations:</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">10 + 20 * 2   // 50
+</code></pre></li>
+<li>
+<p>Logical operations:</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">x &gt; 0 &amp;&amp; y &lt; 100  // Combined conditions
+</code></pre></li>
+</ul>
+<h3 id="parameterized-expressions">
+  Parameterized Expressions
+  <a class="anchor" href="#parameterized-expressions">#</a>
+</h3>
+<p>Variables can be used in expression to parameterize them. They can be accessed directly or nested inside the expression, depending on their structure and how they are passed to the OBITools commands.</p>
+<p><strong>Examples:</strong></p>
+<ul>
+<li>
+<p>Direct access to parameters:</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">foo &gt; 0          // Checks if `foo` is greater than 0
+foo.bar == &#34;ok&#34;  // Access to nested key `bar` in `foo`
+</code></pre></li>
+<li>
+<p>Nested parameters:</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">sequence.Qualities()[0]              // Access first element of array `data`
+annotations[&#34;count&#34;]    // Access key `timeout` count map `annotations`
+</code></pre></li>
+</ul>
+<h3 id="selectors-brackets-vs-dot">
+  Selectors: Brackets vs Dot
+  <a class="anchor" href="#selectors-brackets-vs-dot">#</a>
+</h3>
+<p>OBITools expression language supports two ways to access nested data:</p>
+<ul>
+<li>
+<p>Bracket selector (<code>[]</code>): for dynamic or complex keys.</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">foo[&#34;key&#34; + &#34;name&#34;]  // Dynamic key concatenation
+data[1]              // Access second item in an array
+</code></pre></li>
+<li>
+<p>Dot selector (<code>.</code>): for fixed and alphanumeric keys.</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">foo.bar.baz  // Access `baz` field in `bar` field of `foo`
+</code></pre></li>
+</ul>
+<h3 id="struct-fields-and-methods">
+  Struct Fields and Methods
+  <a class="anchor" href="#struct-fields-and-methods">#</a>
+</h3>
+<p>If the parameters are Go structs, fields and methods can be accessed directly.</p>
+<p><strong>Examples:</strong></p>
+<ul>
+<li>
+<p>Access struct fields:</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">annotations.seq_length + sequence.Count()  // Combine field and method
+</code></pre></li>
+<li>
+<p>Nested structures:</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">annotations.merged_sample.sample_1  // Access nested struct fields
+</code></pre></li>
+</ul>
+<h3 id="built-in-features">
+  Built-in Features
+  <a class="anchor" href="#built-in-features">#</a>
+</h3>
+<p>The expression language includes a rich set of operators and data types:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Category</th>
+          <th>Examples</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Operators</td>
+          <td>+, -, *, /, &gt;, ==, &amp;&amp;, ||</td>
+      </tr>
+      <tr>
+          <td>Constants</td>
+          <td>42, &ldquo;hello&rdquo;, true, null</td>
+      </tr>
+      <tr>
+          <td>Functions</td>
+          <td>date(), strlen(), format()</td>
+      </tr>
+      <tr>
+          <td>Control</td>
+          <td>if-else, ternary ? :, null coalescence ??</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Example:</strong></p>
+<p>With the ternary operator conditional expression, you can conditionally assign a value to a variable. If <code>value</code> is greater than 100, it will be &ldquo;high&rdquo;, otherwise &ldquo;low&rdquo;.</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">result = (value &gt; 100 ? &#34;high&#34; : &#34;low&#34;) ?? &#34;default&#34;
+</code></pre><p>The null coalescence operator (<code>??</code>) returns the left-hand side if it&rsquo;s not <code>null</code>, otherwise it will return the right-hand side. So in this case, if <code>value</code> is <code>null</code>, it will be replaced with &ldquo;default&rdquo;.</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">value ?? &#34;default&#34;
+</code></pre><p>You can chain several <code>??</code> operations together:</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">a ?? b ?? c ?? &#34;fallback&#34;
+</code></pre><h3 id="-list-of-variables-added-to-the-gval-language">
+  🧩 List of variables Added to the Gval Language
+  <a class="anchor" href="#-list-of-variables-added-to-the-gval-language">#</a>
+</h3>
+<p>The expressions are evaluated in the context of a sequence. When evaluating an expression, these variables are available</p>
+<ol>
+<li><strong><code>sequence</code></strong> - a variable representing current sequence being processed by
+the OBITools command. It is an object of type <strong>BioSequence</strong>.</li>
+<li><strong><code>annotations</code></strong> - a variable representing the annotations of the current
+sequence being processed by the OBITools command. It is an object of type
+<strong>Annotations</strong>, actually a map indexed by string. Each string is the tag
+name that you can observe in the header of a sequence in a 
+  <a href="http://metabar:8888/obidoc/formats/fasta/">fasta</a>
+or
+
+  <a href="http://metabar:8888/obidoc/formats/fastq/">fastq</a>
+file</li>
+</ol>
+<p>The expression language allows to access to the methods of the <strong>BioSequence</strong> class for the <code>sequence</code> variable. For example, you can use <code>sequence.Len()</code> returns the length of the sequence and <code>sequence.Id()</code> returns its identifier. The same for the <strong>Annotations</strong> class for the <code>annotations</code> variable.</p>
+<h4 id="-the-useful-methods-for-the-biosequence-class-are">
+  🧩 The useful methods for the <strong>BioSequence</strong> class are:
+  <a class="anchor" href="#-the-useful-methods-for-the-biosequence-class-are">#</a>
+</h4>
+<ol>
+<li><strong><code>Len() int</code></strong> - Returns the length of the sequence.</li>
+<li><strong><code>String() string</code></strong> - Returns the sequence itself as a string.</li>
+<li><strong><code>Id() string</code></strong> - Returns the identifier of the sequence.</li>
+<li><strong><code>Definition() string</code></strong>  - Returns the definition part of the header line of the sequence</li>
+<li><strong><code>HasAnnotation() bool</code></strong> - Returns <code>true</code> if at least one annotation exists for this sequence.</li>
+<li><strong><code>HasDefinition() bool</code></strong> - Returns <code>true</code> if a definition exists for this sequence.</li>
+<li><strong><code>HasSequence() bool</code></strong> - Returns <code>true</code> if the sequence is not empty.</li>
+<li><strong><code>HasQualities() bool</code></strong> - Returns <code>true</code> if quality scores exist for this sequence.</li>
+<li><strong><code>Count() int</code></strong> - Returns the number of occurrences of the sequence in the data set.</li>
+<li><strong><code>Taxid() string</code></strong> - Returns the taxonomy id associated with this sequence.</li>
+</ol>
+<h3 id="-list-of-functions-added-to-the-gval-language">
+  🧩 List of Functions Added to the Gval Language
+  <a class="anchor" href="#-list-of-functions-added-to-the-gval-language">#</a>
+</h3>
+<h4 id="len">
+  <strong><code>len</code></strong>
+  <a class="anchor" href="#len">#</a>
+</h4>
+<p>Calculates the length of an object (e.g., string, sequence).
+The function accepts as input a sequence, a string, a vector or a map.
+On sequence and string, it returns the length of the input (number of
+nucleotides or characters respectively). On maps and vectors and maps,
+the <code>len</code> function returns the number of elements stored in the container object.</p>
+<h5 id="example">
+  <strong>Example:</strong>
+  <a class="anchor" href="#example">#</a>
+</h5>
+<p>Here we use the <code>len</code> function to compute the length of the current sequence.</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">len(sequence)  // Returns the length of the biological sequence
+</code></pre><h4 id="contains">
+  <strong><code>contains</code></strong>
+  <a class="anchor" href="#contains">#</a>
+</h4>
+<p>Checks if a key exists in a map or a substring exists in a string.
+This function applied on map objects. OBITools maps are indexed by string
+keys. The <code>contains</code> required a map object as first parameter and a string
+object as second parameter. It returns the logical value <code>true</code> if the map
+contains the key defined by the second parameter. Otherwise, the function
+returns <code>false</code>.</p>
+<h5 id="example-1">
+  <strong>Example:</strong>
+  <a class="anchor" href="#example-1">#</a>
+</h5>
+<p>Check if the <code>annotations</code> map of the sequence is containing the key <code>count</code>, which
+means: is the sequence annotated by a <code>count</code> tag.</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">contains(annotations,&#34;count&#34;)  // // Checks if &#34;gene&#34; is a key in the annotations map
+</code></pre><h4 id="ismap">
+  <strong><code>ismap</code></strong>
+  <a class="anchor" href="#ismap">#</a>
+</h4>
+<p>Checks if an object is a map (key-value structure). That function is a type assertion
+function it allows for checking that the object provided as parameter is a map. It returns the logical value <code>true</code> if the object is a map, otherwise it returns <code>false</code>.</p>
+<h5 id="example-2">
+  <strong>Example:</strong>
+  <a class="anchor" href="#example-2">#</a>
+</h5>
+<p>Check if the <code>annotations.merged_sample</code> object is a map. <code>annotation</code> is itself a map
+containing every annotation of the current sequence. <code>annotations.merged_sample</code> is the
+object contained in the <code>annotations</code> at the index <code>merged_sample</code>. This tag is normally
+set by <a href="http://metabar:8888/obidoc/obitools/obiuniq/">
+    <abbr title="obiuniq: dereplicate a sequence file"><code>obiuniq</code></abbr>
+    </a> and is a map indexed by sample ids and containing the number
+of time this sequence has been observed in the different samples. If the file is correctly
+annotated, the <code>annotations.merged_sample</code> object is therefore a map and the <code>ismap</code>
+function must return <code>true</code>.</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">ismap(annotations.merged_sample)  // Returns `true` if the `merged_sample` 
+                                    // `annotations` is a map
+</code></pre><h4 id="isvector">
+  <strong><code>isvector</code></strong>
+  <a class="anchor" href="#isvector">#</a>
+</h4>
+<p><strong>Checks if a value is a vector (list or array).</strong> Returns <code>true</code> if the object is a list,
+and <code>false</code> otherwise.</p>
+<h5 id="example-3">
+  <strong>Example:</strong>
+  <a class="anchor" href="#example-3">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">isvector({&#34;toto&#34;:3}) // returns false
+isvector([1,2,3]) // returns true
+</code></pre><h4 id="elementof">
+  <strong><code>elementof</code></strong>
+  <a class="anchor" href="#elementof">#</a>
+</h4>
+<p>Extracts an element from a <strong>vector</strong>, a <strong>map</strong> or a <strong>string</strong>.
+The function requires two arguments, The container element, and the index to be
+extracted. If the index is out of range, it returns an error. If the object is not a vector, map,
+or string, it returns an error. When the container object is a vector or a string the index is
+expected to be a positive or null integer and when it is a map the index should be a string key.</p>
+<h5 id="example-4">
+  <strong>Example:</strong>
+  <a class="anchor" href="#example-4">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">elementof([1,2,3], 0) // returns 1
+elementof({&#34;a&#34;:1,&#34;b&#34;:2}, &#34;a&#34;)  // returns 1
+elementof(&#34;abc&#34;, 0) // returns &#34;a&#34;
+</code></pre><h4 id="min">
+  <strong><code>min</code></strong>
+  <a class="anchor" href="#min">#</a>
+</h4>
+<p>Returns the minimum value of a <strong>vector</strong> or a <strong>map</strong>. If the object is not a vector nor a map, but the value is comparable it will return the value itself. If it is not comparable it returns an error. An error is also returned if the <strong>vector</strong> or the <strong>map</strong> is empty.</p>
+<h5 id="example-5">
+  <strong>Example:</strong>
+  <a class="anchor" href="#example-5">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">min([10,2,3]) // returns 2
+min({&#34;a&#34;:10,&#34;b&#34;:2}) // returns 2
+min(12) // returns 12
+</code></pre><h4 id="max">
+  <strong><code>max</code></strong>
+  <a class="anchor" href="#max">#</a>
+</h4>
+<p>Returns the maximum value of a <strong>vector</strong> or a <strong>map</strong>. If the object is not a vector nor a map, but the value is comparable it will return the value itself. If it is not comparable it returns an error. An error is also returned if the <strong>vector</strong> or the <strong>map</strong> is empty.</p>
+<h5 id="example-6">
+  <strong>Example:</strong>
+  <a class="anchor" href="#example-6">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">max([10,2,3]) // returns 10
+max({&#34;a&#34;:10,&#34;b&#34;:2})  // returns 10
+max(12) // returns 12
+</code></pre><h4 id="sprintf">
+  <strong><code>sprintf</code></strong>
+  <a class="anchor" href="#sprintf">#</a>
+</h4>
+<p><strong>Formats a string by replacing placeholders with values</strong>, enabling dynamic
+text generation. It is commonly used to construct messages, file paths, or
+structured data by inserting variables into predefined templates.</p>
+<hr>
+<p><strong>How It Works</strong></p>
+<ul>
+<li><strong>Placeholders</strong> (e.g., <code>%s</code>, <code>%d</code>, <code>%f</code>) act as markers for values to be inserted.</li>
+<li>The function replaces each placeholder with the corresponding argument in order.</li>
+</ul>
+<hr>
+<h5 id="examples">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples">#</a>
+</h5>
+<ul>
+<li>
+<p><strong>Basic String Insertion</strong></p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">sprintf(&#34;Sample: %s&#34;, &#34;Sper01&#34;)  
+// Output: &#34;Sample: Sper01&#34;
+</code></pre></li>
+<li>
+<p><strong>Basic String Insertion</strong></p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">sprintf(&#34;Sample: %s&#34;, &#34;Sper01&#34;)  
+// Output: &#34;Sample: Sper01&#34;
+</code></pre></li>
+<li>
+<p><strong>Numeric Formatting</strong></p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">ssprintf(&#34;Length: %d bp&#34;, 84)  
+// Output: &#34;Length: 84 bp&#34;
+</code></pre></li>
+<li>
+<p><strong>Floating-Point Precision</strong></p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">sprintf(&#34;GC Content: %.2f%%&#34;, 52.345)  
+// Output: &#34;GC Content: 52.34%&#34;
+</code></pre></li>
+<li>
+<p><strong>Combining Multiple Values</strong></p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">sprintf(&#34;Primer: %s (position %d)&#34;, &#34;GGGCAATCCTGAGCCAA&#34;, 10)  
+// Output: &#34;Primer: GGGCAATCCTGAGCCAA (position 10)&#34;
+</code></pre></li>
+</ul>
+<hr>
+<p>Placeholders like <code>%s</code> (string), <code>%d</code> (integer), <code>%f</code> (float), and <code>%v</code> (generic value) are typical
+of the <code>printf</code> family of function found in many languages.</p>
+<ol>
+<li>
+<p>Padding
+Add padding to values using 0 (zero) or space ( ) for alignment.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Format</th>
+          <th>Description</th>
+          <th>Example</th>
+          <th>Output</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>%5d</td>
+          <td>Minimum width of 5, right-aligned</td>
+          <td>sprintf(&quot;%5d&quot;, 42)</td>
+          <td><code>'   42'</code></td>
+      </tr>
+      <tr>
+          <td>%-5d</td>
+          <td>Minimum width of 5, left-aligned</td>
+          <td>sprintf(&quot;%-5d&quot;, 42)</td>
+          <td><code>'42   '</code></td>
+      </tr>
+      <tr>
+          <td>%05d</td>
+          <td>Zero-padded to 5 digits</td>
+          <td>sprintf(&quot;%05d&quot;, 42)</td>
+          <td><code>'00042'</code></td>
+      </tr>
+      <tr>
+          <td>%05.2f</td>
+          <td>Zero-padded float with precision</td>
+          <td>sprintf(&quot;%05.2f&quot;, 3.14)</td>
+          <td><code>'03.14'</code></td>
+      </tr>
+  </tbody>
+</table>
+</li>
+<li>
+<p>Precision
+Control the number of decimal places for floats or the maximum length for strings.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Format</th>
+          <th>Description</th>
+          <th>Example</th>
+          <th>Output</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>%.2f</td>
+          <td>2 decimal places</td>
+          <td>sprintf(&quot;%.2f&quot;, 3.14159)</td>
+          <td><code>'3.14'</code></td>
+      </tr>
+      <tr>
+          <td>%.3s</td>
+          <td>First 3 characters of a string</td>
+          <td>sprintf(&quot;%.3s&quot;, &ldquo;hello&rdquo;)</td>
+          <td><code>'hel'</code></td>
+      </tr>
+      <tr>
+          <td>%05.2f</td>
+          <td>Zero-padded float with precision</td>
+          <td>sprintf(&quot;%05.2f&quot;, 12.3)</td>
+          <td><code>'12.30'</code></td>
+      </tr>
+  </tbody>
+</table>
+</li>
+<li>
+<p>Alignment
+Use - to left-align values within a field.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Format</th>
+          <th>Description</th>
+          <th>Example</th>
+          <th>Output</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>%-10s</td>
+          <td>Left-align string in 10 chars</td>
+          <td>sprintf(&quot;%-10s&quot;, &ldquo;cat&rdquo;)</td>
+          <td><code>'cat       '</code></td>
+      </tr>
+      <tr>
+          <td>%-5.2f</td>
+          <td>Left-align float with precision</td>
+          <td>sprintf(&quot;%-5.2f&quot;, 3.14)</td>
+          <td><code>'3.14 '</code></td>
+      </tr>
+  </tbody>
+</table>
+</li>
+<li>
+<p>Special Verbs</p>
+<ul>
+<li>
+<p><code>%v</code>: Default formatting (e.g., for slices, maps, or custom types).</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">sprintf(&#34;%v&#34;, [1, 2, 3])       // &#34;[1 2 3]&#34;
+sprintf(&#34;%v&#34;, {&#34;name&#34;: &#34;Alice&#34;}) // &#34;{name: Alice}&#34;
+</code></pre></li>
+<li>
+<p><code>%T</code>: Print the type of a value.</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">sprintf(&#34;%T&#34;, 42)       // &#34;int&#34;
+sprintf(&#34;%T&#34;, &#34;hello&#34;)  // &#34;string&#34;
+</code></pre></li>
+</ul>
+</li>
+<li>
+<p>Hexadecimal and Binary</p>
+<ul>
+<li>
+<p><code>%x</code>/<code>%X</code>: Lowercase/uppercase hex.</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">sprintf(&#34;%x&#34;, 255)  // &#34;ff&#34;
+sprintf(&#34;%X&#34;, 255)  // &#34;FF&#34;
+</code></pre></li>
+<li>
+<p><code>%b</code>: Binary representation.</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">sprintf(&#34;%b&#34;, 5)    // &#34;101&#34;
+</code></pre></li>
+</ul>
+</li>
+<li>
+<p>Scientific Notation</p>
+<p><code>%e</code>/<code>%E</code>: Scientific notation with lowercase/uppercase e.</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">sprintf(&#34;%e&#34;, 123456.789)  // &#34;1.234568e+05&#34;
+sprintf(&#34;%E&#34;, 123456.789)  // &#34;1.234568E+05&#34;
+</code></pre></li>
+<li>
+<p>Use <code>%%</code> to escape a literal % character</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">sprintf(&#34;Percentage: %d%%&#34;, 50)  // &#34;Percentage: 50%&#34;
+</code></pre></li>
+</ol>
+<h4 id="subspc">
+  <strong><code>subspc</code></strong>
+  <a class="anchor" href="#subspc">#</a>
+</h4>
+<p>The function accept a string parameter and replaces spaces in a string with underscores (<code>_</code>).
+It returns the new substituted string.</p>
+<h5 id="examples-1">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples-1">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">subspc(&#34;Abies alba&#34;)  // returns &#34;Abies_alba&#34;
+</code></pre><h4 id="int">
+  <strong><code>int</code></strong>
+  <a class="anchor" href="#int">#</a>
+</h4>
+<p>Converts a value to an integer (<code>int</code>). Fails if conversion is not possible.</p>
+<h5 id="examples-2">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples-2">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">int(&#34;324&#34;) # Returns the integer value 324
+int(3.24) # Returns the integer value 3
+</code></pre><h4 id="numeric">
+  <strong><code>numeric</code></strong>
+  <a class="anchor" href="#numeric">#</a>
+</h4>
+<p>Converts a value to a floating-point number (<code>float64</code>). Fails if conversion is not possible.</p>
+<h5 id="examples-3">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples-3">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">numeric(&#34;3.14159&#34;) # Returns the float value 3.14159
+numeric(3) # Returns the float value 3.0
+</code></pre><h4 id="bool">
+  <strong><code>bool</code></strong>
+  <a class="anchor" href="#bool">#</a>
+</h4>
+<p>Converts a value to a boolean (<code>bool</code>). Fails if conversion is not possible.
+Every non-null numeric value is considered as <code>true</code>. For <code>string</code>, once
+converted to lower cases, value equals to <code>&quot;true&quot;</code>, <code>&quot;t&quot;</code>, <code>&quot;yes&quot;</code>, <code>&quot;1&quot;</code> or <code>&quot;on&quot;</code> are considered
+as <code>true</code>, all others are <code>false</code>.</p>
+<h5 id="examples-4">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples-4">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">bool(&#34;TRUE&#34;) // returns true
+bool(&#34;Toto&#34;) // returns false
+bool(3) // returns true
+bool(0) // returns false   
+</code></pre><h4 id="string">
+  <strong><code>string</code></strong>
+  <a class="anchor" href="#string">#</a>
+</h4>
+<p>Converts a value to a string. Fails if conversion is not possible.</p>
+<h5 id="examples-5">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples-5">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">string([1,2,4]) // returns &#34;[1,2,4]&#34;
+string(&#34;Toto&#34;) // returns &#34;Toto
+string(3) // returns &#34;3&#34;
+string(10.14) // returns &#34;10.14&#34;   
+</code></pre><h4 id="ifelse">
+  <strong><code>ifelse</code></strong>
+  <a class="anchor" href="#ifelse">#</a>
+</h4>
+<p>Conditional operator: returns <code>args[1]</code> if <code>args[0]</code> is true, otherwise <code>args[2]</code>.</p>
+<h5 id="examples-6">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples-6">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">ifelse(bool(&#34;true&#34;), &#34;yes&#34;, &#34;no&#34;) // returns &#34;yes&#34;
+ifelse(bool(&#34;false&#34;), &#34;yes&#34;, &#34;no&#34;) // returns &#34;no&#34;
+</code></pre><h4 id="gcskew">
+  <strong><code>gcskew</code></strong>
+  <a class="anchor" href="#gcskew">#</a>
+</h4>
+<p>Calculates the GC skew (difference between G and C bases) of a biological sequence.</p>
+
+<link rel="stylesheet" href="/obidoc/katex/katex.min.css" />
+<script defer src="/obidoc/katex/katex.min.js"></script>
+<script defer src="/obidoc/katex/auto-render.min.js" onload="renderMathInElement(document.body);"></script><span>
+  \[
+GC_{skew} = \frac{G - C}{G + C}
+\]
+</span>
+
+<h5 id="examples-7">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples-7">#</a>
+</h5>
+<p>For example for sequence <code>&quot;GATCG&quot;</code>: <span>
+  \(GC_{skew} = \frac{2 - 1}{2 + 1} = \frac{1}{3}= 0.33 \)
+</span>
+</p>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">gcskew(&#34;GATCG&#34;) // returns 0.3333 (1/3)
+</code></pre><h4 id="gc">
+  <strong><code>gc</code></strong>
+  <a class="anchor" href="#gc">#</a>
+</h4>
+<p>Calculates the percentage of G and C bases in a biological sequence.</p>
+<span>
+  \[
+GC = \frac{G + C}{len(sequence) - O}
+\]
+</span>
+
+<p>With <em>G</em> and <em>C</em> the number of corresponding nucleotides and <em>O</em> the number
+of ambiguous characters (Ns).</p>
+<p>The function accepts a single argument of type biological sequence.</p>
+<h5 id="examples-8">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples-8">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">gc(&#34;GATCG&#34;) // returns 0.6 (3/5, as there are two Gs and one Cs (Three in total) 
+            // in a sequence of five nucleotides)
+</code></pre><h4 id="composition">
+  <strong><code>composition</code></strong>
+  <a class="anchor" href="#composition">#</a>
+</h4>
+<p>Returns the base composition of a biological sequence as a map (<code>map[string]float64</code>)
+containing five keys: &ldquo;a&rdquo;, &ldquo;c&rdquo;, &ldquo;g&rdquo;, &ldquo;t&rdquo;, and &ldquo;o&rdquo;. The value for each key is the number of occurrences of that base in the sequence, case-insensitive (i.e., both &lsquo;A&rsquo; and &lsquo;a&rsquo; are considered as &lsquo;a&rsquo;). The &ldquo;o&rdquo; key represents the number of other characters (nucleotides that are not A, C, G or T) in the sequence.</p>
+<p>The function accepts a single argument of type biological sequence.</p>
+<h5 id="examples-9">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples-9">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">composition(&#34;GATCG&#34;) // returns map[string]float64{&#34;a&#34;:1, &#34;c&#34;:1, &#34;g&#34;:2, &#34;t&#34;:1, &#34;o&#34;:0} 
+</code></pre><h4 id="qualities">
+  <strong><code>qualities</code></strong>
+  <a class="anchor" href="#qualities">#</a>
+</h4>
+<p>Returns the quality scores of a biological sequence as an array of float values representing the Phred quality scores for each base in the sequence. The function accepts a single argument of type <strong>BioSequence</strong>.</p>
+<h5 id="examples-10">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples-10">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">qualities(sequence)
+</code></pre><h4 id="replace">
+  <strong><code>replace</code></strong>
+  <a class="anchor" href="#replace">#</a>
+</h4>
+<p>Replaces all occurrences of a regular expressions pattern in a string. The function accepts three arguments: the first one is the input string and the second one is the pattern to be replaced. The last argument is what will replace the found pattern in the string. It returns the modified string.</p>
+<h5 id="examples-11">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples-11">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">replace(&#34;GATCG&#34;, &#34;A.&#34;, &#34;xx&#34;) // returns &#34;GxxCG&#34;
+replace(&#34;GATCG&#34;, &#34;[ACGT]+&#34;, &#34;X&#34;) // returns &#34;X&#34; 
+</code></pre><h4 id="substr">
+  <strong><code>substr</code></strong>
+  <a class="anchor" href="#substr">#</a>
+</h4>
+<p>Extracts a substring from the input string. The function accepts three arguments. The first one is the input string, the second one is the start index and the third one is the length of the substring to be extracted. It returns the extracted substring. Position in the string is zero-based.</p>
+<h5 id="examples-12">
+  <strong>Examples</strong>
+  <a class="anchor" href="#examples-12">#</a>
+</h5>
+<pre tabindex="0"><code class="language-gval" data-lang="gval">substr(&#34;GATCG&#34;, 0, 3) // returns &#34;GAT&#34;
+substr(&#34;GATCG&#34;, 1, 4) // returns &#34;ATCG&#34;
+</code></pre></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#obitools-expression-language">OBITools Expression Language</a>
+          <ul>
+            <li><a href="#basic-expressions">Basic Expressions</a></li>
+            <li><a href="#parameterized-expressions">Parameterized Expressions</a></li>
+            <li><a href="#selectors-brackets-vs-dot">Selectors: Brackets vs Dot</a></li>
+            <li><a href="#struct-fields-and-methods">Struct Fields and Methods</a></li>
+            <li><a href="#built-in-features">Built-in Features</a></li>
+            <li><a href="#-list-of-variables-added-to-the-gval-language">🧩 List of variables Added to the Gval Language</a></li>
+            <li><a href="#-list-of-functions-added-to-the-gval-language">🧩 List of Functions Added to the Gval Language</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

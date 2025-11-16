@@ -9,4 +9,5 @@
 /web_src/**/*_files
 /web_src/**/*_cache
 /.luarc.json
+/sandbox
 *.log

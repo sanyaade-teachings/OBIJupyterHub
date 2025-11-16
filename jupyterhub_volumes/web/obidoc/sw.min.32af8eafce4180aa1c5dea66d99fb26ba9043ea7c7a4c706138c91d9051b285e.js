@@ -1,0 +1,1 @@
+navigator.serviceWorker&&navigator.serviceWorker.register("/obidoc/sw.js",{scope:"/obidoc/"})
