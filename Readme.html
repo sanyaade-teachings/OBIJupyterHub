@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>readme</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Readme_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Readme_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Readme_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Readme_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="Readme_files/libs/quarto-html/popper.min.js"></script>
+<script src="Readme_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Readme_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Readme_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Readme_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Readme_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Readme_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Readme_files/libs/bootstrap/bootstrap-d6a003b94517c951b2d65075d42fb01b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="obijupyterhub---the-dna-metabarcoding-learning-server" class="level1">
+<h1>OBIJupyterHub - the DNA Metabarcoding Learning Server</h1>
+<section id="intended-use" class="level2">
+<h2 class="anchored" data-anchor-id="intended-use">Intended use</h2>
+<p>This project packages the MetabarcodingSchool training lab into one reproducible bundle. You get Python, R, and Bash kernels, a Quarto-built course website, and preconfigured admin/student accounts, so onboarding a class is a single command instead of a day of setup. Everything runs locally on a single machine, student work persists between sessions, and <code>./start-jupyterhub.sh</code> takes care of building images, rendering the site, preparing volumes, and bringing JupyterHub up at <code>http://localhost:8888</code>. Defaults (accounts, passwords, volumes) live in the repo so instructors can tweak them quickly.</p>
+</section>
+<section id="prerequisites-with-quick-checks" class="level2">
+<h2 class="anchored" data-anchor-id="prerequisites-with-quick-checks">Prerequisites (with quick checks)</h2>
+<p>You need Docker, Docker Compose, Quarto, and Python 3 available on the machine that will host the lab.</p>
+<ul>
+<li>macOS: install <a href="https://orbstack.dev/">OrbStack</a> (recommended) or Docker Desktop; both ship Docker Engine and Compose.</li>
+<li>Linux: install Docker Engine and the Compose plugin from your distribution (e.g., <code>sudo apt install docker.io docker-compose-plugin</code>) or from Docker’s official packages.</li>
+<li>Windows: install Docker Desktop with the WSL2 backend enabled.</li>
+<li>Quarto CLI: get installers from <a href="https://quarto.org/docs/get-started/" class="uri">https://quarto.org/docs/get-started/</a>.</li>
+<li>Python 3: any recent version is fine (only the standard library is used).</li>
+</ul>
+<p>Verify from a terminal; if a command is missing, install it before moving on:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> <span class="at">--version</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose version    <span class="co"># or: docker-compose --version</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> <span class="at">--version</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">--version</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="how-the-startup-script-works" class="level2">
+<h2 class="anchored" data-anchor-id="how-the-startup-script-works">How the startup script works</h2>
+<p><code>./start-jupyterhub.sh</code> is the single entry point. It builds the Docker images, renders the course website, prepares the volume folders, and starts the stack. Internally it:</p>
+<ul>
+<li>creates the <code>jupyterhub_volumes/</code> tree (caddy, course, shared, users, web…)</li>
+<li>builds <code>jupyterhub-student</code> and <code>jupyterhub-hub</code> images</li>
+<li>renders the Quarto site from <code>web_src/</code>, generates PDF galleries and <code>pages.json</code>, and copies everything into <code>jupyterhub_volumes/web/</code></li>
+<li>runs <code>docker-compose up -d --remove-orphans</code></li>
+</ul>
+<p>You can tailor what it does with a few flags:</p>
+<ul>
+<li><code>--no-build</code> (or <code>--offline</code>): skip Docker image builds and reuse existing images (useful when offline).</li>
+<li><code>--force-rebuild</code>: rebuild images without cache.</li>
+<li><code>--stop-server</code>: stop the stack and remove student containers, then exit.</li>
+<li><code>--update-lectures</code>: rebuild the course website only (no Docker stop/start).</li>
+</ul>
+</section>
+<section id="installation-and-first-run" class="level2">
+<h2 class="anchored" data-anchor-id="installation-and-first-run">Installation and first run</h2>
+<ol type="1">
+<li>Clone the project:</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://forge.metabarcoding.org/MetabarcodingSchool/OBIJupyterHub.git</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> OBIJupyterHub</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ol start="2" type="1">
+<li>(Optional) glance at the structure you’ll populate:</li>
+</ol>
+<pre><code>OBIJupyterHub
+├── start-jupyterhub.sh                  - single entry point (build + render + start)
+├── obijupyterhub                        - Docker images and stack definitions
+│&nbsp;&nbsp; ├── docker-compose.yml
+│&nbsp;&nbsp; ├── Dockerfile
+│&nbsp;&nbsp; ├── Dockerfile.hub
+│&nbsp;&nbsp; └── jupyterhub_config.py
+├── jupyterhub_volumes                   - data persisted on the host
+│&nbsp;&nbsp; ├── course                           - read-only for students (notebooks, data, bin, R packages)
+│&nbsp;&nbsp; ├── shared                           - shared read/write space for everyone
+│&nbsp;&nbsp; ├── users                            - per-user persistent data
+│&nbsp;&nbsp; └── web                              - rendered course website
+└── web_src                              - Quarto sources for the course website</code></pre>
+<ol start="3" type="1">
+<li>Prepare course materials (optional before first run):</li>
+</ol>
+<ul>
+<li>Put notebooks, datasets, scripts, binaries, or PDFs for students under <code>jupyterhub_volumes/course/</code>. They will appear read-only at <code>/home/jovyan/work/course/</code>.</li>
+<li>For collaborative work, drop files in <code>jupyterhub_volumes/shared/</code> (read/write for all at <code>/home/jovyan/work/shared/</code>).</li>
+<li>Edit or add Quarto sources in <code>web_src/</code> to update the course website; the script will render them.</li>
+</ul>
+<ol start="4" type="1">
+<li>Start everything (build + render + launch):</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./start-jupyterhub.sh</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ol start="5" type="1">
+<li><p>Access JupyterHub in a browser at <code>http://localhost:8888</code>.</p></li>
+<li><p>Stop the stack when you’re done (run from <code>obijupyterhub/</code>):</p></li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> down</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="operating-the-stack-one-command-a-few-options" class="level3">
+<h3 class="anchored" data-anchor-id="operating-the-stack-one-command-a-few-options">Operating the stack (one command, a few options)</h3>
+<ul>
+<li>Start or rebuild: <code>./start-jupyterhub.sh</code> (rebuilds images, regenerates the website, starts the stack).</li>
+<li>Start without rebuilding images (offline): <code>./start-jupyterhub.sh --no-build</code></li>
+<li>Force rebuild without cache: <code>./start-jupyterhub.sh --force-rebuild</code></li>
+<li>Stop only: <code>./start-jupyterhub.sh --stop-server</code></li>
+<li>Rebuild website only (no Docker stop/start): <code>./start-jupyterhub.sh --update-lectures</code></li>
+<li>Access at <code>http://localhost:8888</code> (students: any username / password <code>metabar2025</code>; admin: <code>admin</code> / <code>admin2025</code>).</li>
+<li>Check logs from <code>obijupyterhub/</code> with <code>docker-compose logs -f jupyterhub</code>.</li>
+<li>Stop with <code>docker-compose down</code> (from <code>obijupyterhub/</code>). Rerun <code>./start-jupyterhub.sh</code> to start again or after config changes.</li>
+</ul>
+</section>
+</section>
+<section id="managing-shared-data" class="level2">
+<h2 class="anchored" data-anchor-id="managing-shared-data">Managing shared data</h2>
+<p>Each student lands in <code>/home/jovyan/work/</code> with three key areas: their own files, a shared space, and a read-only course space. Everything under <code>work/</code> is persisted on the host in <code>jupyterhub_volumes</code>.</p>
+<pre><code>work/                             # Personal workspace root (persistent)
+├── [student files]               # Their own files and notebooks
+├── R_packages/                   # Personal R packages (writable by student)
+├── shared/                       # Shared workspace (read/write, shared with all)
+└── course/                       # Course files (read-only, managed by admin)
+    ├── R_packages/               # Shared R packages (read-only, installed by prof)
+    ├── bin/                      # Shared executables (in PATH)
+    └── [course materials]        # Your course files</code></pre>
+<p>R looks for packages in this order: personal <code>work/R_packages/</code>, then shared <code>work/course/R_packages/</code>, then system libraries. Because everything lives under <code>work/</code>, student files survive restarts.</p>
+<section id="user-accounts" class="level3">
+<h3 class="anchored" data-anchor-id="user-accounts">User Accounts</h3>
+<p>Defaults are defined in <code>obijupyterhub/docker-compose.yml</code>: admin (<code>admin</code> / <code>admin2025</code>) with write access to <code>course/</code>, and students (any username, password <code>metabar2025</code>) with read-only access to <code>course/</code>. Adjust <code>JUPYTERHUB_ADMIN_PASSWORD</code> and <code>JUPYTERHUB_PASSWORD</code> there, then rerun <code>./start-jupyterhub.sh</code>.</p>
+</section>
+<section id="installing-r-packages-admin-only" class="level3">
+<h3 class="anchored" data-anchor-id="installing-r-packages-admin-only">Installing R Packages (Admin Only)</h3>
+<p>From the host, install shared R packages into <code>course/R_packages/</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install packages</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">tools/install_packages.sh</span> reshape2 plotly knitr</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Students can install their own packages into their personal <code>work/R_packages/</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install in personal library (each student has their own)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">'mypackage'</span>)  <span class="co"># Will install in work/R_packages/</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="using-r-packages-students" class="level3">
+<h3 class="anchored" data-anchor-id="using-r-packages-students">Using R Packages (Students)</h3>
+<p>Students simply load packages normally:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reshape2)  <span class="co"># R checks: 1) work/R_packages/ 2) work/course/R_packages/ 3) system</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>R automatically searches in this order:</p>
+<ol type="1">
+<li>Personal packages: <code>/home/jovyan/work/R_packages/</code> (R_LIBS_USER)</li>
+<li>Prof packages: <code>/home/jovyan/work/course/R_packages/</code> (R_LIBS_SITE)</li>
+<li>System packages</li>
+</ol>
+</section>
+<section id="list-available-packages" class="level3">
+<h3 class="anchored" data-anchor-id="list-available-packages">List Available Packages</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List all available packages (personal + course + system)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">installed.packages</span>()[,<span class="st">"Package"</span>]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check personal packages</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="st">"/home/jovyan/work/R_packages"</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check course packages (installed by prof)</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="st">"/home/jovyan/work/course/R_packages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="deposit-or-retrieve-course-and-student-files" class="level3">
+<h3 class="anchored" data-anchor-id="deposit-or-retrieve-course-and-student-files">Deposit or retrieve course and student files</h3>
+<p>On the host, place course files in <code>jupyterhub_volumes/course/</code> (they appear read-only to students), shared files in <code>jupyterhub_volumes/shared/</code>, and collect student work from <code>jupyterhub_volumes/users/</code>.</p>
+</section>
+</section>
+<section id="user-management" class="level2">
+<h2 class="anchored" data-anchor-id="user-management">User Management</h2>
+<section id="option-1-predefined-user-list" class="level3">
+<h3 class="anchored" data-anchor-id="option-1-predefined-user-list">Option 1: Predefined User List</h3>
+<p>In <code>jupyterhub_config.py</code>, uncomment and modify:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>c.Authenticator.allowed_users <span class="op">=</span> {<span class="st">'student1'</span>, <span class="st">'student2'</span>, <span class="st">'student3'</span>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="option-2-allow-everyone-for-testing" class="level3">
+<h3 class="anchored" data-anchor-id="option-2-allow-everyone-for-testing">Option 2: Allow Everyone (for testing)</h3>
+<p>By default, the configuration allows any user:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>c.Authenticator.allow_all <span class="op">=</span> <span class="va">True</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>⚠️ <strong>Warning</strong>: DummyAuthenticator is ONLY for local testing!</p>
+</section>
+</section>
+<section id="kernel-verification" class="level2">
+<h2 class="anchored" data-anchor-id="kernel-verification">Kernel Verification</h2>
+<p>Once logged in, create a new notebook and verify you have access to:</p>
+<ul>
+<li><strong>Python 3</strong> (default kernel)</li>
+<li><strong>R</strong> (R kernel)</li>
+<li><strong>Bash</strong> (bash kernel)</li>
+</ul>
+</section>
+<section id="customization-for-your-labs" class="level2">
+<h2 class="anchored" data-anchor-id="customization-for-your-labs">Customization for Your Labs</h2>
+<section id="add-additional-r-packages" class="level3">
+<h3 class="anchored" data-anchor-id="add-additional-r-packages">Add Additional R Packages</h3>
+<p>Modify the <code>Dockerfile</code> (before <code>USER ${NB_UID}</code>):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode dockerfile code-with-copy"><code class="sourceCode dockerfile"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">R</span> <span class="at">-e</span> <span class="st">"install.packages(c('your_package'), repos='http://cran.rstudio.com/')"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Then rerun <code>./start-jupyterhub.sh</code> to rebuild and restart.</p>
+</section>
+<section id="add-python-packages" class="level3">
+<h3 class="anchored" data-anchor-id="add-python-packages">Add Python Packages</h3>
+<p>Add to the <code>Dockerfile</code> (before <code>USER ${NB_UID}</code>):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode dockerfile code-with-copy"><code class="sourceCode dockerfile"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">pip</span> install numpy pandas matplotlib seaborn</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Then rerun <code>./start-jupyterhub.sh</code> to rebuild and restart.</p>
+</section>
+<section id="change-port-if-8000-is-occupied" class="level3">
+<h3 class="anchored" data-anchor-id="change-port-if-8000-is-occupied">Change Port (if 8000 is occupied)</h3>
+<p>Modify in <code>docker-compose.yml</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ports</span><span class="kw">:</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="st">"8001:8000"</span><span class="co">  # Accessible on localhost:8001</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="advantages-of-this-approach" class="level2">
+<h2 class="anchored" data-anchor-id="advantages-of-this-approach">Advantages of This Approach</h2>
+<p>✅ <strong>Everything in Docker</strong>: No need to install Python/JupyterHub on your computer<br>
+✅ <strong>Portable</strong>: Easy to deploy on another server<br>
+✅ <strong>Isolated</strong>: No pollution of your system environment<br>
+✅ <strong>Easy to Clean</strong>: A simple <code>docker-compose down</code> is enough<br>
+✅ <strong>Reproducible</strong>: Students will have exactly the same environment</p>
+</section>
+<section id="troubleshooting" class="level2">
+<h2 class="anchored" data-anchor-id="troubleshooting">Troubleshooting</h2>
+<ul>
+<li>Docker daemon unavailable: make sure OrbStack/Docker Desktop/daemon is running; verify <code>/var/run/docker.sock</code> exists.</li>
+<li>Student containers do not start: check <code>docker-compose logs jupyterhub</code> and confirm the images exist with <code>docker images | grep jupyterhub-student</code>.</li>
+<li>Port conflict: change the published port in <code>docker-compose.yml</code>.</li>
+</ul>
+<p><strong>I want to start from scratch</strong>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">pushd</span> obijupyterhub</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker-compose</span> down <span class="at">-v</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rmi jupyterhub-hub jupyterhub-student</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="bu">popd</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Then rebuild everything</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="ex">./start-jupyterhub.sh</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

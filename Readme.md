@@ -8,6 +8,15 @@ You must have docker running on your computer
 
 ## Installation Steps
 
+### Dependencies required by `start-jupyterhub.sh`
+
+The startup script builds the Docker images, renders the course site and moves files into the mounted volumes. Ensure these commands are available before running it:
+
+- `docker` and `docker-compose` with the daemon running (the script calls `docker-compose down`/`up` and `docker build`; Compose V2 plugin is fine if `docker-compose` is present)
+- `quarto` CLI to render `web_src` into `jupyterhub_volumes/web` (installers at <https://quarto.org/docs/get-started/>)
+- `python3` for `tools/generate_pdf_galleries.py` and `tools/generate_pages_json.py` (standard library only)
+- `git` to clone the repository (optional once the files are on disk)
+
 ### 1. Create Directory Structure
 
 ```bash

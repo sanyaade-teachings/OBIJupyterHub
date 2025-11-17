@@ -3,6 +3,7 @@
 /jupyterhub_volumes/shared
 /jupyterhub_volumes/jupyterhub
 /jupyterhub_volumes/caddy
+/jupyterhub_volumes/course/data/Genbank
 /**/.DS_Store
 /web_src/**/*.RData
 /web_src/**/*.pdf
@@ -11,3 +12,4 @@
 /.luarc.json
 /sandbox
 *.log
+ncbitaxo_*
