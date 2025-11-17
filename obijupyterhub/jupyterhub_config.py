@@ -76,7 +76,7 @@ c.DockerSpawner.volumes = {
 }
 
 # Memory and CPU configuration (adjust according to your needs)
-c.DockerSpawner.mem_limit = '2G'
+c.DockerSpawner.mem_limit = '6G'
 c.DockerSpawner.cpu_limit = 1.0
 
 # User configuration - Simple password authentication for lab

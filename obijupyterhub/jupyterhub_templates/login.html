@@ -1,112 +1,229 @@
-{% extends "page.html" %}
-{% if announcement_login is string %}
-  {% set announcement = announcement_login %}
-{% endif %}
-{% block login_widget %}
-{% endblock login_widget %}
-{% block main %}
-  {% block login %}
-    <div id="login-main" class="container">
-      {% block login_container %}
-        {% if custom_html %}
-          {{ custom_html | safe }}
-        {% elif login_service %}
-          <div class="service-login">
-            <a role="button"
-               class='btn btn-jupyter btn-lg'
-               href='{{ authenticator_login_url | safe }}'>Sign in with {{ login_service }}</a>
-          </div>
-        {% else %}
-          <form action="{{ authenticator_login_url | safe }}"
-                method="post"
-                role="form">
-            <div class="auth-form-header">
-              <h1>Sign in</h1>
-            </div>
-            <div class='auth-form-body m-auto'>
-              {% if login_error %}<p class="login_error">{{ login_error }}</p>{% endif %}
-              <input type="hidden" name="_xsrf" value="{{ xsrf }}" />
-              {# Allow full override of the "label" and "input" elements of the username and password fields. #}
-              {% block username_input %}
-                <label for="username_input">Username:</label>
-                <input id="username_input"
-                       {% block username_input_attrs %}
-                       type="text"
-                       autocapitalize="off"
-                       autocorrect="off"
-                       autocomplete="username"
-                       class="form-control"
-                       name="username"
-                       value="{{ username }}"
-                       autofocus="autofocus"
-                       {% endblock username_input_attrs %} />
-              {% endblock username_input %}
-              {% block password_input %}
-                <label for='password_input'>Password:</label>
-                <input id="password_input"
-                       {% block password_input_attrs %}
-                       type="password"
-                       class="form-control"
-                       autocomplete="current-password"
-                       name="password"
-                       {% endblock password_input_attrs %} />
-              {% endblock password_input %}
-              {% if authenticator.request_otp %}
-                {% block otp_input %}
-                  <label for="otp_input">{{ authenticator.otp_prompt }}</label>
-                  <input id="otp_input"
-                         {% block otp_input_attrs %}
-                         class="form-control"
-                         autocomplete="one-time-password"
-                         name="otp"
-                         {% endblock otp_input_attrs %} />
-                {% endblock otp_input %}
-              {% endif %}
-              <div class="feedback-container">
-                <input id="login_submit"
-                       type="submit"
-                       class='btn btn-jupyter form-control'
-                       value='Sign in'
-                       tabindex="3" />
-                <div class="feedback-widget hidden">
-                  <i class="fa fa-spinner"></i>
-                </div>
-              </div>
-              {% block login_terms %}
-                {% if login_term_url %}
-                  <div id="login_terms" class="login_terms">
-                    <input type="checkbox"
-                           id="login_terms_checkbox"
-                           name="login_terms_checkbox"
-                           required />
-                    {% block login_terms_text %}
-                      {# allow overriding the text #}
-                      By logging into the platform you accept the <a href="{{ login_term_url }}">terms and conditions</a>.
-                    {% endblock login_terms_text %}
-                  </div>
-                {% endif %}
-              {% endblock login_terms %}
-            </div>
-          </form>
-        {% endif %}
-      {% endblock login_container %}
-    </div>
-  {% endblock login %}
-{% endblock main %}
-{% block script %}
-  {{ super() }}
-  <script>
-    if (!window.isSecureContext) {
-      // unhide http warning
-      var warning = document.getElementById('insecure-login-warning');
-      warning.className = warning.className.replace(/\bhidden\b/, '');
+{% extends "page.html" %} {% if announcement_login is string %} {% set
+announcement = announcement_login %} {% endif %} {% block head %} {{ super() }}
+<style>
+  body {
+    background: radial-gradient(
+      circle at top,
+      #f9f8ff 0%,
+      #f1f5ff 45%,
+      #e7eefb 100%
+    );
+    min-height: 100vh;
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  }
+  #login-main {
+    max-width: 950px;
+    margin: 4rem auto;
+    padding: 0;
+  }
+  .metabar-card {
+    display: flex;
+    flex-wrap: wrap;
+    box-shadow: 0 20px 60px rgba(30, 50, 120, 0.15);
+    border-radius: 28px;
+    overflow: hidden;
+    background: white;
+  }
+  .auth-form-body img#metabar-img {
+    width: 200px; /* ajuste selon le rendu souhaité */
+    height: auto;
+    display: block;
+    margin: 0 auto 1rem;
+  }
+  .login-panel {
+    flex: 1 1 360px;
+    padding: 2.5rem;
+  }
+  .login-panel h2 {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+  .login-panel p.subtitle {
+    color: #667080;
+    margin-bottom: 1.75rem;
+  }
+  .auth-form-body label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: #6b7280;
+  }
+  .auth-form-body input.form-control {
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    border: 1px solid #d7def0;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .auth-form-body input.form-control:focus {
+    border-color: #6b8afd;
+    box-shadow: 0 0 0 3px rgba(107, 138, 253, 0.2);
+    outline: none;
+  }
+  .btn.btn-jupyter {
+    background: linear-gradient(135deg, #6b8afd, #3f6dd9);
+    border: none;
+    border-radius: 14px;
+    padding: 0.85rem 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .metabar-footnote {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    margin-top: 1.5rem;
+  }
+  @media (max-width: 900px) {
+    #login-main {
+      margin: 2rem 1rem;
     }
-    // setup onSubmit feedback
-    $('form').submit((e) => {
-      var form = $(e.target);
-      form.find('.feedback-container>input').attr('disabled', true);
-      form.find('.feedback-container>*').toggleClass('hidden');
-      form.find('.feedback-widget>*').toggleClass('fa-pulse');
-    });
-  </script>
+    .metabar-card {
+      flex-direction: column;
+    }
+    .metabar-hero img {
+      position: relative;
+      opacity: 1;
+    }
+    .metabar-hero__overlay {
+      background: rgba(4, 20, 43, 0.85);
+      border-radius: inherit;
+    }
+  }
+</style>
+{% endblock head %} {% block login_widget %}{% endblock login_widget %} {% block
+main %} {% block login %}
+<div id="login-main" class="container">
+  <div class="metabar-card">
+    <section class="login-panel">
+      <h2></h2>
+      <p class="subtitle"></p>
+      {% block login_container %} {% if custom_html %} {{ custom_html | safe }}
+      {% elif login_service %}
+      <div class="service-login">
+        <a
+          role="button"
+          class="btn btn-jupyter btn-lg w-100"
+          href="{{ authenticator_login_url | safe }}"
+          >Sign in with {{ login_service }}</a
+        >
+      </div>
+      {% else %}
+      <form
+        action="{{ authenticator_login_url | safe }}"
+        method="post"
+        role="form"
+      >
+        <div class="auth-form-body">
+          {% if login_error %}
+          <p class="login_error">{{ login_error }}</p>
+          {% endif %}
+          <img
+            id="metabar-img"
+            src="/img/welcome_metabar.webp"
+            alt="Metabarcoding welcome illustration"
+            style="
+              width: 308px;
+              height: auto;
+              display: block;
+              margin: 0 auto 1rem;
+            "
+          />
+          <input type="hidden" name="_xsrf" value="{{ xsrf }}" />
+          {% block username_input %}
+          <label for="username_input">Username</label>
+          <input
+            id="username_input"
+            {%
+            block
+            username_input_attrs
+            %}
+            type="text"
+            autocapitalize="off"
+            autocorrect="off"
+            autocomplete="username"
+            class="form-control"
+            name="username"
+            value="{{ username }}"
+            autofocus="autofocus"
+            {%
+            endblock
+            username_input_attrs
+            %}
+          />
+          {% endblock username_input %} {% block password_input %}
+          <label for="password_input">Password</label>
+          <input
+            id="password_input"
+            {%
+            block
+            password_input_attrs
+            %}
+            type="password"
+            class="form-control"
+            autocomplete="current-password"
+            name="password"
+            {%
+            endblock
+            password_input_attrs
+            %}
+          />
+          {% endblock password_input %} {% if authenticator.request_otp %} {%
+          block otp_input %}
+          <label for="otp_input">{{ authenticator.otp_prompt }}</label>
+          <input
+            id="otp_input"
+            {%
+            block
+            otp_input_attrs
+            %}
+            class="form-control"
+            autocomplete="one-time-password"
+            name="otp"
+            {%
+            endblock
+            otp_input_attrs
+            %}
+          />
+          {% endblock otp_input %} {% endif %}
+          <div class="feedback-container mt-4">
+            <input
+              id="login_submit"
+              type="submit"
+              class="btn btn-jupyter form-control"
+              value="Sign in"
+              tabindex="3"
+            />
+            <div class="feedback-widget hidden">
+              <i class="fa fa-spinner"></i>
+            </div>
+          </div>
+          {% block login_terms %} {% if login_term_url %}
+          <div id="login_terms" class="login_terms mt-3">
+            <input
+              type="checkbox"
+              id="login_terms_checkbox"
+              name="login_terms_checkbox"
+              required
+            />
+            {% block login_terms_text %} By logging in you accept the
+            <a href="{{ login_term_url }}">terms and conditions</a>. {% endblock
+            login_terms_text %}
+          </div>
+          {% endif %} {% endblock login_terms %}
+        </div>
+      </form>
+      {% endif %} {% endblock login_container %}
+    </section>
+  </div>
+</div>
+{% endblock login %} {% endblock main %} {% block script %} {{ super() }}
+<script>
+  $("form").submit((e) => {
+    const form = $(e.target);
+    form.find(".feedback-container>input").attr("disabled", true);
+    form.find(".feedback-container>*").toggleClass("hidden");
+    form.find(".feedback-widget>*").toggleClass("fa-pulse");
+  });
+</script>
 {% endblock script %}
