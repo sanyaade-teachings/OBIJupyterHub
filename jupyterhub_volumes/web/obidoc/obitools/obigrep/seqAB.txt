@@ -1,2 +1,0 @@
-seqA1
-seqB1

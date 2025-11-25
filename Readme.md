@@ -1,4 +1,4 @@
-# JupyterHub Configuration with OrbStack on Mac (all in Docker)
+# OBIJupyterHub - the DNA Metabarcoding Learning Server
 
 ## Intended use
 
@@ -31,6 +31,14 @@ python3 --version
 - builds `jupyterhub-student` and `jupyterhub-hub` images
 - renders the Quarto site from `web_src/`, generates PDF galleries and `pages.json`, and copies everything into `jupyterhub_volumes/web/`
 - runs `docker-compose up -d --remove-orphans`
+
+You can tailor what it does with a few flags:
+
+- `--no-build` (or `--offline`): skip Docker image builds and reuse existing images (useful when offline).
+- `--force-rebuild`: rebuild images without cache.
+- `--stop-server`: stop the stack and remove student containers, then exit.
+- `--update-lectures`: rebuild the course website only (no Docker stop/start).
+- `--build-obidoc`: force rebuilding the obidoc documentation (auto-built if empty; skipped in offline mode).
 
 ## Installation and first run
 
@@ -78,9 +86,14 @@ OBIJupyterHub
 docker-compose down
 ```
 
-### Operating the stack (with one command)
+### Operating the stack (one command, a few options)
 
-- Start or rebuild at any time with `./start-jupyterhub.sh` from the project root. It rebuilds images, regenerates the website, and starts the stack.
+- Start or rebuild: `./start-jupyterhub.sh` (rebuilds images, regenerates the website, starts the stack).
+- Start without rebuilding images (offline): `./start-jupyterhub.sh --no-build`
+- Force rebuild without cache: `./start-jupyterhub.sh --force-rebuild`
+- Stop only: `./start-jupyterhub.sh --stop-server`
+- Rebuild website only (no Docker stop/start): `./start-jupyterhub.sh --update-lectures`
+- Rebuild obidoc docs: `./start-jupyterhub.sh --build-obidoc` (also builds automatically if `jupyterhub_volumes/web/obidoc` is empty; skipped in offline mode)
 - Access at `http://localhost:8888` (students: any username / password `metabar2025`; admin: `admin` / `admin2025`).
 - Check logs from `obijupyterhub/` with `docker-compose logs -f jupyterhub`.
 - Stop with `docker-compose down` (from `obijupyterhub/`). Rerun `./start-jupyterhub.sh` to start again or after config changes.

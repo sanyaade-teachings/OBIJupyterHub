@@ -4,6 +4,7 @@
 /jupyterhub_volumes/jupyterhub
 /jupyterhub_volumes/caddy
 /jupyterhub_volumes/course/data/Genbank
+/jupyterhub_volumes/web/
 /**/.DS_Store
 /web_src/**/*.RData
 /web_src/**/*.pdf
@@ -15,3 +16,4 @@
 ncbitaxo_*
 Readme_files
 Readme.html
+tmp.*
