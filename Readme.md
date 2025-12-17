@@ -6,31 +6,50 @@ This project packages the MetabarcodingSchool training lab into one reproducible
 
 ## Prerequisites (with quick checks)
 
-You need Docker, Docker Compose, Quarto, and Python 3 available on the machine that will host the lab.
+You only need **Docker and Docker Compose** on the machine that will host the lab. All other tools (Quarto, Hugo, Python, R) are provided via a builder Docker image and do not need to be installed on your system.
 
 - macOS: install [OrbStack](https://orbstack.dev/) (recommended) or Docker Desktop; both ship Docker Engine and Compose.
 - Linux: install Docker Engine and the Compose plugin from your distribution (e.g., `sudo apt install docker.io docker-compose-plugin`) or from Docker’s official packages.
 - Windows: install Docker Desktop with the WSL2 backend enabled.
-- Quarto CLI: get installers from <https://quarto.org/docs/get-started/>.
-- Python 3: any recent version is fine (only the standard library is used).
 
-Verify from a terminal; if a command is missing, install it before moving on:
+Verify from a terminal:
 
 ```bash
 docker --version
 docker compose version    # or: docker-compose --version
-quarto --version
-python3 --version
 ```
 
 ## How the startup script works
 
 `./start-jupyterhub.sh` is the single entry point. It builds the Docker images, renders the course website, prepares the volume folders, and starts the stack. Internally it:
 
-- creates the `jupyterhub_volumes/` tree (caddy, course, shared, users, web…)
+- creates the `jupyterhub_volumes/` tree (caddy, course, shared, users, web...)
+- builds the `obijupyterhub-builder` image (contains Quarto, Hugo, R, Python) if not already present
 - builds `jupyterhub-student` and `jupyterhub-hub` images
+- detects R package dependencies from Quarto files using the `{attachment}` package and installs them automatically
 - renders the Quarto site from `web_src/`, generates PDF galleries and `pages.json`, and copies everything into `jupyterhub_volumes/web/`
 - runs `docker-compose up -d --remove-orphans`
+
+### Builder image
+
+The builder image (`obijupyterhub-builder`) contains all the tools needed to prepare the course materials:
+
+- **Quarto** for rendering the course website
+- **Hugo** for building the obidoc documentation
+- **R** with the `{attachment}` package for automatic dependency detection
+- **Python 3** for utility scripts
+
+This means you don't need to install any of these tools on your host system. The script automatically builds this image on first run and reuses it for subsequent builds. Use `--force-rebuild` to rebuild the builder image if needed.
+
+### R package caching for builds
+
+R packages required by your Quarto documents are automatically detected and installed during the build process. These packages are cached in `jupyterhub_volumes/builder/R_packages/` so they persist across builds. This means:
+
+- **First build**: All R packages used in your `.qmd` files are detected and installed (may take some time)
+- **Subsequent builds**: Only missing packages are installed, making builds much faster
+- **Adding new packages**: Simply use `library(newpackage)` in your Quarto files; the build process will detect and install it automatically
+
+To clear the R package cache and force a fresh installation, delete the `jupyterhub_volumes/builder/R_packages/` directory.
 
 You can tailor what it does with a few flags:
 
@@ -66,6 +85,8 @@ OBIJupyterHub
 │   └── web                              - rendered course website
 └── web_src                              - Quarto sources for the course website
 ```
+
+Note: The `obijupyterhub/` directory also contains `Dockerfile.builder` which provides the build environment, the `tools/` directory contains utility scripts including `install_quarto_deps.R` for automatic R dependency detection, and `jupyterhub_volumes/builder/` stores cached R packages for faster builds.
 
 3) Prepare course materials (optional before first run):
 - Put notebooks, datasets, scripts, binaries, or PDFs for students under `jupyterhub_volumes/course/`. They will appear read-only at `/home/jovyan/work/course/`.
@@ -246,8 +267,11 @@ ports:
 ``` bash
 pushd obijupyterhub
 docker-compose down -v
-docker rmi jupyterhub-hub jupyterhub-student
+docker rmi jupyterhub-hub jupyterhub-student obijupyterhub-builder
 popd
+
+# Optionally clear the R package cache
+rm -rf jupyterhub_volumes/builder/R_packages
 
 # Then rebuild everything
 ./start-jupyterhub.sh

@@ -5,6 +5,7 @@
 /jupyterhub_volumes/caddy
 /jupyterhub_volumes/course/data/Genbank
 /jupyterhub_volumes/web/
+/jupyterhub_volumes/builder
 /**/.DS_Store
 /web_src/**/*.RData
 /web_src/**/*.pdf
