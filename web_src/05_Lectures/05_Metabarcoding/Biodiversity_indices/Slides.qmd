@@ -3,22 +3,31 @@ title: "Biodiversity metrics \ and metabarcoding"
 author: "Eric Coissac"
 date: "02/02/2024"
 bibliography: inst/REFERENCES.bib
-format: 
+format:
   revealjs:
     css: ../../slides.css
     transition: slide
     scrollable: true
-    theme: beige 
+    theme: beige
     html-math-method: mathjax
     embed-resources: true
 editor: visual
 ---
 
 ```{r setup, include=FALSE}
-library(knitr) 
+library(knitr)
+library(Rdpack)
 library(tidyverse)
-library(kableExtra)
+library(gt)
 library(latex2exp)
+
+# Install MetabarSchool if not available
+if (!requireNamespace("MetabarSchool", quietly = TRUE)) {
+  if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes", dependencies = TRUE)
+  }
+  remotes::install_git('https://forge.metabarcoding.org/MetabarcodingSchool/biodiversity-metrics.git')
+}
 library(MetabarSchool)
 
 opts_chunk$set(echo = FALSE,
@@ -49,7 +58,7 @@ install.packages("devtools",dependencies = TRUE)
 Then you can install *MetabarSchool*
 
 ```{r  eval=FALSE, echo=TRUE}
-devtools::install_git("https://git.metabarcoding.org/MetabarcodingSchool/biodiversity-metrics.git")
+remotes::install_git('https://forge.metabarcoding.org/MetabarcodingSchool/biodiversity-metrics.git')
 ```
 
 You will also need the *vegan* package
@@ -68,11 +77,15 @@ A 16 plants mock community
 data("plants.16")
 x = cbind(` ` =seq_len(nrow(plants.16)),plants.16)
 x$`Relative aboundance`=paste0('1/',1/x$dilution)
-knitr::kable(x[,-(4:5)],
-             format = "html", 
-             row.names = FALSE,
-             align = "rlrr")  %>% 
-  kable_styling(position = "center")
+x[,-(4:5)] %>%
+  gt() %>%
+  cols_align(align = "center", columns = 1) %>%
+  cols_align(align = "left", columns = 2) %>%
+  cols_align(align = "right", columns = c(3, 4)) %>%
+  tab_options(
+    table.align = "center",
+    heading.align = "center"
+  )
 ```
 
 ## The experiment {.flexbox .vcenter}
@@ -100,11 +113,14 @@ data("positive.motus")
 -   `positive.count` read count matrix $`r nrow(positive.count)` \; PCRs \; \times \; `r ncol(positive.count)` \; MOTUs$
 
 ```{r}
-knitr::kable(positive.count[1:5,1:5],
-             format="html",
-             align = 'rc') %>% 
-  kable_styling(position = "center")  %>% 
-  row_spec(0, angle = -45)
+as.data.frame(positive.count[1:5,1:5]) %>%
+  gt() %>%
+  cols_align(align = "right", columns = 1) %>%
+  cols_align(align = "center", columns = 2:ncol(positive.count[1:5,1:5])) %>%
+  tab_options(
+    table.align = "center",
+    heading.align = "center"
+  )
 ```
 
 <br>
@@ -126,10 +142,14 @@ data("positive.motus")
 -   `positive.samples` a `r nrow(positive.samples)` rows `data.frame` of `r ncol(positive.samples)` columns describing each PCR
 
 ```{r}
-knitr::kable(head(positive.samples,n=3),
-             format="html",
-             align = 'rc') %>% 
-  kable_styling(position = "center")
+head(positive.samples,n=3) %>%
+  gt() %>%
+  cols_align(align = "right", columns = 1) %>%
+  cols_align(align = "center", columns = 2:ncol(head(positive.samples,n=3))) %>%
+  tab_options(
+    table.align = "center",
+    heading.align = "center"
+  )
 ```
 
 <br>
@@ -151,10 +171,16 @@ data("positive.motus")
 -   `positive.motus` : a `r nrow(positive.motus)` rows `data.frame` of `r ncol(positive.motus)` columns describing each MOTU
 
 ```{r}
-knitr::kable(head(positive.motus,n=3),
-             format = "html",
-             align = 'rlrc') %>% 
-  kable_styling(position = "center")
+head(positive.motus,n=3) %>%
+  gt() %>%
+  cols_align(align = "right", columns = 1) %>%
+  cols_align(align = "left", columns = 2) %>%
+  cols_align(align = "right", columns = 3) %>%
+  cols_align(align = "center", columns = 4) %>%
+  tab_options(
+    table.align = "center",
+    heading.align = "center"
+  )
 ```
 
 <br>
@@ -172,10 +198,17 @@ table(colSums(positive.count) == 1)
 ```
 
 ```{r}
-kable(t(table(colSums(positive.count) == 1)),
-             format = "html") %>% 
-  kable_styling(position = "center")   %>% 
-  row_spec(0, align = 'c')
+as.data.frame(t(table(colSums(positive.count) == 1))) %>%
+  gt() %>%
+  cols_align(align = "center", columns = everything()) %>%
+  tab_style(
+    style = cell_text(align = "center"),
+    locations = cells_column_labels()
+  ) %>%
+  tab_options(
+    table.align = "center",
+    heading.align = "center"
+  )
 ```
 
 <br>
@@ -195,7 +228,7 @@ positive.motus = positive.motus[are.not.singleton,]
 Despite all standardization efforts
 
 ```{r fig.height=3}
-par(bg=NA) 
+par(bg=NA)
 hist(rowSums(positive.count),
      breaks = 15,
      xlab="Read counts",
@@ -209,7 +242,7 @@ Is it related to the amount of DNA in the extract ?
 ## What do the reading numbers per PCR mean? {.smaller}
 
 ```{r echo=TRUE, fig.height=4}
-par(bg=NA) 
+par(bg=NA)
 boxplot(rowSums(positive.count) ~ positive.samples$dilution,log="y")
 abline(h = median(rowSums(positive.count)),lw=2,col="red",lty=2)
 ```
@@ -288,7 +321,7 @@ table(are.still.present)
 ## Rarefying read count (4) {.flexbox .vcenter}
 
 ```{r echo=TRUE, fig.height=3.5}
-par(bg=NA) 
+par(bg=NA)
 boxplot(colSums(positive.count) ~ are.still.present, log="y")
 ```
 
@@ -360,10 +393,13 @@ knitr::include_graphics("figures/alpha_diversity.svg")
 E1 = c(A=0.25,B=0.25,C=0.25,D=0.25,E=0,F=0,G=0)
 E2 = c(A=0.55,B=0.07,C=0.02,D=0.17,E=0.07,F=0.07,G=0.03)
 environments = t(data.frame(`Environment 1` = E1,`Environment 2` = E2))
-kable(environments,
-             format="html",
-             align = 'rr') %>% 
-  kable_styling(position = "center")
+as.data.frame(environments) %>%
+  gt() %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_options(
+    table.align = "center",
+    heading.align = "center"
+  )
 ```
 
 ## Richness {.flexbox .vcenter}
@@ -379,10 +415,13 @@ S = rowSums(environments > 0)
 ```
 
 ```{r}
-kable(data.frame(S=S),
-             format="html",
-             align = 'rr') %>% 
-  kable_styling(position = "center")
+data.frame(S=S) %>%
+  gt() %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_options(
+    table.align = "center",
+    heading.align = "center"
+  )
 ```
 
 ## Gini-Simpson's index {.smaller}
@@ -414,10 +453,13 @@ GS = 1 - rowSums(environments^2)
 ```
 
 ```{r}
-kable(data.frame(`Gini-Simpson`=GS),
-             format="html",
-             align = 'rr') %>% 
-  kable_styling(position = "center")
+data.frame(`Gini-Simpson`=GS) %>%
+  gt() %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_options(
+    table.align = "center",
+    heading.align = "center"
+  )
 ```
 
 ## Shannon entropy {.smaller}
@@ -443,10 +485,13 @@ H = - rowSums(environments * log(environments),na.rm = TRUE)
 ```
 
 ```{r}
-kable(data.frame(`Shannon index`=H),
-             format="html",
-             align = 'rr') %>% 
-  kable_styling(position = "center")
+data.frame(`Shannon index`=H) %>%
+  gt() %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_options(
+    table.align = "center",
+    heading.align = "center"
+  )
 ```
 
 ## Hill's number {.smaller}
@@ -476,10 +521,17 @@ D2 = exp(- rowSums(environments * log(environments),na.rm = TRUE))
 ```
 
 ```{r}
-kable(data.frame(`Hill Numbers`=D2),
-             format="html",
-             align = 'rr') %>% 
-  kable_styling(position = "center")
+data.frame(`Hill Numbers` = D2) %>%
+  gt() %>%
+  cols_align(align = "center") %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) %>%
+  tab_options(
+    table.align = "center",
+    heading.align = "center"
+  )
 ```
 
 ## Generalized logaritmic function {.smaller}
@@ -493,7 +545,7 @@ $$
 The function is not defined for $q=1$ but when $q \longrightarrow 1\;,\; ^q\log(x) \longrightarrow \log(x)$
 
 $$
-^q\log(x) = \left\{ 
+^q\log(x) = \left\{
              \begin{align}
                \log(x),& \text{if } q = 1\\
                \frac{x^{(1-q)}-1}{1-q},& \text{otherwise}
@@ -505,7 +557,7 @@ $$
 log_q = function(x,q=1) {
   if (q==1)
     log(x)
-  else 
+  else
     (x^(1-q)-1)/(1-q)
 }
 ```
@@ -535,7 +587,7 @@ legend("topleft",legend = qs,fill =  seq_along(qs),cex=1.5)
 ## And its inverse function {.flexbox .vcenter}
 
 $$
-^qe^x = \left\{ 
+^qe^x = \left\{
              \begin{align}
                e^x,& \text{if } x = 1 \\
                (1 + x(1-q))^{(\frac{1}{1-q})},& \text{otherwise}
@@ -601,14 +653,14 @@ environments.dq = apply(environments,MARGIN = 1,D_spectrum,q=qs)
 
 ```{r}
 par(mfrow=c(1,2),bg=NA)
-plot(qs,environments.hq[,2],type="l",col="red", 
+plot(qs,environments.hq[,2],type="l",col="red",
      xlab=TeX('$q$'),
      ylab=TeX('$^qH$'),
      xlim=c(-0.5,3.5),
      main="generalized entropy")
 points(qs,environments.hq[,1],type="l",col="blue")
 abline(v=c(0,1,2),lty=2,col=4:6)
-plot(qs,environments.dq[,2],type="l",col="red", 
+plot(qs,environments.dq[,2],type="l",col="red",
      xlab=TeX('$q$'),
      ylab=TeX('$^qD$'),
      main="Hill's number")
@@ -657,7 +709,7 @@ plot(qs,H.mock,type="l",
      xlim=c(-0.5,3.5),
      main="generalized entropy")
 abline(v=c(0,1,2),lty=2,col=4:6)
-plot(qs,D.mock,type="l", 
+plot(qs,D.mock,type="l",
      xlab=TeX('$q$'),
      ylab=TeX('$^qD$'),
      main="Hill's number")
@@ -674,7 +726,7 @@ positive.H = apply(positive.count.relfreq,
 ```
 
 ```{r}
-par(bg=NA) 
+par(bg=NA)
 boxplot(t(positive.H),
         xlab=TeX('$q$'),
         ylab=TeX('$^qH$'),
@@ -685,7 +737,7 @@ points(H.mock,col="red",type="l")
 ## Biodiversity spectrum and metabarcoding (2) {.flexbox .vcenter .smaller}
 
 ```{r}
-par(bg=NA) 
+par(bg=NA)
 boxplot(t(positive.H)[,11:31],
         xlab=TeX('$q$'),
         ylab=TeX('$^qH$'),
@@ -706,7 +758,7 @@ positive.D = apply(positive.count.relfreq,
 ```
 
 ```{r}
-par(bg=NA) 
+par(bg=NA)
 boxplot(t(positive.D),
         xlab=TeX('$q$'),
         ylab=TeX('$^qD$'),
@@ -753,7 +805,7 @@ positive.clean.H = apply(positive.clean.count.relfreq,
 ```
 
 ```{r fig.height=3.5}
-par(bg=NA) 
+par(bg=NA)
 boxplot(t(positive.clean.H),
         xlab=TeX('$q$'),
         ylab=TeX('$^qH$'),
@@ -771,7 +823,7 @@ positive.clean.D = apply(positive.clean.count.relfreq,
 ```
 
 ```{r}
-par(bg=NA) 
+par(bg=NA)
 boxplot(t(positive.clean.D),
         xlab=TeX('$q$'),
         ylab=TeX('$^qD$'),
@@ -1069,7 +1121,7 @@ BC_{jk}=\frac{\sum _{i=1}^{p}(N_{ij} - min(N_{ij},N_{ik}) + (N_{ik} - min(N_{ij}
 $$
 
 $$
-BC_{jk}=\frac{\sum _{i=1}^{p}|N_{ij} - N_{ik}|}{\sum _{i=1}^{p}N_{ij}+\sum _{i=1}^{p}N_{ik}} 
+BC_{jk}=\frac{\sum _{i=1}^{p}|N_{ij} - N_{ik}|}{\sum _{i=1}^{p}N_{ij}+\sum _{i=1}^{p}N_{ik}}
 $$
 
 $$
@@ -1159,7 +1211,7 @@ legend("topleft",legend = levels(samples.type),fill = 1:4,cex=1.2)
 
 ````{=html}
 <!---
-## Computation of norms 
+## Computation of norms
 
 ```{r guiana_norm, echo=TRUE}
 guiana.n1.dist = norm(guiana.relfreq.final,l=1)
@@ -1168,7 +1220,7 @@ guiana.n3.dist = norm(guiana.relfreq.final^(1/3),l=3)
 guiana.n4.dist = norm(guiana.relfreq.final^(1/100),l=100)
 ```
 
-## pCoA on norms 
+## pCoA on norms
 
 ```{r dependson="guiana_norm"}
 guiana.n1.pcoa  = cmdscale(guiana.n1.dist,k=3,eig = TRUE)
