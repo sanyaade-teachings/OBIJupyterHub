@@ -19,37 +19,63 @@ RUN TEMP=. curl -L https://raw.githubusercontent.com/metabarcoding/obitools4/mas
     && cp $HOME/obitools-build/bin/* /usr/local/bin
 RUN ls -l /usr/local/bin
 
-
 # ---------- Stage 2 : image finale ----------
 FROM jupyter/base-notebook:latest
 
 USER root
 
 # Installer seulement les dépendances d'exécution (sans build-essential)
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # R et dépendances de base
     r-base \
-    libcurl4-openssl-dev libssl-dev libxml2-dev \
+    r-base-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    libicu-dev \
+    zlib1g-dev \
+    # Polices et rendu graphique (indispensable pour ggplot2, ragg, etc.)
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libfontconfig1-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libtiff5-dev \
+    libjpeg-dev \
+    pandoc \
+    # Outils de compilation et gestion de versions
+    libgit2-dev \
+    cmake \
+    # Utilitaires systèmes déjà présents dans votre Dockerfile
     curl \
+    wget \
     git \
-    texlive-xetex texlive-fonts-recommended texlive-plain-generic \
-    ruby ruby-dev \
-    vim nano \
+    vim \
+    nano \
+    less \
+    gdebi-core \
+    ripgrep \
+    # Pour générer des PDF/rapports depuis R Markdown / Jupyter
+    texlive-xetex \
+    texlive-luatex \
+    texlive-fonts-recommended \
+    texlive-fonts-extra \
+    texlive-latex-extra \
+    texlive-plain-generic \
+    lmodern \
+    fonts-lmodern \
+    librsvg2-bin \
+    cm-super \
+    # Ruby (si vous en avez besoin pour autre chose)
+    ruby \
+    ruby-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Installer R et packages
-RUN R -e "install.packages(c('IRkernel','tidyverse','vegan','ade4','BiocManager','remotes','igraph'), \
-                             dependencies=TRUE, \
-                             repos='http://cran.rstudio.com/')" && \
-    R -e "BiocManager::install('biomformat')" && \
-    R -e "remotes::install_github('metabaRfactory/metabaR')" && \
-    R -e "remotes::install_git('https://forge.metabarcoding.org/obitools/ROBIUtils.git')" && \
-    R -e "remotes::install_git('https://forge.metabarcoding.org/obitools/ROBITaxonomy.git')" && \
-    R -e "remotes::install_git('https://forge.metabarcoding.org/obitools/ROBITools.git')" && \
-    R -e "remotes::install_git('https://forge.metabarcoding.org/obitools/ROBITaxonomy.git')" && \
-    R -e "remotes::install_git('https://forge.metabarcoding.org/MetabarcodingSchool/biodiversity-metrics.git')" && \
-    R -e "IRkernel::installspec(user = FALSE)" && \
-    rm -rf /tmp/Rtmp*
+COPY install_R_packages.R /tmp/install_R_packages.R
+RUN Rscript /tmp/install_R_packages.R --no-save --no-restore && \
+    rm -rf /tmp/Rtmp* /tmp/install_R_packages.R
 
 # Installer les autres outils
 RUN pip install --no-cache-dir bash_kernel csvkit && \
@@ -57,9 +83,17 @@ RUN pip install --no-cache-dir bash_kernel csvkit && \
 
 RUN gem install youplot
 
+# Installation de Quarto (multi-arch)
+RUN ARCH=$(dpkg --print-architecture) && \
+    QUARTO_VERSION="1.8.27" && \
+    wget https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${ARCH}.deb && \
+    gdebi --non-interactive quarto-${QUARTO_VERSION}-linux-${ARCH}.deb && \
+    rm quarto-${QUARTO_VERSION}-linux-${ARCH}.deb
+
 # Set permissions for Jupyter user
 RUN mkdir -p /home/${NB_USER}/.local/share/jupyter && \
-    chown -R ${NB_UID}:${NB_GID} /home/${NB_USER} 
+    chown -R ${NB_UID}:${NB_GID} /home/${NB_USER}
+
 
 
 # Copier uniquement le binaire csvlens du builder
