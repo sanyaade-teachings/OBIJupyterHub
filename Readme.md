@@ -75,10 +75,13 @@ OBIJupyterHub
 ├── start-jupyterhub.sh                  - single entry point (build + render + start)
 ├── obijupyterhub                        - Docker images and stack definitions
 │   ├── docker-compose.yml
-│   ├── Dockerfile
-│   ├── Dockerfile.hub
+│   ├── install_R_packages.R             - An R script used to install all need R packages
+│   ├── Dockerfile                       - Image used by the students
+│   ├── Dockerfile.hub                   - Image for the jupyter hub
+│   ├── Dockerfile.builder               - Image for the builder
 │   └── jupyterhub_config.py
 ├── jupyterhub_volumes                   - data persisted on the host
+│   ├── builder                          - R packages cache for building lectures
 │   ├── course                           - read-only for students (notebooks, data, bin, R packages)
 │   ├── shared                           - shared read/write space for everyone
 │   ├── users                            - per-user persistent data
@@ -86,7 +89,7 @@ OBIJupyterHub
 └── web_src                              - Quarto sources for the course website
 ```
 
-Note: The `obijupyterhub/` directory also contains `Dockerfile.builder` which provides the build environment, the `tools/` directory contains utility scripts including `install_quarto_deps.R` for automatic R dependency detection, and `jupyterhub_volumes/builder/` stores cached R packages for faster builds.
+Note: The `tools/` directory contains utility scripts including `install_quarto_deps.R` for automatic R dependency detection.
 
 3) Prepare course materials (optional before first run):
 - Put notebooks, datasets, scripts, binaries, or PDFs for students under `jupyterhub_volumes/course/`. They will appear read-only at `/home/jovyan/work/course/`.

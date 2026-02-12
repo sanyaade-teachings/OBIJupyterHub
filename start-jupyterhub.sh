@@ -35,6 +35,10 @@ Options:
 EOF
 }
 
+
+dockercompose=$(which docker-compose || echo 'docker compose')
+
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --no-build|--offline) NO_BUILD=true ;;
@@ -78,31 +82,57 @@ if [ ! -f "Dockerfile" ] || [ ! -f "docker-compose.yml" ]; then
     exit 1
 fi
 
+get_file_timestamp() {
+    local file="$1"
+    case "$(uname -s)" in
+        Linux)
+            stat -c %Y "$file"
+            ;;
+        Darwin)
+            # BSD stat : -f pour format, %m = timestamp modification
+            stat -f %m "$file"
+            ;;
+        *)
+            echo "Système non supporté" >&2
+            return 1
+            ;;
+    esac
+}
+
 check_if_image_needs_rebuild() {
     local image_name="$1"
     local dockerfile="$2"
-    
+
+    echo -e "${BLUE}Checking image ${image_name}...${NC}"
+
     # Check if image exists
     if ! docker image inspect "$image_name" >/dev/null 2>&1; then
+        echo -e "${YELLOW}Docker image ${image_name} doesn't exist.${NC}"
         return 0  # Need to build (image doesn't exist)
     fi
-    
+
     # If force rebuild, always rebuild
     if $FORCE_REBUILD; then
+        echo -e "${YELLOW}Docker image build is forced.${NC}"
         return 0  # Need to rebuild
     fi
-    
+
     # Compare Dockerfile modification time with image creation time
     if [ -f "$dockerfile" ]; then
-        local dockerfile_mtime=$(stat -c %Y "$dockerfile" 2>/dev/null || echo 0)
-        local image_created=$(docker image inspect "$image_name" --format='{{.Created}}' 2>/dev/null | sed 's/\.000000000//' | xargs -I {} date -d "{}" +%s 2>/dev/null || echo 0)
-        
+        local dockerfile_mtime=$(get_file_timestamp "$dockerfile" 2>/dev/null || echo 0)
+        local image_created=$(docker image inspect "$image_name" --format='{{.Created}}' 2>/dev/null \
+              | sed -E 's/\.[0-9]+//' \
+              | (read d; if [[ "$(uname -s)" == "Darwin" ]]; then date -ju -f "%Y-%m-%dT%H:%M:%S" "${d%Z}" +%s; else date -d "$d" +%s; fi) 2>/dev/null || echo 0)
+
+        echo -e "${BLUE}Docker image ${image_name} created at: ${image_created}.${NC}"
+        echo -e "${BLUE}Docker file ${dockerfile} modified at: ${dockerfile_mtime}.${NC}"
+
         if [ "$dockerfile_mtime" -gt "$image_created" ]; then
             echo -e "${YELLOW}Dockerfile is newer than image, rebuild needed${NC}"
             return 0  # Need to rebuild
         fi
     fi
-    
+
     return 1  # No need to rebuild
 }
 
@@ -112,7 +142,7 @@ build_builder_image() {
         if $FORCE_REBUILD; then
             build_flag+=(--no-cache)
         fi
-        
+
         echo ""
         echo -e "${BLUE}Building builder image...${NC}"
         docker build "${build_flag[@]}" -t "$BUILDER_IMAGE" -f Dockerfile.builder .
@@ -136,7 +166,7 @@ run_in_builder() {
 
 stop_stack() {
     echo -e "${BLUE}Stopping existing containers...${NC}"
-    docker-compose down 2>/dev/null || true
+    ${dockercompose} down 2>/dev/null || true
 
     echo -e "${BLUE}Cleaning up student containers...${NC}"
     docker ps -aq --filter name=jupyter- | xargs -r docker rm -f 2>/dev/null || true
@@ -237,7 +267,7 @@ build_website() {
 start_stack() {
     echo ""
     echo -e "${BLUE}Starting JupyterHub...${NC}"
-    docker-compose up -d --remove-orphans
+    ${dockercompose} up -d --remove-orphans
 
     echo ""
     echo -e "${YELLOW}Waiting for JupyterHub to start...${NC}"
@@ -268,13 +298,13 @@ print_success() {
         echo "   - work/course/R_packages/   : shared R packages by prof (read-only)"
         echo "   - work/course/bin/          : shared executables (in PATH)"
         echo ""
-        echo "To view logs:    docker-compose logs -f jupyterhub"
-        echo "To stop:         docker-compose down"
+        echo "To view logs:    ${dockercompose} logs -f jupyterhub"
+        echo "To stop:         ${dockercompose} down"
         echo ""
     else
         echo ""
         echo -e "${YELLOW}JupyterHub container doesn't seem to be starting${NC}"
-        echo "Check logs with: docker-compose logs jupyterhub"
+        echo "Check logs with: ${dockercompose} logs jupyterhub"
         exit 1
     fi
 }
