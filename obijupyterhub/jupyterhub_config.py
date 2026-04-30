@@ -14,7 +14,10 @@ VOLUMES_BASE_PATH = '/volumes/users'  # Path as seen from JupyterHub container (
 HOST_VOLUMES_PATH = os.environ.get('HOST_VOLUMES_PATH', '/volumes')  # Real path on host machine (parent dir)
 
 # Docker image to use for student containers
-c.DockerSpawner.image = 'jupyterhub-student:latest'
+c.DockerSpawner.image = os.environ.get(
+    'STUDENT_IMAGE',
+    'registry.metabarcoding.org/metabarschool/obijupyterhub-student:latest'
+)
 
 # Docker network (create with: docker network create jupyterhub-network)
 c.DockerSpawner.network_name = 'jupyterhub-network'

@@ -32,6 +32,7 @@ RUN apt-get update \
        libpng-dev \
        libtiff5-dev \
        libjpeg-dev \
+       libuv1-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -54,12 +55,15 @@ RUN ARCH=$(dpkg --print-architecture) \
        | tar -xz -C /usr/local/bin hugo \
     && chmod +x /usr/local/bin/hugo
 
-# Install Quarto using the official .deb package (handles all dependencies properly)
+# Install Quarto from the official tarball.
+# Using tar.gz instead of .deb avoids dpkg and is more reliable in cross-arch
+# (QEMU) builds where GitHub downloads are slower and more prone to transient errors.
 ARG QUARTO_VERSION=1.6.42
 RUN ARCH=$(dpkg --print-architecture) \
-    && curl -fsSL -o /tmp/quarto.deb "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${ARCH}.deb" \
-    && dpkg -i /tmp/quarto.deb \
-    && rm /tmp/quarto.deb
+    && curl -fsSL --retry 5 --retry-delay 10 \
+       "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${ARCH}.tar.gz" \
+       | tar -xz -C /opt \
+    && ln -s "/opt/quarto-${QUARTO_VERSION}/bin/quarto" /usr/local/bin/quarto
 
 # Create working directory
 WORKDIR /workspace

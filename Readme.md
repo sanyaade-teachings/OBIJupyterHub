@@ -2,14 +2,14 @@
 
 ## Intended use
 
-This project packages the MetabarcodingSchool training lab into one reproducible bundle. You get Python, R, and Bash kernels, a Quarto-built course website, and preconfigured admin/student accounts, so onboarding a class is a single command instead of a day of setup. Everything runs locally on a single machine, student work persists between sessions, and `./start-jupyterhub.sh` takes care of building images, rendering the site, preparing volumes, and bringing JupyterHub up at `http://localhost:8888`. Defaults (accounts, passwords, volumes) live in the repo so instructors can tweak them quickly.
+This project packages the MetabarcodingSchool training lab into one reproducible bundle. You get Python, R, and Bash kernels, a Quarto-built course website, and preconfigured admin/student accounts, so onboarding a class is a single command instead of a day of setup. Everything runs locally on a single machine, student work persists between sessions, and `./start-jupyterhub.sh` takes care of pulling images, rendering the site, preparing volumes, and bringing JupyterHub up at `http://localhost:8888`.
 
 ## Prerequisites (with quick checks)
 
 You only need **Docker and Docker Compose** on the machine that will host the lab. All other tools (Quarto, Hugo, Python, R) are provided via a builder Docker image and do not need to be installed on your system.
 
 - macOS: install [OrbStack](https://orbstack.dev/) (recommended) or Docker Desktop; both ship Docker Engine and Compose.
-- Linux: install Docker Engine and the Compose plugin from your distribution (e.g., `sudo apt install docker.io docker-compose-plugin`) or from Docker’s official packages.
+- Linux: install Docker Engine and the Compose plugin (`sudo apt install docker.io docker-compose-plugin`) or from Docker's official packages.
 - Windows: install Docker Desktop with the WSL2 backend enabled.
 
 Verify from a terminal:
@@ -19,263 +19,268 @@ docker --version
 docker compose version    # or: docker-compose --version
 ```
 
-## How the startup script works
+## Three operating modes
 
-`./start-jupyterhub.sh` is the single entry point. It builds the Docker images, renders the course website, prepares the volume folders, and starts the stack. Internally it:
+`./start-jupyterhub.sh` has three modes that control how Docker images are obtained:
 
-- creates the `jupyterhub_volumes/` tree (caddy, course, shared, users, web...)
-- builds the `obijupyterhub-builder` image (contains Quarto, Hugo, R, Python) if not already present
-- builds `jupyterhub-student` and `jupyterhub-hub` images
-- detects R package dependencies from Quarto files using the `{attachment}` package and installs them automatically
-- renders the Quarto site from `web_src/`, generates PDF galleries and `pages.json`, and copies everything into `jupyterhub_volumes/web/`
-- runs `docker-compose up -d --remove-orphans`
+| Mode | Flag | Description |
+|------|------|-------------|
+| **Pull** (default) | *(none)* | Pull pre-built images from the registry and start |
+| **Local build** | `--local-build` | Build images locally on your machine and start (no push) |
+| **Publish** | `--publish` | Build multi-arch images (amd64 + arm64), push to registry, then start |
 
-### Builder image
+### Pull mode — default, fastest
 
-The builder image (`obijupyterhub-builder`) contains all the tools needed to prepare the course materials:
+```bash
+./start-jupyterhub.sh
+```
 
-- **Quarto** for rendering the course website
-- **Hugo** for building the obidoc documentation
-- **R** with the `{attachment}` package for automatic dependency detection
-- **Python 3** for utility scripts
+Downloads the three pre-built images from `registry.metabarcoding.org/metabarschool/`:
+- `obijupyterhub-builder:latest`
+- `obijupyterhub-hub:latest`
+- `obijupyterhub-student:latest`
 
-This means you don't need to install any of these tools on your host system. The script automatically builds this image on first run and reuses it for subsequent builds. Use `--force-rebuild` to rebuild the builder image if needed.
+This is what instructors should use in class. No compilation, no wait.
 
-### R package caching for builds
+### Local build mode — for development
 
-R packages required by your Quarto documents are automatically detected and installed during the build process. These packages are cached in `jupyterhub_volumes/builder/R_packages/` so they persist across builds. This means:
+```bash
+./start-jupyterhub.sh --local-build
+```
 
-- **First build**: All R packages used in your `.qmd` files are detected and installed (may take some time)
-- **Subsequent builds**: Only missing packages are installed, making builds much faster
-- **Adding new packages**: Simply use `library(newpackage)` in your Quarto files; the build process will detect and install it automatically
+Builds all three images locally using the Dockerfiles in `obijupyterhub/`. Rebuilt images stay on your machine and are not pushed to the registry. Additional flags apply only in this mode:
 
-To clear the R package cache and force a fresh installation, delete the `jupyterhub_volumes/builder/R_packages/` directory.
+| Flag | Effect |
+|------|--------|
+| `--no-build` / `--offline` | Skip all image operations, use whatever is already local |
+| `--force-rebuild` | Rebuild all images without Docker cache |
+| `--rebuild-builder` | Force rebuild the builder image only |
+| `--rebuild-student` | Force rebuild the student image only |
+| `--rebuild-hub` | Force rebuild the JupyterHub image only |
 
-You can tailor what it does with a few flags:
+`--rebuild-*` and `--force-rebuild` imply `--local-build` automatically.
 
-- `--no-build` (or `--offline`): skip Docker image builds and reuse existing images (useful when offline).
-- `--force-rebuild`: rebuild images without cache.
-- `--stop-server`: stop the stack and remove student containers, then exit.
-- `--update-lectures`: rebuild the course website only (no Docker stop/start).
-- `--build-obidoc`: force rebuilding the obidoc documentation (auto-built if empty; skipped in offline mode).
+### Publish mode — for maintainers
+
+```bash
+./start-jupyterhub.sh --publish
+```
+
+Builds all three images for both `linux/amd64` and `linux/arm64` using `docker buildx`, then pushes them to the registry tagged with both `:latest` and the version from `version.txt`. Requires write access to the registry and `docker buildx` with a `docker-container` driver.
+
+**Before publishing a new version**, bump `version.txt` at the project root:
+
+```
+0.2.0
+```
+
+## Actions (all modes)
+
+These flags work alongside any mode:
+
+| Flag | Effect |
+|------|--------|
+| `--stop-server` | Stop the stack and remove student containers, then exit |
+| `--update-lectures` | Rebuild the course website only (no Docker stop/start) |
+| `--build-obidoc` | Force rebuild of the obidoc documentation |
 
 ## Installation and first run
 
-1) Clone the project:
+1. Clone the project:
 
 ```bash
 git clone https://forge.metabarcoding.org/MetabarcodingSchool/OBIJupyterHub.git
 cd OBIJupyterHub
 ```
 
-2) (Optional) glance at the structure you’ll populate:
+2. Repository structure:
 
-```         
-OBIJupyterHub
-├── start-jupyterhub.sh                  - single entry point (build + render + start)
-├── obijupyterhub                        - Docker images and stack definitions
-│   ├── docker-compose.yml
-│   ├── install_R_packages.R             - An R script used to install all need R packages
-│   ├── Dockerfile                       - Image used by the students
-│   ├── Dockerfile.hub                   - Image for the jupyter hub
-│   ├── Dockerfile.builder               - Image for the builder
-│   └── jupyterhub_config.py
-├── jupyterhub_volumes                   - data persisted on the host
-│   ├── builder                          - R packages cache for building lectures
-│   ├── course                           - read-only for students (notebooks, data, bin, R packages)
-│   ├── shared                           - shared read/write space for everyone
-│   ├── users                            - per-user persistent data
-│   └── web                              - rendered course website
-└── web_src                              - Quarto sources for the course website
+```
+OBIJupyterHub/
+├── start-jupyterhub.sh              single entry point
+├── version.txt                      current image version number
+├── obijupyterhub/
+│   ├── docker-compose.yml
+│   ├── Dockerfile                   student image
+│   ├── Dockerfile.hub               JupyterHub image
+│   ├── Dockerfile.builder           builder image (Quarto, Hugo, R, Python)
+│   └── jupyterhub_config.py
+├── jupyterhub_volumes/              data persisted on the host
+│   ├── builder/R_packages/          R package cache for building lectures
+│   ├── course/                      read-only for students (notebooks, data, bin)
+│   ├── shared/                      shared read/write space for everyone
+│   ├── users/                       per-user persistent data
+│   └── web/                         rendered course website
+├── tools/
+│   ├── install_quarto_deps.R        automatic R dependency detection and install
+│   └── install_packages.sh          install shared R packages into course/
+└── web_src/                         Quarto sources for the course website
 ```
 
-Note: The `tools/` directory contains utility scripts including `install_quarto_deps.R` for automatic R dependency detection.
+3. (Optional) place course materials in `jupyterhub_volumes/course/` before first run.
 
-3) Prepare course materials (optional before first run):
-- Put notebooks, datasets, scripts, binaries, or PDFs for students under `jupyterhub_volumes/course/`. They will appear read-only at `/home/jovyan/work/course/`.
-- For collaborative work, drop files in `jupyterhub_volumes/shared/` (read/write for all at `/home/jovyan/work/shared/`).
-- Edit or add Quarto sources in `web_src/` to update the course website; the script will render them.
-
-4) Start everything (build + render + launch):
+4. Start everything:
 
 ```bash
-./start-jupyterhub.sh
+./start-jupyterhub.sh            # pulls images from registry (recommended)
+# or
+./start-jupyterhub.sh --local-build   # builds locally
 ```
 
-5) Access JupyterHub in a browser at `http://localhost:8888`.
+5. Access JupyterHub at `http://localhost:8888`.
 
-6) Stop the stack when you’re done (run from `obijupyterhub/`):
+6. Stop when done:
 
 ```bash
+./start-jupyterhub.sh --stop-server
+# or from obijupyterhub/
 docker-compose down
 ```
 
-### Operating the stack (one command, a few options)
+## How the builder image works
 
-- Start or rebuild: `./start-jupyterhub.sh` (rebuilds images, regenerates the website, starts the stack).
-- Start without rebuilding images (offline): `./start-jupyterhub.sh --no-build`
-- Force rebuild without cache: `./start-jupyterhub.sh --force-rebuild`
-- Stop only: `./start-jupyterhub.sh --stop-server`
-- Rebuild website only (no Docker stop/start): `./start-jupyterhub.sh --update-lectures`
-- Rebuild obidoc docs: `./start-jupyterhub.sh --build-obidoc` (also builds automatically if `jupyterhub_volumes/web/obidoc` is empty; skipped in offline mode)
-- Access at `http://localhost:8888` (students: any username / password `metabar2025`; admin: `admin` / `admin2025`).
-- Check logs from `obijupyterhub/` with `docker-compose logs -f jupyterhub`.
-- Stop with `docker-compose down` (from `obijupyterhub/`). Rerun `./start-jupyterhub.sh` to start again or after config changes.
+The `obijupyterhub-builder` image contains Quarto, Hugo, R, and Python — you do not need any of these on your host. The script runs this image as a temporary container to:
 
-## Managing shared data
+- detect R package dependencies from your `.qmd` files (scans `library()`, `require()`, and `remotes::install_git/github()` calls using base R — no external package required)
+- install missing R packages into `jupyterhub_volumes/builder/R_packages/` (cached between runs)
+- render the Quarto website from `web_src/`
+- generate PDF galleries and `pages.json`
+- (optionally) build the obidoc documentation with Hugo
 
-Each student lands in `/home/jovyan/work/` with three key areas: their own files, a shared space, and a read-only course space. Everything under `work/` is persisted on the host in `jupyterhub_volumes`.
+### R package caching
 
-```         
-work/                             # Personal workspace root (persistent)
-├── [student files]               # Their own files and notebooks
-├── R_packages/                   # Personal R packages (writable by student)
-├── shared/                       # Shared workspace (read/write, shared with all)
-└── course/                       # Course files (read-only, managed by admin)
-    ├── R_packages/               # Shared R packages (read-only, installed by prof)
-    ├── bin/                      # Shared executables (in PATH)
-    └── [course materials]        # Your course files
+Packages are cached in `jupyterhub_volumes/builder/R_packages/`:
+
+- **First build**: all packages used in your `.qmd` files are detected and installed (may take a while).
+- **Subsequent builds**: only new packages are installed, making builds much faster.
+- **Non-CRAN packages**: packages installed via `remotes::install_git()` or `remotes::install_github()` in your `.qmd` files are detected and pre-installed automatically before rendering.
+- **Clear the cache**: delete `jupyterhub_volumes/builder/R_packages/` to force a full reinstall.
+
+## Managing course and student data
+
+Each student lands in `/home/jovyan/work/` with three areas:
+
+```
+work/
+├── [student files]         personal workspace (persistent)
+├── R_packages/             personal R packages (writable by student)
+├── shared/                 shared space (read/write, all students)
+└── course/                 course files (read-only)
+    ├── R_packages/         shared R packages installed by the instructor
+    ├── bin/                shared executables (added to PATH)
+    └── [course materials]
 ```
 
-R looks for packages in this order: personal `work/R_packages/`, then shared `work/course/R_packages/`, then system libraries. Because everything lives under `work/`, student files survive restarts.
+On the host, place course files in `jupyterhub_volumes/course/`, collaborative files in `jupyterhub_volumes/shared/`, and collect student work from `jupyterhub_volumes/users/`.
 
-### User Accounts
+### Installing shared R packages (instructor)
 
-Defaults are defined in `obijupyterhub/docker-compose.yml`: admin (`admin` / `admin2025`) with write access to `course/`, and students (any username, password `metabar2025`) with read-only access to `course/`. Adjust `JUPYTERHUB_ADMIN_PASSWORD` and `JUPYTERHUB_PASSWORD` there, then rerun `./start-jupyterhub.sh`.
-
-### Installing R Packages (Admin Only)
-
-From the host, install shared R packages into `course/R_packages/`:
-
-``` bash
-# Install packages
+```bash
 tools/install_packages.sh reshape2 plotly knitr
 ```
 
-Students can install their own packages into their personal `work/R_packages/`:
+### Installing personal R packages (students)
 
 ```r
-# Install in personal library (each student has their own)
-install.packages('mypackage')  # Will install in work/R_packages/
+install.packages('mypackage')   # installs into work/R_packages/
 ```
 
-### Using R Packages (Students)
+### Loading packages (students)
 
-Students simply load packages normally:
-
-``` r
-library(reshape2)  # R checks: 1) work/R_packages/ 2) work/course/R_packages/ 3) system
-library(plotly)
+```r
+library(reshape2)   # searches: work/R_packages/ → work/course/R_packages/ → system
 ```
 
-R automatically searches in this order: 
+## User accounts
 
-1. Personal packages: `/home/jovyan/work/R_packages/` (R_LIBS_USER) 
-1. Prof packages: `/home/jovyan/work/course/R_packages/` (R_LIBS_SITE) 
-1. System packages
+Defaults are set in `obijupyterhub/docker-compose.yml`:
 
-### List Available Packages
+| Account | Username | Password |
+|---------|----------|----------|
+| Admin | `admin` | `admin2025` |
+| Students | any | `metabar2025` |
 
-``` r
-# List all available packages (personal + course + system)
-installed.packages()[,"Package"]
+Change `JUPYTERHUB_ADMIN_PASSWORD` and `JUPYTERHUB_PASSWORD` in the compose file, then rerun `./start-jupyterhub.sh`.
 
-# Check personal packages
-list.files("/home/jovyan/work/R_packages")
+To restrict access to a predefined list, edit `jupyterhub_config.py`:
 
-# Check course packages (installed by prof)
-list.files("/home/jovyan/work/course/R_packages")
-```
-
-### Deposit or retrieve course and student files
-
-On the host, place course files in `jupyterhub_volumes/course/` (they appear read-only to students), shared files in `jupyterhub_volumes/shared/`, and collect student work from `jupyterhub_volumes/users/`.
-
-## User Management
-
-### Option 1: Predefined User List
-
-In `jupyterhub_config.py`, uncomment and modify:
-
-``` python
+```python
 c.Authenticator.allowed_users = {'student1', 'student2', 'student3'}
 ```
 
-### Option 2: Allow Everyone (for testing)
+## Customising the images
 
-By default, the configuration allows any user:
+All image customisations require a rebuild. Use `--local-build` (or the targeted `--rebuild-*` flag) to apply changes locally, or `--publish` to push them to the registry.
 
-``` python
-c.Authenticator.allow_all = True
-```
+### Add R packages baked into the student image
 
-⚠️ **Warning**: DummyAuthenticator is ONLY for local testing!
+Edit `obijupyterhub/Dockerfile` (before `USER ${NB_UID}`):
 
-## Kernel Verification
-
-Once logged in, create a new notebook and verify you have access to: 
-
-- **Python 3** (default kernel) 
-- **R** (R kernel) 
-- **Bash** (bash kernel)
-
-## Customization for Your Labs
-
-### Add Additional R Packages
-
-Modify the `Dockerfile` (before `USER ${NB_UID}`):
-
-``` dockerfile
+```dockerfile
 RUN R -e "install.packages(c('your_package'), repos='http://cran.rstudio.com/')"
 ```
 
-Then rerun `./start-jupyterhub.sh` to rebuild and restart.
+Then rebuild:
 
-### Add Python Packages
+```bash
+./start-jupyterhub.sh --rebuild-student
+```
 
-Add to the `Dockerfile` (before `USER ${NB_UID}`):
+### Add Python packages
 
-``` dockerfile
+Edit `obijupyterhub/Dockerfile` (before `USER ${NB_UID}`):
+
+```dockerfile
 RUN pip install numpy pandas matplotlib seaborn
 ```
 
-Then rerun `./start-jupyterhub.sh` to rebuild and restart.
+Then rebuild:
 
-### Change Port (if 8000 is occupied)
-
-Modify in `docker-compose.yml`:
-
-``` yaml
-ports:
-  - "8001:8000"  # Accessible on localhost:8001
+```bash
+./start-jupyterhub.sh --rebuild-student
 ```
 
-## Advantages of This Approach
+### Change the listening port
 
-✅ **Everything in Docker**: No need to install Python/JupyterHub on your computer\
-✅ **Portable**: Easy to deploy on another server\
-✅ **Isolated**: No pollution of your system environment\
-✅ **Easy to Clean**: A simple `docker-compose down` is enough\
-✅ **Reproducible**: Students will have exactly the same environment
+In `obijupyterhub/docker-compose.yml`:
+
+```yaml
+ports:
+  - "8001:80"   # accessible at http://localhost:8001
+```
 
 ## Troubleshooting
 
-- Docker daemon unavailable: make sure OrbStack/Docker Desktop/daemon is running; verify `/var/run/docker.sock` exists.
-- Student containers do not start: check `docker-compose logs jupyterhub` and confirm the images exist with `docker images | grep jupyterhub-student`.
-- Port conflict: change the published port in `docker-compose.yml`.
+**Docker daemon unavailable**: make sure OrbStack / Docker Desktop / the daemon is running.
 
+**Student containers do not start**: run `docker-compose logs jupyterhub` from `obijupyterhub/` and confirm the student image is present:
 
-**I want to start from scratch**:
+```bash
+docker images | grep obijupyterhub-student
+```
 
-``` bash
-pushd obijupyterhub
+**Port conflict**: change the published port in `docker-compose.yml`.
+
+**Registry pull fails**: check your network, or fall back to a local build:
+
+```bash
+./start-jupyterhub.sh --local-build
+```
+
+**Start from scratch**:
+
+```bash
+./start-jupyterhub.sh --stop-server
+
+cd obijupyterhub
 docker-compose down -v
-docker rmi jupyterhub-hub jupyterhub-student obijupyterhub-builder
-popd
+docker rmi jupyterhub-hub jupyterhub-student obijupyterhub-builder 2>/dev/null || true
+docker rmi registry.metabarcoding.org/metabarschool/obijupyterhub-hub:latest \
+           registry.metabarcoding.org/metabarschool/obijupyterhub-student:latest \
+           registry.metabarcoding.org/metabarschool/obijupyterhub-builder:latest 2>/dev/null || true
+cd ..
 
-# Optionally clear the R package cache
-rm -rf jupyterhub_volumes/builder/R_packages
+rm -rf jupyterhub_volumes/builder/R_packages   # clear R package cache
 
-# Then rebuild everything
-./start-jupyterhub.sh
+./start-jupyterhub.sh   # pull fresh images and start
 ```
