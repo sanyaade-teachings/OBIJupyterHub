@@ -82,7 +82,8 @@ These flags work alongside any mode:
 |------|--------|
 | `--stop-server` | Stop the stack and remove student containers, then exit |
 | `--update-lectures` | Rebuild the course website only (no Docker stop/start) |
-| `--build-obidoc` | Force rebuild of the obidoc documentation |
+| `--update-obidoc` | Rebuild the obidoc documentation only (no Docker stop/start) |
+| `--build-obidoc` | Force rebuild of obidoc documentation on next full start |
 
 ## Installation and first run
 
@@ -155,6 +156,48 @@ Packages are cached in `jupyterhub_volumes/builder/R_packages/`:
 - **Subsequent builds**: only new packages are installed, making builds much faster.
 - **Non-CRAN packages**: packages installed via `remotes::install_git()` or `remotes::install_github()` in your `.qmd` files are detected and pre-installed automatically before rendering.
 - **Clear the cache**: delete `jupyterhub_volumes/builder/R_packages/` to force a full reinstall.
+
+## OBITools documentation (obidoc)
+
+The OBITools4 documentation is built from the [`obitools4-doc`](https://github.com/metabarcoding/obitools4-doc) repository using Hugo and served as a static site at `http://localhost:8888/obidoc/`.
+
+### How it works
+
+The builder container clones the repository (with all submodules), runs `hugo build`, and writes the generated HTML into `jupyterhub_volumes/web/obidoc/`. Caddy then serves these files directly — no special routing is needed.
+
+### First installation
+
+The documentation is built automatically on the first full start if `jupyterhub_volumes/web/obidoc/` is empty:
+
+```bash
+./start-jupyterhub.sh
+```
+
+To force a build even if the directory is already populated, use `--build-obidoc` during a full start:
+
+```bash
+./start-jupyterhub.sh --build-obidoc
+```
+
+### Updating the documentation
+
+To rebuild the documentation without stopping the running stack:
+
+```bash
+./start-jupyterhub.sh --update-obidoc
+```
+
+This pulls the latest version of the builder image (or uses the local one with `--local-build`), reclones the `obitools4-doc` repository, rebuilds the site, and replaces the contents of `jupyterhub_volumes/web/obidoc/`. The JupyterHub stack keeps running throughout.
+
+### Removing the documentation
+
+To remove the built documentation (e.g. to free disk space or force a clean rebuild):
+
+```bash
+rm -rf jupyterhub_volumes/web/obidoc/*
+```
+
+The next `./start-jupyterhub.sh` will rebuild it automatically.
 
 ## Managing course and student data
 

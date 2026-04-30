@@ -33,6 +33,7 @@ RUN apt-get update \
        libtiff5-dev \
        libjpeg-dev \
        libuv1-dev \
+       golang-go \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -44,7 +45,7 @@ RUN mkdir -p ${R_LIBS_BUILDER} \
 
 # Install Hugo (extended version for SCSS support)
 # Detect architecture and download appropriate binary
-ARG HUGO_VERSION=0.140.2
+ARG HUGO_VERSION=0.159.2
 RUN ARCH=$(dpkg --print-architecture) \
     && case "$ARCH" in \
          amd64) HUGO_ARCH="amd64" ;; \
