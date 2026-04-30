@@ -1,11 +1,8 @@
 services:
   jupyterhub:
-    build:
-      context: .
-      dockerfile: Dockerfile.hub
     container_name: jupyterhub
     hostname: jupyterhub
-    image: jupyterhub-hub:latest
+    image: ${HUB_IMAGE:-registry.metabarcoding.org/metabarschool/obijupyterhub-hub:latest}
     expose:
       - "8000"
     volumes:
@@ -21,6 +18,8 @@ services:
       - jupyterhub-network
     restart: unless-stopped
     environment:
+      # Docker image used for student containers (read by jupyterhub_config.py)
+      STUDENT_IMAGE: ${STUDENT_IMAGE:-registry.metabarcoding.org/metabarschool/obijupyterhub-student:latest}
       # Shared password for all students
       JUPYTERHUB_PASSWORD: metabar2025
       # Admin password (for installing R packages)
