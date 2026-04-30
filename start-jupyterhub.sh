@@ -20,6 +20,9 @@ FORCE_REBUILD=false
 STOP_SERVER=false
 UPDATE_LECTURES=false
 BUILD_OBIDOC=false
+REBUILD_BUILDER=false
+REBUILD_STUDENT=false
+REBUILD_HUB=false
 
 usage() {
     cat <<EOF
@@ -27,7 +30,10 @@ Usage: ./start-jupyterhub.sh [options]
 
 Options:
   --no-build | --offline   Skip Docker image builds (use existing images)
-  --force-rebuild          Rebuild images without cache
+  --force-rebuild          Rebuild all images without cache
+  --rebuild-builder        Force rebuild the builder image only
+  --rebuild-student        Force rebuild the student image only
+  --rebuild-hub            Force rebuild the JupyterHub image only
   --stop-server            Stop the stack and remove student containers, then exit
   --update-lectures        Rebuild the course website only (no Docker stop/start)
   --build-obidoc           Force rebuild of obidoc documentation
@@ -43,6 +49,9 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --no-build|--offline) NO_BUILD=true ;;
         --force-rebuild) FORCE_REBUILD=true ;;
+        --rebuild-builder) REBUILD_BUILDER=true ;;
+        --rebuild-student) REBUILD_STUDENT=true ;;
+        --rebuild-hub) REBUILD_HUB=true ;;
         --stop-server) STOP_SERVER=true ;;
         --update-lectures) UPDATE_LECTURES=true ;;
         --build-obidoc) BUILD_OBIDOC=true ;;
@@ -102,6 +111,7 @@ get_file_timestamp() {
 check_if_image_needs_rebuild() {
     local image_name="$1"
     local dockerfile="$2"
+    local force="${3:-false}"
 
     echo -e "${BLUE}Checking image ${image_name}...${NC}"
 
@@ -111,8 +121,8 @@ check_if_image_needs_rebuild() {
         return 0  # Need to build (image doesn't exist)
     fi
 
-    # If force rebuild, always rebuild
-    if $FORCE_REBUILD; then
+    # If force rebuild (global or per-image), always rebuild
+    if $FORCE_REBUILD || $force; then
         echo -e "${YELLOW}Docker image build is forced.${NC}"
         return 0  # Need to rebuild
     fi
@@ -137,9 +147,9 @@ check_if_image_needs_rebuild() {
 }
 
 build_builder_image() {
-    if check_if_image_needs_rebuild "$BUILDER_IMAGE" "Dockerfile.builder"; then
+    if check_if_image_needs_rebuild "$BUILDER_IMAGE" "Dockerfile.builder" "$REBUILD_BUILDER"; then
         local build_flag=()
-        if $FORCE_REBUILD; then
+        if $FORCE_REBUILD || $REBUILD_BUILDER; then
             build_flag+=(--no-cache)
         fi
 
@@ -178,25 +188,28 @@ build_images() {
         return
     fi
 
-    local build_flag=()
-    if $FORCE_REBUILD; then
-        build_flag+=(--no-cache)
-    fi
-
     # Check and build student image
-    if check_if_image_needs_rebuild "jupyterhub-student:latest" "Dockerfile"; then
+    if check_if_image_needs_rebuild "jupyterhub-student:latest" "Dockerfile" "$REBUILD_STUDENT"; then
+        local student_flag=()
+        if $FORCE_REBUILD || $REBUILD_STUDENT; then
+            student_flag+=(--no-cache)
+        fi
         echo ""
         echo -e "${BLUE}Building student image...${NC}"
-        docker build "${build_flag[@]}" -t jupyterhub-student:latest -f Dockerfile .
+        docker build "${student_flag[@]}" -t jupyterhub-student:latest -f Dockerfile .
     else
         echo -e "${BLUE}Student image is up to date, skipping build.${NC}"
     fi
 
     # Check and build JupyterHub image
-    if check_if_image_needs_rebuild "jupyterhub-hub:latest" "Dockerfile.hub"; then
+    if check_if_image_needs_rebuild "jupyterhub-hub:latest" "Dockerfile.hub" "$REBUILD_HUB"; then
+        local hub_flag=()
+        if $FORCE_REBUILD || $REBUILD_HUB; then
+            hub_flag+=(--no-cache)
+        fi
         echo ""
         echo -e "${BLUE}Building JupyterHub image...${NC}"
-        docker build "${build_flag[@]}" -t jupyterhub-hub:latest -f Dockerfile.hub .
+        docker build "${hub_flag[@]}" -t jupyterhub-hub:latest -f Dockerfile.hub .
     else
         echo -e "${BLUE}JupyterHub image is up to date, skipping build.${NC}"
     fi

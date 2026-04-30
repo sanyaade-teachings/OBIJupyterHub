@@ -32,6 +32,7 @@ RUN apt-get update \
        libpng-dev \
        libtiff5-dev \
        libjpeg-dev \
+       libuv1-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
