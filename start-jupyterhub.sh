@@ -38,6 +38,7 @@ REBUILD_HUB=false
 # Actions
 STOP_SERVER=false
 UPDATE_LECTURES=false
+UPDATE_OBIDOC=false
 BUILD_OBIDOC=false
 
 usage() {
@@ -58,7 +59,8 @@ Build options (--local-build only):
 Actions:
   --stop-server            Stop the stack and remove student containers, then exit
   --update-lectures        Rebuild the course website only (no Docker stop/start)
-  --build-obidoc           Force rebuild of obidoc documentation
+  --update-obidoc          Rebuild the obidoc documentation only (no Docker stop/start)
+  --build-obidoc           Force rebuild of obidoc documentation on next full start
   -h, --help               Show this help
 EOF
 }
@@ -76,6 +78,7 @@ while [[ $# -gt 0 ]]; do
         --rebuild-hub)         REBUILD_HUB=true; LOCAL_BUILD=true ;;
         --stop-server)         STOP_SERVER=true ;;
         --update-lectures)     UPDATE_LECTURES=true ;;
+        --update-obidoc)       UPDATE_OBIDOC=true ;;
         --build-obidoc)        BUILD_OBIDOC=true ;;
         -h|--help) usage; exit 0 ;;
         *) echo "Unknown option: $1" >&2; usage; exit 1 ;;
@@ -387,7 +390,7 @@ build_obidoc() {
               -j 8 \
               https://github.com/metabarcoding/obitools4-doc.git
         cd obitools4-doc
-        hugo -D build --baseURL "/obidoc/"
+        hugo --gc --minify --buildDrafts --baseURL "/obidoc/"
         mkdir -p /workspace/jupyterhub_volumes/web/obidoc
         rm -rf /workspace/jupyterhub_volumes/web/obidoc/*
         mv public/* /workspace/jupyterhub_volumes/web/obidoc/
@@ -494,6 +497,19 @@ if $UPDATE_LECTURES; then
             || echo -e "${YELLOW}Could not pull builder image, using local cache.${NC}"
     fi
     build_website
+    popd >/dev/null
+    exit 0
+fi
+
+if $UPDATE_OBIDOC; then
+    if $LOCAL_BUILD; then
+        build_builder_image
+    elif ! $NO_BUILD; then
+        docker pull "$BUILDER_IMAGE" 2>/dev/null \
+            || echo -e "${YELLOW}Could not pull builder image, using local cache.${NC}"
+    fi
+    BUILD_OBIDOC=true
+    build_obidoc
     popd >/dev/null
     exit 0
 fi
