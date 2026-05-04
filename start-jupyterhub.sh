@@ -266,17 +266,15 @@ publish_images() {
     version=$(read_version)
 
     # docker buildx --push uses Docker's own credential store, independent of
-    # skopeo. Verify auth early to get a clear error before a long build.
-    echo -e "${BLUE}Checking registry authentication...${NC}"
+    # skopeo. Prompt once before the (long) build so the user isn't surprised
+    # by an auth failure at the very end.
     local registry_host="${REGISTRY%%/*}"
-    if ! docker login "$registry_host" >/dev/null 2>&1; then
-        echo -e "${YELLOW}Not logged in to ${registry_host}. Running docker login...${NC}"
-        docker login "$registry_host" || {
-            echo "Error: authentication to ${registry_host} failed." >&2
-            echo "Run: docker login ${registry_host}" >&2
-            exit 1
-        }
-    fi
+    echo -e "${BLUE}Authenticating to ${registry_host} (required to push)...${NC}"
+    docker login "$registry_host" || {
+        echo "Error: authentication to ${registry_host} failed." >&2
+        echo "Run: docker login ${registry_host}" >&2
+        exit 1
+    }
 
     echo ""
     echo -e "${BLUE}Publishing images (version ${version}) to ${REGISTRY}${NC}"
