@@ -4,6 +4,9 @@ project:
   post-render:
     - scripts/copy-to-web.sh
 
+execute:
+  freeze: auto
+
 format:
   html:
     toc: false
